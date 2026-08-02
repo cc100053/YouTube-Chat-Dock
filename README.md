@@ -7,6 +7,7 @@ Not a floating overlay. The video is resized to fit beside the chat, never cover
 - **Drag the divider** to resize. Page mode and fullscreen remember separate widths.
 - **Double-click** the divider to reset.
 - **Chat replay** on VODs works exactly like live chat.
+- **RTL locales** supported — chat docks left, and the divider flips with it.
 - **No permissions.** No API calls, no network requests, no tracking.
 
 ## Install
@@ -36,7 +37,7 @@ Defaults (440px page / 560px fullscreen) are in `dock.css` under `:root`.
 
 ## How it works
 
-Four non-obvious things make this work, each of which took measuring the live DOM to find.
+Five non-obvious things make this work, each of which took measuring the live DOM to find.
 
 **Fullscreen is not an overlay problem.** YouTube already docks chat in fullscreen — it hides `#columns` entirely and moves chat into `#panels-full-bleed-container`, a flex sibling of the player inside `#full-bleed-container`. So resizing is pure flex sizing. No `position: fixed`, no z-index fights. The whole fullscreen section is a handful of `flex` declarations.
 
@@ -44,15 +45,20 @@ Four non-obvious things make this work, each of which took measuring the live DO
 
 **Chat has a hard floor of 298px.** YouTube sets `min-width: 298px` on `<yt-live-chat-app>`. Narrower than that and the app refuses to shrink while its iframe does, so the right edge of every message is clipped by an ancestor's `overflow: hidden`. Releasing that min-width — along with the `min-width: auto` on its flex descendants, which won't shrink below their content — lets chat reflow cleanly down to 120px with zero overflow.
 
+**RTL is not detectable from `<html dir>`.** In right-to-left locales YouTube
+mirrors the layout and docks chat on the left, so the divider must switch edges
+and invert its drag direction. The obvious check fails: with `hl=ar`, YouTube
+leaves `documentElement` at `direction: ltr` and applies `rtl` to `<body>`
+instead. Measured with Arabic loaded — chat at `left: 18, right: 409`, player
+starting at `409`. The side is therefore decided geometrically, by comparing the
+panel's centre to the viewport's, which is immune to which element YouTube tags.
+
 **The chat iframe swallows the pointer.** It's a real `<iframe>`, so once the cursor crosses into it mid-drag the parent stops receiving `pointermove`. Handled with `setPointerCapture` plus a transparent full-viewport shield inserted on `pointerdown`.
 
 CSS is injected by the manifest at `document_start`, so it applies before first paint — no flash of YouTube's default sidebar width.
 
 ## Known limitations
 
-- **RTL locales.** YouTube mirrors its layout in right-to-left languages, putting
-  the sidebar on the left. Widths still apply correctly, but the divider stays on
-  the panel's left edge, so the drag direction feels inverted.
 - **Below 1000px viewport width** YouTube switches to a single-column layout where
   chat sits under the video. The extension deliberately does not apply there.
 - Widths live in `localStorage`, so clearing site data for youtube.com resets them.

@@ -197,6 +197,14 @@ yt-live-chat-app yt-live-chat-text-message-renderer {
   opacity: 1;
 }
 
+/* RTL locales put chat on the left, so the divider grabs its right edge.
+   Flip the readout to stay on the video side. dock.js toggles this class
+   from measured geometry. */
+#ytchat-resizer.ytchat-flip .ytchat-readout {
+  left: auto;
+  right: 14px;
+}
+
 /* Blocks the chat iframe from swallowing the pointer mid-drag. */
 #ytchat-resizer-shield {
   position: fixed;

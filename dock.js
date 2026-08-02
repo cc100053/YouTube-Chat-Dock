@@ -78,6 +78,24 @@
       : document.querySelector('ytd-watch-flexy:not([fullscreen]) ytd-live-chat-frame#chat');
   }
 
+  /* RTL locales mirror the layout and put chat on the LEFT, which flips both
+     the divider's edge and the direction that widens it.
+
+     Detection is geometric on purpose. Reading `direction` off
+     documentElement does NOT work: with hl=ar YouTube leaves <html> at
+     direction:ltr and applies rtl to <body> instead (measured — chat at
+     left:18 right:409, player starting at 409). Measuring where the panel
+     actually sits is immune to which element YouTube decides to flag, and
+     stays correct if that internal detail changes. */
+  function panelOnLeft(rect) {
+    return (rect.left + rect.right) / 2 < window.innerWidth / 2;
+  }
+
+  /* The edge facing the video — the one the divider grabs. */
+  function innerEdge(rect) {
+    return (panelOnLeft(rect) ? rect.right : rect.left) - 5;
+  }
+
   // ---- divider ---------------------------------------------------------
   const handle = document.createElement('div');
   handle.id = 'ytchat-resizer';
@@ -103,9 +121,11 @@
     // Chat closed, collapsed, or below the single-column breakpoint.
     if (r.height < 40 || r.width < 1 || window.innerWidth < 1000) return hide();
     handle.style.display = 'flex';
-    handle.style.left = (r.left - 5) + 'px';
+    handle.style.left = innerEdge(r) + 'px';
     handle.style.top = r.top + 'px';
     handle.style.height = r.height + 'px';
+    // Keep the px readout on the video side of the divider in both directions.
+    handle.classList.toggle('ytchat-flip', panelOnLeft(r));
   }
 
   function endDrag(onMove, onUp) {
@@ -126,6 +146,10 @@
     dragging = true;
     const startX = e.clientX;
     const startW = readWidth();
+    /* Resolved once, at grab time: the side must not flip mid-drag even if a
+       relayout momentarily reports different geometry. */
+    const startEl = panel();
+    const onLeft = startEl ? panelOnLeft(startEl.getBoundingClientRect()) : false;
     handle.classList.add('dragging');
     readout.textContent = startW + 'px';
     try { handle.setPointerCapture(e.pointerId); } catch (err) { /* ignore */ }
@@ -137,11 +161,12 @@
     (document.body || root).appendChild(shield);
 
     const onMove = (ev) => {
-      // Panel is right-anchored: dragging left widens it.
-      const px = writeWidth(startW + (startX - ev.clientX));
+      /* Widen by dragging toward the video: left in LTR, right in RTL. */
+      const delta = onLeft ? (ev.clientX - startX) : (startX - ev.clientX);
+      const px = writeWidth(startW + delta);
       readout.textContent = px + 'px';
       const el = panel();
-      if (el) handle.style.left = (el.getBoundingClientRect().left - 5) + 'px';
+      if (el) handle.style.left = innerEdge(el.getBoundingClientRect()) + 'px';
     };
     const onUp = () => endDrag(onMove, onUp);
 
