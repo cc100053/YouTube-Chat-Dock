@@ -83,6 +83,44 @@ ytd-watch-flexy[fullscreen] .ytp-chrome-bottom {
 }
 
 /* -------------------------------------------------------------
+   2b. Side flip — chat on the other side
+
+   dock.js sets data-ytchat-flip on <html> from localStorage at
+   document_start, so a flipped layout is painted flipped.
+
+   Both containers are plain flex rows (#columns always, and
+   #full-bleed-container because section 2 makes it one), so
+   order:-1 on the chat side is the whole mechanism — it moves
+   the panel to the row's START, which is the left in LTR and
+   the right in RTL. That is why dock.js stores a *flip* rather
+   than a literal side, and why its geometric side detection
+   needs no changes.
+
+   The padding swap restores YouTube's gutters. #secondary
+   carries padding-right (the outer gutter) while #primary
+   carries margin-left (outer) + padding-right (inner). Moved
+   left as-is, that measured 0px against the window edge and a
+   doubled 32px gap against the video; swapping the padding
+   measured 16 / 16 / 16 again, matching the unflipped layout
+   exactly (chat 16..456, video 472..1889 at 1920px wide).
+
+   Measured in LTR. The gutter swap is unverified under RTL,
+   where YouTube's own padding-right lands on the inner edge —
+   worst case there is a cosmetic 0/32 gutter, not a break.
+   ------------------------------------------------------------- */
+@media (min-width: 1000px) {
+  :root[data-ytchat-flip] ytd-watch-flexy:not([fullscreen]) #secondary.ytd-watch-flexy {
+    order: -1 !important;
+    padding-left: var(--ytd-watch-flexy-horizontal-page-margin) !important;
+    padding-right: 0 !important;
+  }
+}
+
+:root[data-ytchat-flip] ytd-watch-flexy[fullscreen] #panels-full-bleed-container {
+  order: -1 !important;
+}
+
+/* -------------------------------------------------------------
    3. Video sizing — all modes
 
    YouTube writes the <video> size as inline width/height/left/top
@@ -205,6 +243,57 @@ yt-live-chat-app yt-live-chat-text-message-renderer {
   right: 14px;
 }
 
+/* Side toggle. Sits on the divider — the only surface this extension owns —
+   and overhangs it on both sides, which is fine: the divider is z-index
+   100000, above both the video and the chat iframe. Hidden during a drag so
+   it never sits under the cursor mid-resize. */
+#ytchat-flip-btn {
+  position: absolute;
+  /* Below the chat header, not beside it: at top:8px this landed 24px from
+     YouTube's own "close chat" ✕ (measured, panel top 68 → button 76..100),
+     which is a misclick waiting to happen. */
+  top: 48px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 24px;
+  height: 24px;
+  padding: 0;
+  border: 0;
+  border-radius: 50%;
+  background: rgba(0, 0, 0, .75);
+  color: #fff;
+  /* System stack: Roboto is not installed on stock macOS or Windows. */
+  font: 600 13px/1 system-ui, -apple-system, "Segoe UI", Roboto, Arial, sans-serif;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity .12s ease, background .12s ease;
+}
+
+#ytchat-resizer:hover #ytchat-flip-btn,
+#ytchat-flip-btn:focus-visible {
+  opacity: 1;
+  pointer-events: auto;
+}
+
+#ytchat-flip-btn:hover {
+  background: #3ea6ff;
+  color: #0f0f0f;
+}
+
+#ytchat-flip-btn:focus-visible {
+  outline: 2px solid #3ea6ff;
+  outline-offset: 2px;
+}
+
+#ytchat-resizer.dragging #ytchat-flip-btn {
+  opacity: 0;
+  pointer-events: none;
+}
+
 /* Blocks the chat iframe from swallowing the pointer mid-drag. */
 #ytchat-resizer-shield {
   position: fixed;
@@ -216,7 +305,8 @@ yt-live-chat-app yt-live-chat-text-message-renderer {
 @media (prefers-reduced-motion: reduce) {
   #ytchat-resizer,
   #ytchat-resizer::before,
-  #ytchat-resizer .ytchat-readout {
+  #ytchat-resizer .ytchat-readout,
+  #ytchat-flip-btn {
     transition: none;
   }
 }

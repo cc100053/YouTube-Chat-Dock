@@ -6,6 +6,7 @@ Not a floating overlay. The video is resized to fit beside the chat, never cover
 
 - **Drag the divider** to resize. Page mode and fullscreen remember separate widths.
 - **Double-click** the divider to reset.
+- **Hover the divider and click ⇄** to move chat to the other side. The choice persists.
 - **Chat replay** on VODs works exactly like live chat.
 - **RTL locales** supported — chat docks left, and the divider flips with it.
 - **No permissions.** No API calls, no network requests, no tracking.
@@ -37,7 +38,7 @@ Defaults (440px page / 560px fullscreen) are in `dock.css` under `:root`.
 
 ## How it works
 
-Five non-obvious things make this work, each of which took measuring the live DOM to find.
+Six non-obvious things make this work, each of which took measuring the live DOM to find.
 
 **Fullscreen is not an overlay problem.** YouTube already docks chat in fullscreen — it hides `#columns` entirely and moves chat into `#panels-full-bleed-container`, a flex sibling of the player inside `#full-bleed-container`. So resizing is pure flex sizing. No `position: fixed`, no z-index fights. The whole fullscreen section is a handful of `flex` declarations.
 
@@ -53,6 +54,16 @@ instead. Measured with Arabic loaded — chat at `left: 18, right: 409`, player
 starting at `409`. The side is therefore decided geometrically, by comparing the
 panel's centre to the viewport's, which is immune to which element YouTube tags.
 
+**Switching sides is one flex property, and it isn't "left".** Both containers
+that can hold chat are flex rows, so `order: -1` on the chat side is the entire
+mechanism — it moves the panel to the row's *start*, which is the left in LTR and
+the right in RTL. The toggle therefore stores a flip, not a literal side, and the
+geometric detection above keeps working without being told anything. Moving chat
+left as-is left it flush against the window and doubled the gap to the video;
+swapping `#secondary`'s horizontal padding restored YouTube's own 16px gutters
+exactly — measured at 1920px wide, chat `16…456` and video `472…1889`, a pixel
+mirror of the unflipped layout.
+
 **The chat iframe swallows the pointer.** It's a real `<iframe>`, so once the cursor crosses into it mid-drag the parent stops receiving `pointermove`. Handled with `setPointerCapture` plus a transparent full-viewport shield inserted on `pointerdown`.
 
 CSS is injected by the manifest at `document_start`, so it applies before first paint — no flash of YouTube's default sidebar width.
@@ -61,6 +72,10 @@ CSS is injected by the manifest at `document_start`, so it applies before first 
 
 - **Below 1000px viewport width** YouTube switches to a single-column layout where
   chat sits under the video. The extension deliberately does not apply there.
+- **The side flip is unverified in true fullscreen and under RTL.** The fullscreen
+  rule is the same `order: -1` on the same kind of flex row, and its failure mode
+  is benign: chat simply stays put. Under RTL the flip works but the gutter
+  correction may be cosmetically off.
 - Widths live in `localStorage`, so clearing site data for youtube.com resets them.
   This is a deliberate trade for zero permissions and no load flicker — see the
   comment in `dock.js`.

@@ -20,6 +20,8 @@
     fs:   { cssVar: '--ytchat-fsw', key: 'ytchat-fsw', def: 560 },
   };
 
+  const FLIP_KEY = 'ytchat-flip';
+
   const root = document.documentElement;
   const inFullscreen = () => !!document.querySelector('ytd-watch-flexy[fullscreen]');
   const mode = () => (inFullscreen() ? MODES.fs : MODES.page);
@@ -52,9 +54,28 @@
     }
   }
 
+  /* The side toggle is stored as a *flip*, not as "left"/"right", because
+     `order: -1` moves a flex item to the row's START — which is the left in
+     LTR and the right in RTL. One boolean therefore means "the other side"
+     in both locales, and the geometric side detection below keeps working
+     without knowing why the panel moved. */
+  let flipped = false;
+
+  function applyFlip(on) {
+    flipped = on;
+    // Attribute, not a class: YouTube owns className on <html>, nothing owns this.
+    if (on) root.setAttribute('data-ytchat-flip', '');
+    else root.removeAttribute('data-ytchat-flip');
+  }
+
   function restore() {
     for (const m of Object.values(MODES)) applyVar(m, clamp(readStored(m)));
     root.style.setProperty('--ytchat-top', TOP_GAP + 'px');
+    try {
+      applyFlip(localStorage.getItem(FLIP_KEY) === '1');
+    } catch (e) {
+      applyFlip(false); // storage disabled / partitioned
+    }
   }
 
   function readWidth() {
@@ -107,6 +128,18 @@
   const readout = document.createElement('span');
   readout.className = 'ytchat-readout';
   handle.appendChild(readout);
+
+  /* The divider is the only surface this extension owns — there is no popup
+     and no chrome.storage — so the side toggle lives on it, revealed on
+     hover. Every listener stops propagation: the divider below it treats
+     pointerdown as "start dragging" and dblclick as "reset width". */
+  const flipBtn = document.createElement('button');
+  flipBtn.id = 'ytchat-flip-btn';
+  flipBtn.type = 'button';
+  flipBtn.textContent = '⇄';
+  flipBtn.title = 'Move chat to the other side';
+  flipBtn.setAttribute('aria-label', 'Move chat to the other side');
+  handle.appendChild(flipBtn);
 
   let shield = null;
   let dragging = false;
@@ -180,6 +213,22 @@
     window.dispatchEvent(new Event('resize'));
     reposition();
   });
+
+  function toggleSide() {
+    applyFlip(!flipped);
+    try { localStorage.setItem(FLIP_KEY, flipped ? '1' : '0'); } catch (e) { /* ignore */ }
+    window.dispatchEvent(new Event('resize'));
+    reposition();
+    // YouTube resizes the player asynchronously; re-measure once it has.
+    setTimeout(() => safeReposition(), 120);
+  }
+
+  flipBtn.addEventListener('pointerdown', (e) => e.stopPropagation());
+  flipBtn.addEventListener('dblclick', (e) => e.stopPropagation());
+  flipBtn.addEventListener('click', safe((e) => {
+    e.stopPropagation();
+    toggleSide();
+  }));
 
   function mount() {
     restore();

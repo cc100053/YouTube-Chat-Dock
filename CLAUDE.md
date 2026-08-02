@@ -48,6 +48,11 @@ Past examples of assumptions that measured false:
 - **The chat is a real `<iframe>` and steals `pointermove` mid-drag.** Both `setPointerCapture` *and* the `#ytchat-resizer-shield` overlay are load-bearing; dropping either makes drags die when the cursor crosses into chat.
 - **Widths are clamped against the live viewport**, not just `MAX`, reserving `KEEP_FOR_VIDEO`. A width saved on a large monitor otherwise restores verbatim onto a laptop and leaves the player a sliver.
 - **Page-mode sizing is gated behind `@media (min-width: 1000px)`.** Below that YouTube stacks chat under the video; forcing a sidebar width there fights the stock responsive layout. The divider hides at the same breakpoint.
+- **The side toggle stores a flip, never a literal "left"/"right".** It works by
+  putting `order: -1` on the chat container, and `order` moves an item to the flex
+  row's *start* — left in LTR, right in RTL. Storing "left" would invert the
+  control in Arabic. The `data-ytchat-flip` attribute on `<html>` is the only
+  interface; `panelOnLeft` still measures, and needs no knowledge of it.
 - **Panel side is resolved geometrically** (`panelOnLeft`: panel centre vs viewport centre) and resolved *once* at `pointerdown` so a relayout cannot flip it mid-drag. The clamp guarantees the panel never reaches half the viewport, so the comparison is never ambiguous.
 
 ## Before publishing to the Chrome Web Store

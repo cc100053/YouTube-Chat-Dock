@@ -1,7 +1,7 @@
 {
   "manifest_version": 3,
   "name": "YouTube Chat Dock",
-  "version": "1.2.0",
+  "version": "1.3.0",
   "description": "Dock YouTube live chat and chat replay as a resizable side panel with a draggable divider. Works in true fullscreen.",
   "homepage_url": "https://github.com/cc100053/YouTube-Chat-Dock",
   "minimum_chrome_version": "88",
