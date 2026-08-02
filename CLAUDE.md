@@ -65,3 +65,5 @@ Past examples of assumptions that measured false:
 ## Conventions
 
 Comments explain *why*, and specifically what was measured — the numbers in them are real observations, not illustrations. Keep that: they are the only record of which YouTube behaviours were verified and when. Commit messages follow the same pattern, stating the measurement that justified the change.
+
+**Commit and push every change without being asked.** Once the work is complete and validated (`node --check`, manifest JSON check, and whatever was measured on the live page), `git add -A`, commit, and `git push origin main`. Commit straight to `main` — that is this repo's entire history, and branching per change fights the intent. The exception is work that is knowingly broken or mid-refactor: say so instead of committing it.
