@@ -23,10 +23,14 @@ Until it's on the Chrome Web Store:
 Widths are set by dragging, and persist in `localStorage`. The bounds live at the top of `dock.js`:
 
 ```js
-const MIN = 120;   // narrowest draggable width
-const MAX = 1100;  // widest
-const TOP_GAP = 72; // gap under the masthead in page mode
+const MIN = 120;             // narrowest draggable width
+const MAX = 1100;            // widest
+const KEEP_FOR_VIDEO = 480;  // player never squeezed below this
+const TOP_GAP = 72;          // gap under the masthead in page mode
 ```
+
+Widths are clamped against the *current* viewport on every load, so a width
+saved on a large monitor won't leave a sliver of video on a laptop.
 
 Defaults (440px page / 560px fullscreen) are in `dock.css` under `:root`.
 
@@ -43,6 +47,17 @@ Four non-obvious things make this work, each of which took measuring the live DO
 **The chat iframe swallows the pointer.** It's a real `<iframe>`, so once the cursor crosses into it mid-drag the parent stops receiving `pointermove`. Handled with `setPointerCapture` plus a transparent full-viewport shield inserted on `pointerdown`.
 
 CSS is injected by the manifest at `document_start`, so it applies before first paint — no flash of YouTube's default sidebar width.
+
+## Known limitations
+
+- **RTL locales.** YouTube mirrors its layout in right-to-left languages, putting
+  the sidebar on the left. Widths still apply correctly, but the divider stays on
+  the panel's left edge, so the drag direction feels inverted.
+- **Below 1000px viewport width** YouTube switches to a single-column layout where
+  chat sits under the video. The extension deliberately does not apply there.
+- Widths live in `localStorage`, so clearing site data for youtube.com resets them.
+  This is a deliberate trade for zero permissions and no load flicker — see the
+  comment in `dock.js`.
 
 ## Files
 

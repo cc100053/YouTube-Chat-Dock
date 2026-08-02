@@ -1,5 +1,6 @@
 /* =============================================================
    YouTube Chat Dock — drag divider
+
    Runs in the top frame only. The chat iframe needs styling
    (dock.css, injected there by the manifest) but no script.
    ============================================================= */
@@ -8,9 +9,11 @@
 
   if (window.top !== window.self) return;
 
-  const MIN = 120;   // narrower than this and chat is unreadable, not broken
+  const MIN = 120;      // narrower than this chat is unreadable, not broken
   const MAX = 1100;
+  const KEEP_FOR_VIDEO = 480; // never let chat squeeze the player below this
   const TOP_GAP = 72;
+  const TICK_MS = 400;
 
   const MODES = {
     page: { cssVar: '--ytchat-w', key: 'ytchat-w', def: 440 },
@@ -21,17 +24,36 @@
   const inFullscreen = () => !!document.querySelector('ytd-watch-flexy[fullscreen]');
   const mode = () => (inFullscreen() ? MODES.fs : MODES.page);
 
+  /* A width saved on a 2560px monitor must not be restored verbatim onto a
+     1280px laptop — that would leave the player a sliver. Clamp against the
+     current viewport every time, not just against the static MAX. */
+  function clamp(px) {
+    const ceiling = Math.max(MIN, Math.min(MAX, window.innerWidth - KEEP_FOR_VIDEO));
+    return Math.round(Math.min(ceiling, Math.max(MIN, px)));
+  }
+
   /* Inline custom properties beat every stylesheet, so a stored width always
-     wins over the defaults in dock.css. */
+     wins over the defaults in dock.css.
+
+     Storage is localStorage rather than chrome.storage.local on purpose:
+     chrome.storage is async, which would paint the default width first and
+     then jump on every page load, and it would require the "storage"
+     permission. Synchronous read at document_start keeps the extension both
+     flicker-free and permission-free. Trade-off: widths are lost if the user
+     clears site data for youtube.com. */
   const applyVar = (m, px) => root.style.setProperty(m.cssVar, px + 'px');
 
-  function restore() {
-    for (const m of Object.values(MODES)) {
-      let saved = null;
-      try { saved = localStorage.getItem(m.key); } catch (e) { /* private mode */ }
-      const px = parseFloat(saved);
-      applyVar(m, Number.isFinite(px) ? Math.min(MAX, Math.max(MIN, px)) : m.def);
+  function readStored(m) {
+    try {
+      const px = parseFloat(localStorage.getItem(m.key));
+      return Number.isFinite(px) ? px : m.def;
+    } catch (e) {
+      return m.def; // storage disabled / partitioned
     }
+  }
+
+  function restore() {
+    for (const m of Object.values(MODES)) applyVar(m, clamp(readStored(m)));
     root.style.setProperty('--ytchat-top', TOP_GAP + 'px');
   }
 
@@ -42,9 +64,9 @@
 
   function writeWidth(px) {
     const m = mode();
-    px = Math.round(Math.min(MAX, Math.max(MIN, px)));
+    px = clamp(px);
     applyVar(m, px);
-    try { localStorage.setItem(m.key, String(px)); } catch (e) { /* private mode */ }
+    try { localStorage.setItem(m.key, String(px)); } catch (e) { /* ignore */ }
     return px;
   }
 
@@ -60,6 +82,10 @@
   const handle = document.createElement('div');
   handle.id = 'ytchat-resizer';
   handle.title = 'Drag to resize chat · double-click to reset';
+  handle.setAttribute('role', 'separator');
+  handle.setAttribute('aria-orientation', 'vertical');
+  handle.setAttribute('aria-label', 'Resize chat panel');
+
   const readout = document.createElement('span');
   readout.className = 'ytchat-readout';
   handle.appendChild(readout);
@@ -67,16 +93,31 @@
   let shield = null;
   let dragging = false;
 
+  function hide() { handle.style.display = 'none'; }
+
   function reposition() {
     if (dragging) return;
     const el = panel();
-    if (!el) { handle.style.display = 'none'; return; }
+    if (!el) return hide();
     const r = el.getBoundingClientRect();
-    if (r.height < 40 || r.width < 1) { handle.style.display = 'none'; return; }
+    // Chat closed, collapsed, or below the single-column breakpoint.
+    if (r.height < 40 || r.width < 1 || window.innerWidth < 1000) return hide();
     handle.style.display = 'flex';
     handle.style.left = (r.left - 5) + 'px';
     handle.style.top = r.top + 'px';
     handle.style.height = r.height + 'px';
+  }
+
+  function endDrag(onMove, onUp) {
+    dragging = false;
+    handle.classList.remove('dragging');
+    handle.removeEventListener('pointermove', onMove);
+    handle.removeEventListener('pointerup', onUp);
+    handle.removeEventListener('pointercancel', onUp);
+    if (shield) { shield.remove(); shield = null; }
+    // Nudge YouTube into recomputing its own player layout.
+    window.dispatchEvent(new Event('resize'));
+    reposition();
   }
 
   handle.addEventListener('pointerdown', (e) => {
@@ -87,13 +128,13 @@
     const startW = readWidth();
     handle.classList.add('dragging');
     readout.textContent = startW + 'px';
-    handle.setPointerCapture(e.pointerId);
+    try { handle.setPointerCapture(e.pointerId); } catch (err) { /* ignore */ }
 
     /* Pointer capture alone isn't enough insurance: the shield also stops the
        chat iframe hit-testing the pointer away mid-drag. */
     shield = document.createElement('div');
     shield.id = 'ytchat-resizer-shield';
-    document.body.appendChild(shield);
+    (document.body || root).appendChild(shield);
 
     const onMove = (ev) => {
       // Panel is right-anchored: dragging left widens it.
@@ -102,18 +143,7 @@
       const el = panel();
       if (el) handle.style.left = (el.getBoundingClientRect().left - 5) + 'px';
     };
-
-    const onUp = () => {
-      dragging = false;
-      handle.classList.remove('dragging');
-      handle.removeEventListener('pointermove', onMove);
-      handle.removeEventListener('pointerup', onUp);
-      handle.removeEventListener('pointercancel', onUp);
-      if (shield) { shield.remove(); shield = null; }
-      // Nudge YouTube into recomputing its own player layout.
-      window.dispatchEvent(new Event('resize'));
-      reposition();
-    };
+    const onUp = () => endDrag(onMove, onUp);
 
     handle.addEventListener('pointermove', onMove);
     handle.addEventListener('pointerup', onUp);
@@ -132,18 +162,40 @@
     reposition();
   }
 
-  restore();
+  /* One throw must not kill the loop or spam the console every 400ms. */
+  let errorsLogged = 0;
+  function safe(fn) {
+    return function () {
+      try {
+        fn.apply(null, arguments);
+      } catch (e) {
+        if (errorsLogged++ < 3) console.warn('[YouTube Chat Dock]', e);
+      }
+    };
+  }
+
+  const safeReposition = safe(reposition);
+  const safeMount = safe(mount);
+
+  function tick() {
+    // YouTube can replace <body> wholesale on some navigations.
+    if (document.body && !handle.isConnected) document.body.appendChild(handle);
+    reposition();
+  }
+
+  safeMount();
   if (document.readyState === 'loading') {
-    document.addEventListener('DOMContentLoaded', mount, { once: true });
-  } else {
-    mount();
+    document.addEventListener('DOMContentLoaded', safeMount, { once: true });
   }
 
   /* YouTube is an SPA and the player relayouts asynchronously; no single
-     event is reliable, so poll cheaply (one getBoundingClientRect). */
-  addEventListener('resize', reposition, { passive: true });
-  addEventListener('scroll', reposition, { passive: true });
-  addEventListener('fullscreenchange', () => setTimeout(reposition, 120));
-  addEventListener('yt-navigate-finish', () => { mount(); setTimeout(reposition, 400); });
-  setInterval(reposition, 400);
+     event is reliable, so poll cheaply (one querySelector + one rect). */
+  addEventListener('resize', safe(() => { restore(); reposition(); }), { passive: true });
+  addEventListener('scroll', safeReposition, { passive: true });
+  addEventListener('fullscreenchange', () => setTimeout(safeReposition, 120));
+  addEventListener('yt-navigate-finish', safe(() => {
+    mount();
+    setTimeout(safeReposition, 400);
+  }));
+  setInterval(safe(tick), TICK_MS);
 })();

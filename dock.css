@@ -1,11 +1,14 @@
 /* =============================================================
    YouTube Chat Dock — layout
-   Injected by manifest at document_start, so it applies before
-   first paint (no flash of YouTube's default sidebar width).
-   The watch-page rules and the chat-iframe rules live in one
-   file because their selectors are disjoint: ytd-watch-flexy
-   only exists in the top frame, yt-live-chat-app only in the
-   chat iframe.
+
+   Injected by the manifest at document_start, so it applies
+   before first paint (no flash of YouTube's default sidebar
+   width).
+
+   Watch-page rules and chat-iframe rules share this file. The
+   manifest injects into all frames, so EVERY chat-iframe rule
+   must be scoped to a chat-only ancestor — bare ID selectors
+   like #items match 9 unrelated elements on the watch page.
    ============================================================= */
 
 :root {
@@ -16,40 +19,45 @@
 
 /* -------------------------------------------------------------
    1. Watch page — page + theater mode
-   YouTube sizes the sidebar from its own custom properties and
-   #primary is flex:1, so overriding these reflows the player.
-   The explicit #secondary width is the belt-and-braces path:
-   some layouts (vertical/short live videos) ignore the variable.
+
+   Gated on viewport width: below ~1000px YouTube drops to a
+   single-column layout where #secondary sits UNDER the video.
+   Forcing a fixed sidebar width there would fight the stock
+   responsive layout, so we simply don't apply.
    ------------------------------------------------------------- */
-ytd-watch-flexy {
-  --ytd-watch-flexy-sidebar-width: var(--ytchat-w) !important;
-  --ytd-watch-flexy-sidebar-min-width: var(--ytchat-w) !important;
-  --ytd-watch-flexy-chat-max-height: calc(100vh - var(--ytchat-top) - 16px) !important;
-}
+@media (min-width: 1000px) {
+  ytd-watch-flexy {
+    --ytd-watch-flexy-sidebar-width: var(--ytchat-w) !important;
+    --ytd-watch-flexy-sidebar-min-width: var(--ytchat-w) !important;
+    --ytd-watch-flexy-chat-max-height: calc(100vh - var(--ytchat-top) - 16px) !important;
+  }
 
-ytd-watch-flexy:not([fullscreen]) #secondary.ytd-watch-flexy {
-  width: var(--ytchat-w) !important;
-  min-width: var(--ytchat-w) !important;
-  max-width: var(--ytchat-w) !important;
-  flex: 0 0 var(--ytchat-w) !important;
-}
+  ytd-watch-flexy:not([fullscreen]) #secondary.ytd-watch-flexy {
+    width: var(--ytchat-w) !important;
+    min-width: var(--ytchat-w) !important;
+    max-width: var(--ytchat-w) !important;
+    flex: 0 0 var(--ytchat-w) !important;
+  }
 
-ytd-watch-flexy:not([fullscreen]) ytd-live-chat-frame#chat {
-  position: sticky !important;
-  top: var(--ytchat-top) !important;
-  width: 100% !important;
-  height: calc(100vh - var(--ytchat-top) - 16px) !important;
-  max-height: calc(100vh - var(--ytchat-top) - 16px) !important;
-  min-height: 0 !important;
-  margin: 0 0 12px 0 !important;
+  ytd-watch-flexy:not([fullscreen]) ytd-live-chat-frame#chat {
+    position: sticky !important;
+    top: var(--ytchat-top) !important;
+    width: 100% !important;
+    height: calc(100vh - var(--ytchat-top) - 16px) !important;
+    max-height: calc(100vh - var(--ytchat-top) - 16px) !important;
+    min-height: 0 !important;
+    margin: 0 0 12px 0 !important;
+  }
 }
 
 /* -------------------------------------------------------------
    2. True fullscreen
+
    YouTube hides #columns entirely and moves chat into
    #panels-full-bleed-container, a flex sibling of the player
    inside #full-bleed-container. Pure flex sizing — no fixed
-   positioning, no overlay, no z-index fights.
+   positioning, no overlay, no z-index fights. Not gated on
+   viewport width: fullscreen is always wide.
    ------------------------------------------------------------- */
 ytd-watch-flexy[fullscreen] #full-bleed-container {
   display: flex !important;
@@ -75,11 +83,13 @@ ytd-watch-flexy[fullscreen] .ytp-chrome-bottom {
 }
 
 /* -------------------------------------------------------------
-   3. Video sizing — ALL modes
+   3. Video sizing — all modes
+
    YouTube writes the <video> size as inline width/height/left/top
    from JS and does NOT recompute it when CSS resizes the player.
    Without this the video keeps its old, larger box and is visibly
-   cropped after a resize.
+   cropped after a resize (measured: player 1157x651, video still
+   1346x757). Hand sizing back to the browser.
    ------------------------------------------------------------- */
 ytd-watch-flexy .html5-video-container {
   width: 100% !important;
@@ -96,36 +106,39 @@ ytd-watch-flexy video.html5-main-video {
 
 /* -------------------------------------------------------------
    4. Inside the chat iframe
-   YouTube hard-codes min-width:298px on <yt-live-chat-app>.
-   Narrower than that, the app refuses to shrink while the iframe
-   does, so the right-hand side of every message gets clipped.
-   Releasing it (plus the min-width:auto on flex descendants,
-   which otherwise won't shrink below their content) lets chat
-   reflow cleanly — verified to 120px with zero overflow.
-   ------------------------------------------------------------- */
-yt-live-chat-app,
-yt-live-chat-renderer,
-#contents.yt-live-chat-renderer,
-#chat.yt-live-chat-renderer,
-#chat-messages,
-#item-scroller,
-#item-offset,
-#items,
-yt-live-chat-item-list-renderer,
-#input-panel {
-  min-width: 0 !important;
-}
 
+   YouTube hard-codes min-width:298px on <yt-live-chat-app>.
+   Narrower than that, the app refuses to shrink while its iframe
+   does, so the right edge of every message is clipped by an
+   ancestor's overflow:hidden. Releasing it — plus the
+   min-width:auto on its flex descendants, which won't shrink
+   below their content — lets chat reflow cleanly to 120px.
+
+   Every selector here is scoped to a chat-only ancestor so these
+   rules cannot touch the watch page.
+   ------------------------------------------------------------- */
 yt-live-chat-app {
-  /* only inside the chat document; harmless elsewhere */
+  min-width: 0 !important;
   max-width: 100% !important;
 }
 
-yt-live-chat-text-message-renderer #message {
+yt-live-chat-app yt-live-chat-renderer,
+yt-live-chat-app yt-live-chat-item-list-renderer,
+yt-live-chat-app #contents,
+yt-live-chat-app #chat,
+yt-live-chat-app #chat-messages,
+yt-live-chat-app #item-scroller,
+yt-live-chat-app #item-offset,
+yt-live-chat-app #items,
+yt-live-chat-app #input-panel {
+  min-width: 0 !important;
+}
+
+yt-live-chat-app yt-live-chat-text-message-renderer #message {
   overflow-wrap: anywhere !important;
 }
 
-yt-live-chat-text-message-renderer {
+yt-live-chat-app yt-live-chat-text-message-renderer {
   padding: 2px 12px !important;
   line-height: 1.25 !important;
 }
@@ -172,7 +185,8 @@ yt-live-chat-text-message-renderer {
   border-radius: 4px;
   background: #3ea6ff;
   color: #0f0f0f;
-  font: 600 11px/1 Roboto, Arial, sans-serif;
+  /* System stack: Roboto is not installed on stock macOS or Windows. */
+  font: 600 11px/1 system-ui, -apple-system, "Segoe UI", Roboto, Arial, sans-serif;
   white-space: nowrap;
   pointer-events: none;
   opacity: 0;
@@ -189,4 +203,12 @@ yt-live-chat-text-message-renderer {
   inset: 0;
   z-index: 99999;
   cursor: col-resize;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  #ytchat-resizer,
+  #ytchat-resizer::before,
+  #ytchat-resizer .ytchat-readout {
+    transition: none;
+  }
 }
