@@ -1,0 +1,192 @@
+/* =============================================================
+   YouTube Chat Dock — layout
+   Injected by manifest at document_start, so it applies before
+   first paint (no flash of YouTube's default sidebar width).
+   The watch-page rules and the chat-iframe rules live in one
+   file because their selectors are disjoint: ytd-watch-flexy
+   only exists in the top frame, yt-live-chat-app only in the
+   chat iframe.
+   ============================================================= */
+
+:root {
+  --ytchat-w: 440px;    /* page + theater mode; dock.js overrides inline */
+  --ytchat-fsw: 560px;  /* true fullscreen */
+  --ytchat-top: 72px;   /* gap under the masthead */
+}
+
+/* -------------------------------------------------------------
+   1. Watch page — page + theater mode
+   YouTube sizes the sidebar from its own custom properties and
+   #primary is flex:1, so overriding these reflows the player.
+   The explicit #secondary width is the belt-and-braces path:
+   some layouts (vertical/short live videos) ignore the variable.
+   ------------------------------------------------------------- */
+ytd-watch-flexy {
+  --ytd-watch-flexy-sidebar-width: var(--ytchat-w) !important;
+  --ytd-watch-flexy-sidebar-min-width: var(--ytchat-w) !important;
+  --ytd-watch-flexy-chat-max-height: calc(100vh - var(--ytchat-top) - 16px) !important;
+}
+
+ytd-watch-flexy:not([fullscreen]) #secondary.ytd-watch-flexy {
+  width: var(--ytchat-w) !important;
+  min-width: var(--ytchat-w) !important;
+  max-width: var(--ytchat-w) !important;
+  flex: 0 0 var(--ytchat-w) !important;
+}
+
+ytd-watch-flexy:not([fullscreen]) ytd-live-chat-frame#chat {
+  position: sticky !important;
+  top: var(--ytchat-top) !important;
+  width: 100% !important;
+  height: calc(100vh - var(--ytchat-top) - 16px) !important;
+  max-height: calc(100vh - var(--ytchat-top) - 16px) !important;
+  min-height: 0 !important;
+  margin: 0 0 12px 0 !important;
+}
+
+/* -------------------------------------------------------------
+   2. True fullscreen
+   YouTube hides #columns entirely and moves chat into
+   #panels-full-bleed-container, a flex sibling of the player
+   inside #full-bleed-container. Pure flex sizing — no fixed
+   positioning, no overlay, no z-index fights.
+   ------------------------------------------------------------- */
+ytd-watch-flexy[fullscreen] #full-bleed-container {
+  display: flex !important;
+}
+
+ytd-watch-flexy[fullscreen] #panels-full-bleed-container {
+  flex: 0 0 var(--ytchat-fsw) !important;
+  width: var(--ytchat-fsw) !important;
+  max-width: var(--ytchat-fsw) !important;
+  min-width: 0 !important;
+  overflow: hidden !important;
+}
+
+ytd-watch-flexy[fullscreen] #player-full-bleed-container {
+  flex: 1 1 auto !important;
+  width: auto !important;
+  min-width: 0 !important;
+}
+
+ytd-watch-flexy[fullscreen] .ytp-chrome-bottom {
+  width: calc(100% - 24px) !important;
+  left: 12px !important;
+}
+
+/* -------------------------------------------------------------
+   3. Video sizing — ALL modes
+   YouTube writes the <video> size as inline width/height/left/top
+   from JS and does NOT recompute it when CSS resizes the player.
+   Without this the video keeps its old, larger box and is visibly
+   cropped after a resize.
+   ------------------------------------------------------------- */
+ytd-watch-flexy .html5-video-container {
+  width: 100% !important;
+  height: 100% !important;
+}
+
+ytd-watch-flexy video.html5-main-video {
+  width: 100% !important;
+  height: 100% !important;
+  left: 0 !important;
+  top: 0 !important;
+  object-fit: contain !important;
+}
+
+/* -------------------------------------------------------------
+   4. Inside the chat iframe
+   YouTube hard-codes min-width:298px on <yt-live-chat-app>.
+   Narrower than that, the app refuses to shrink while the iframe
+   does, so the right-hand side of every message gets clipped.
+   Releasing it (plus the min-width:auto on flex descendants,
+   which otherwise won't shrink below their content) lets chat
+   reflow cleanly — verified to 120px with zero overflow.
+   ------------------------------------------------------------- */
+yt-live-chat-app,
+yt-live-chat-renderer,
+#contents.yt-live-chat-renderer,
+#chat.yt-live-chat-renderer,
+#chat-messages,
+#item-scroller,
+#item-offset,
+#items,
+yt-live-chat-item-list-renderer,
+#input-panel {
+  min-width: 0 !important;
+}
+
+yt-live-chat-app {
+  /* only inside the chat document; harmless elsewhere */
+  max-width: 100% !important;
+}
+
+yt-live-chat-text-message-renderer #message {
+  overflow-wrap: anywhere !important;
+}
+
+yt-live-chat-text-message-renderer {
+  padding: 2px 12px !important;
+  line-height: 1.25 !important;
+}
+
+/* -------------------------------------------------------------
+   5. Drag divider
+   ------------------------------------------------------------- */
+#ytchat-resizer {
+  position: fixed;
+  width: 10px;
+  z-index: 100000;
+  cursor: col-resize;
+  display: none;
+  align-items: center;
+  justify-content: center;
+  background: transparent;
+  transition: background .12s ease;
+  touch-action: none;
+}
+
+#ytchat-resizer::before {
+  content: '';
+  width: 2px;
+  height: 44px;
+  border-radius: 2px;
+  background: rgba(255, 255, 255, .28);
+  transition: background .12s ease, height .12s ease;
+}
+
+#ytchat-resizer:hover::before,
+#ytchat-resizer.dragging::before {
+  background: #3ea6ff;
+  height: 90px;
+}
+
+#ytchat-resizer.dragging {
+  background: rgba(62, 166, 255, .12);
+}
+
+#ytchat-resizer .ytchat-readout {
+  position: absolute;
+  left: 14px;
+  padding: 3px 7px;
+  border-radius: 4px;
+  background: #3ea6ff;
+  color: #0f0f0f;
+  font: 600 11px/1 Roboto, Arial, sans-serif;
+  white-space: nowrap;
+  pointer-events: none;
+  opacity: 0;
+  transition: opacity .12s ease;
+}
+
+#ytchat-resizer.dragging .ytchat-readout {
+  opacity: 1;
+}
+
+/* Blocks the chat iframe from swallowing the pointer mid-drag. */
+#ytchat-resizer-shield {
+  position: fixed;
+  inset: 0;
+  z-index: 99999;
+  cursor: col-resize;
+}
