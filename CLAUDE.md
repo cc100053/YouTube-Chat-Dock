@@ -57,6 +57,12 @@ Past examples of assumptions that measured false:
 
 ## Before publishing to the Chrome Web Store
 
+Listing copy, privacy policy and every image asset live in `store/`.
+`store/listing.md` is the source of truth for the dashboard fields and carries
+the measured character counts; `store/make_assets.py` regenerates all images
+(and the packed `icons/`) from code, so nothing is hand-edited in an image
+editor; `store/package.sh` builds the upload ZIP and validates first.
+
 - Bump `version` in `manifest.json`.
 - `description` must be **≤ 132 characters** — the store rejects longer, and it has already been over once.
 - Keep `permissions` and `host_permissions` absent. `content_scripts.matches` is sufficient and zero-permission is a deliberate property of the listing.
