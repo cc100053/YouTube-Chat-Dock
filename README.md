@@ -150,6 +150,11 @@ CSS is injected by the manifest at `document_start`, so it applies before first 
 | `_locales/` | Two strings only — the name and description Chrome and the store read |
 | `store/` | Chrome Web Store listing copy, privacy policy, generated assets, packaging |
 
+## Support
+
+If it saves you some squinting: https://ko-fi.com/hangyodev — and a star on
+this repo helps more people find it.
+
 ## License
 
 MIT

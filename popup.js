@@ -22,7 +22,7 @@
      store/package.sh refuses to build the upload ZIP while this is unset or
      malformed, so neither can reach the store by accident.
      ------------------------------------------------------------------ */
-  var COFFEE_URL = '';
+  var COFFEE_URL = 'https://ko-fi.com/hangyodev';
 
   var $ = function (id) { return document.getElementById(id); };
 

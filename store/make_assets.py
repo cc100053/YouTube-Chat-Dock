@@ -321,7 +321,7 @@ def popup_mock(d, x, y, w=460):
 
     ROW_HINT, ROW_PLAIN, RANGE = 56, 40, 42
     h = (78 + 32 + ROW_HINT + 46 + 30
-         + ROW_PLAIN * len(rows_layout) + RANGE * len(ranges) + 62)
+         + ROW_PLAIN * len(rows_layout) + RANGE * len(ranges) + 96)
     rrect(d, (x, y, x + w, y + h), 16, fill=BG, outline=(52, 52, 52))
 
     icon_mark(d, x + 24, y + 18, 34)
@@ -362,9 +362,12 @@ def popup_mock(d, x, y, w=460):
         cy += RANGE
         d.line((x + 24, cy - 10, x + w - 24, cy - 10), fill=LINE, width=1)
 
+    # Footer is two rows in the real popup: Reset, then the links on their own
+    # full-width row. One row fit English and clipped everything else.
     rrect(d, (x + 24, cy + 8, x + 160, cy + 42), 17, fill=SURFACE, outline=LINE)
     d.text((x + 92, cy + 25), "Reset to defaults", font=font(13), fill=TEXT, anchor="mm")
-    d.text((x + w - 24, cy + 25), "Star me on GitHub", font=font(13), fill=MUTED, anchor="rm")
+    d.text((x + 24, cy + 58), "\u2605  Star me on GitHub", font=font(13), fill=MUTED)
+    d.text((x + w - 24, cy + 58), "Buy me a coffee", font=font(13), fill=MUTED, anchor="ra")
     return h
 
 
