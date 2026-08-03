@@ -55,7 +55,7 @@ WHAT IT DOES
 • Theater mode is docked too. YouTube narrows the player there to reserve a
   side slot, then leaves it empty and drops chat underneath — this fills it.
 • A settings popup in the toolbar: an on/off switch, all three widths, the
-  side toggle, theater docking, and a reset.
+  side toggle, and a reset. Theater docking and the divider are always on.
 • Pick your own interface language from 12, independently of your browser's.
 
 ONE PERMISSION, AND NOTHING LEAVES YOUR BROWSER
@@ -235,7 +235,8 @@ YouTube Chat Dock 將直播聊天室與聊天重播變成一個真正的側邊�
 • 完整支援由右至左的語言介面，聊天室會停靠在正確的一側。
 • 劇院模式同樣停靠。YouTube 在該模式下會收窄播放器以預留一格側邊空位，卻將該處留空
   並把聊天室排到影片下方 —— 本擴充功能會填補該空位。
-• 工具列設定面板：啟用開關、三種寬度、左右切換、劇院模式停靠、一鍵回復預設值。
+• 工具列設定面板：啟用開關、三種寬度、左右切換、一鍵回復預設值。劇院模式停靠與
+  分隔線一律啟用。
 • 介面語言可自行從 12 種語言中選擇，不必跟隨瀏覽器。
 
 只有一個權限，而且沒有任何資料離開你的瀏覽器

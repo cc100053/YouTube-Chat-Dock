@@ -53,24 +53,6 @@
         <span class="track" aria-hidden="true"></span>
       </label>
 
-      <label class="row switch">
-        <span class="labels">
-          <span class="title" data-i18n="optTheater"></span>
-          <span class="hint" data-i18n="optTheaterHint"></span>
-        </span>
-        <input type="checkbox" id="theater">
-        <span class="track" aria-hidden="true"></span>
-      </label>
-
-      <label class="row switch">
-        <span class="labels">
-          <span class="title" data-i18n="optDivider"></span>
-          <span class="hint" data-i18n="optDividerHint"></span>
-        </span>
-        <input type="checkbox" id="divider">
-        <span class="track" aria-hidden="true"></span>
-      </label>
-
       <label class="row range">
         <span class="title" data-i18n="optPageWidth"></span>
         <output id="pageWidthOut"></output>
@@ -89,7 +71,6 @@
         <input type="range" id="fsWidth">
       </label>
 
-      <p class="note" data-i18n="noteNarrow"></p>
     </section>
   </main>
 
@@ -97,7 +78,9 @@
     <button type="button" id="reset" data-i18n="btnReset"></button>
     <nav>
       <a id="source" href="https://github.com/cc100053/YouTube-Chat-Dock"
-         target="_blank" rel="noreferrer" data-i18n="linkSource"></a>
+         target="_blank" rel="noreferrer">
+        <span aria-hidden="true">★</span><span data-i18n="linkStar"></span>
+      </a>
       <a id="coffee" target="_blank" rel="noreferrer">
         <span aria-hidden="true">☕</span><span data-i18n="linkCoffee"></span>
       </a>

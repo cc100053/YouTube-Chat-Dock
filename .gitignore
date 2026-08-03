@@ -4,3 +4,14 @@
 *.pem
 node_modules/
 CLAUDE.md
+
+# Local agent / editor state — this repo is public.
+.claude/
+.vscode/
+.idea/
+*.log
+.env
+.env.*
+
+# Build output from store/package.sh (covered by *.zip, kept explicit).
+store/*.zip

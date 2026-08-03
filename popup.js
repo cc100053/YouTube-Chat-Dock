@@ -53,7 +53,9 @@
 
     // The picker's own auto entry is the only option that needs translating;
     // the rest are autonyms and must stay in their own language.
-    if (langSel.options.length) langSel.options[0].textContent = msg('langAuto');
+    if (langSel.options.length) {
+      langSel.options[0].textContent = AUTO_MARK + '\u00A0 ' + msg('langAuto');
+    }
 
     unit = msg('unitPx');
     showWidth(pageOut, pageWidth.value);
@@ -61,10 +63,13 @@
     showWidth(fsOut, fsWidth.value);
   }
 
+  /* Theater docking and the drag divider are always on and have no controls
+     here any more. Their keys still exist and dock.js still honours them, so
+     they must NOT be referenced in this file — $('theater') returns null now,
+     and calling addEventListener on it threw during init, which aborted the
+     whole popup and rendered it blank. */
   var enabled = $('enabled');
   var flip = $('flip');
-  var theater = $('theater');
-  var divider = $('divider');
   var pageWidth = $('pageWidth');
   var twWidth = $('twWidth');
   var fsWidth = $('fsWidth');
@@ -83,10 +88,15 @@
 
   function showWidth(out, px) { out.textContent = px + ' ' + unit; }
 
-  // Auto first, then the catalogues in the order i18n.js declares them.
+  /* Auto first, then the catalogues in the order i18n.js declares them.
+     The flag is a prefix on the autonym, never a replacement for it — on
+     Windows the flag falls back to two plain letters, so the autonym is what
+     has to carry the meaning. */
+  var AUTO_MARK = '\uD83C\uDF10';   // globe, for the auto entry
+
   langSel.appendChild(new Option('', 'auto'));
-  YTCHAT_LANGS.forEach(function (pair) {
-    langSel.appendChild(new Option(pair[1], pair[0]));
+  YTCHAT_LANGS.forEach(function (l) {
+    langSel.appendChild(new Option(l[2] + '\u00A0 ' + l[1], l[0]));
   });
 
   try {
@@ -102,8 +112,6 @@
   function render(s) {
     enabled.checked = YTCHAT.isOn(s[YTCHAT.K.enabled]);
     flip.checked = YTCHAT.isOn(s[YTCHAT.K.flip]);
-    theater.checked = YTCHAT.isOn(s[YTCHAT.K.theater]);
-    divider.checked = YTCHAT.isOn(s[YTCHAT.K.divider]);
 
     var w = function (k) {
       return YTCHAT.clampWidth(s[k]) || Number(YTCHAT.DEF[k]);
@@ -161,14 +169,6 @@
 
   flip.addEventListener('change', function () {
     set(YTCHAT.K.flip, flip.checked ? '1' : '0');
-  });
-
-  theater.addEventListener('change', function () {
-    set(YTCHAT.K.theater, theater.checked ? '1' : '0');
-  });
-
-  divider.addEventListener('change', function () {
-    set(YTCHAT.K.divider, divider.checked ? '1' : '0');
   });
 
   langSel.addEventListener('change', function () {

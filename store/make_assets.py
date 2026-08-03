@@ -310,30 +310,23 @@ def slider(d, x, y, w, frac):
 def popup_mock(d, x, y, w=460):
     """The settings popup, drawn at the proportions it actually renders at.
 
-    Checked against the real popup in Chrome (en, zh_TW and ar) first: the
-    switch states, the three width values and the section order are what it
-    shows at defaults. Heights here are tracked with one running cursor
-    because the first version computed the card height from a formula that
-    forgot the language block, and the card overflowed the slide."""
+    Checked against the real popup in Chrome across all twelve languages
+    first. Theater docking and the drag divider are always on and no longer
+    have controls, so they are absent here too."""
     rows_general = [("Enable on YouTube", "Turn the panel off without uninstalling.", True)]
-    rows_layout = [
-        ("Chat on the other side", "", False),
-        ("Dock chat in theater mode", "Fills the empty slot YouTube leaves there.", True),
-        ("Show the drag divider", "Hide it to keep the layout but stop resizing.", True),
-    ]
+    rows_layout = [("Chat on the other side", "", False)]
     ranges = [("Width in page view", "440 px", 0.33),
               ("Width in theater mode", "450 px", 0.34),
               ("Width in fullscreen", "560 px", 0.45)]
 
     ROW_HINT, ROW_PLAIN, RANGE = 56, 40, 42
-    h = (78 + 32                                    # header, GENERAL label
-         + ROW_HINT + 46 + 30                       # enable, language, LAYOUT label
-         + ROW_PLAIN + ROW_HINT * 2                 # layout switches
-         + RANGE * len(ranges) + 76)                # widths, note + button
+    h = (78 + 32 + ROW_HINT + 46 + 30
+         + ROW_PLAIN * len(rows_layout) + RANGE * len(ranges) + 62)
     rrect(d, (x, y, x + w, y + h), 16, fill=BG, outline=(52, 52, 52))
 
     icon_mark(d, x + 24, y + 18, 34)
-    d.text((x + 70, y + 26), "YouTube Chat Dock", font=font(17, True), fill=TEXT)
+    d.text((x + 70, y + 22), "YouTube Chat Dock", font=font(17, True), fill=TEXT)
+    d.text((x + 70, y + 44), "v1.6.0", font=font(12), fill=MUTED)
     d.line((x, y + 70, x + w, y + 70), fill=LINE, width=1)
 
     def switch_row(cy, title, hint, on):
@@ -352,8 +345,8 @@ def popup_mock(d, x, y, w=460):
 
     d.text((x + 24, cy + 8), "Language", font=font(15), fill=TEXT)
     rrect(d, (x + w - 24 - 150, cy, x + w - 24, cy + 30), 8, fill=SURFACE, outline=LINE)
-    # Helvetica Neue has no CJK coverage, so the mock shows the auto entry
-    # rather than an autonym that would render as tofu boxes.
+    # Helvetica Neue has neither CJK nor flag-emoji coverage, so the mock shows
+    # the auto entry rather than glyphs that would render as tofu boxes.
     d.text((x + w - 99, cy + 15), "Auto", font=font(13), fill=TEXT, anchor="mm")
     cy += 46
 
@@ -369,14 +362,9 @@ def popup_mock(d, x, y, w=460):
         cy += RANGE
         d.line((x + 24, cy - 10, x + w - 24, cy - 10), fill=LINE, width=1)
 
-    rrect(d, (x + 24, cy + 2, x + w - 24, cy + 44), 8, fill=SURFACE)
-    d.text((x + 34, cy + 8), "Below a 1000 px window YouTube stacks chat under",
-           font=font(12), fill=MUTED)
-    d.text((x + 34, cy + 24), "the video, and the panel does not apply there.",
-           font=font(12), fill=MUTED)
-    rrect(d, (x + 24, cy + 52, x + 160, cy + 86), 17, fill=SURFACE, outline=LINE)
-    d.text((x + 92, cy + 69), "Reset to defaults", font=font(13), fill=TEXT, anchor="mm")
-    d.text((x + w - 24, cy + 69), "Source code", font=font(13), fill=MUTED, anchor="rm")
+    rrect(d, (x + 24, cy + 8, x + 160, cy + 42), 17, fill=SURFACE, outline=LINE)
+    d.text((x + 92, cy + 25), "Reset to defaults", font=font(13), fill=TEXT, anchor="mm")
+    d.text((x + w - 24, cy + 25), "Star me on GitHub", font=font(13), fill=MUTED, anchor="rm")
     return h
 
 
@@ -387,7 +375,7 @@ def shot5():
              "Settings in one click",
              "An off switch, every width, and a language of your own choosing — from the toolbar.")
 
-    popup_mock(d, 80, 184)
+    popup_mock(d, 80, 250)
 
     bx = 640
     claims = [
