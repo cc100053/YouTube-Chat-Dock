@@ -109,6 +109,28 @@
      non-empty check and then resolve against chrome-extension://<id>/, giving
      a link that looks fine in the popup and 404s on click. Anything that is
      not a valid https URL leaves the button hidden. */
+  /* The review page lives at a URL containing the extension's own id, which
+     is not known until the item is published — so it is read from
+     chrome.runtime.id rather than hard-coded, and can never go stale.
+
+     Visibility keys off update_url, which Chrome injects into the manifest it
+     hands back only for store-installed copies. An unpacked development copy
+     has no update_url and no listing to review, so the button stays hidden
+     rather than pointing at a 404. The hidden path is verified; the visible
+     one cannot be until the item is actually published. */
+  var rate = $('rate');
+  try {
+    var mf = chrome.runtime.getManifest();
+    if (mf && mf.update_url && chrome.runtime.id) {
+      rate.href = 'https://chromewebstore.google.com/detail/'
+                + chrome.runtime.id + '/reviews';
+    } else {
+      rate.hidden = true;
+    }
+  } catch (e) {
+    rate.hidden = true;
+  }
+
   var coffee = $('coffee');
   var coffeeOk = false;
   try {

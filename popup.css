@@ -290,12 +290,14 @@ footer {
   border-block-start: 1px solid var(--line);
 }
 
+/* Three links now, so they flow from the start and wrap, rather than being
+   justified to the edges — space-between strands the last item on its own
+   line at a random offset once the row wraps. */
 footer nav {
   display: flex;
   align-items: center;
   flex-wrap: wrap;
-  justify-content: space-between;
-  gap: 6px 14px;
+  gap: 6px 16px;
   width: 100%;
 }
 
@@ -330,9 +332,9 @@ footer a:focus-visible { outline: 2px solid var(--blue); outline-offset: 3px; bo
 #reset:active { transform: translateY(1px); }
 #reset:focus-visible { outline: 2px solid var(--blue); outline-offset: 2px; }
 
-/* The coffee link is hidden unless popup.js has a real URL to point it at —
-   see COFFEE_URL. Shipping a dead donate link is worse than shipping none. */
-#coffee[hidden] { display: none; }
+/* Hidden means gone, not blank: the coffee link without a COFFEE_URL, and
+   the rate link on an unpacked copy that has no listing to review. */
+#coffee[hidden], #rate[hidden] { display: none; }
 
 /* ---- toast ----------------------------------------------------------- */
 
