@@ -270,14 +270,16 @@ https://github.com/cc100053/YouTube-Chat-Dock
 
 - [ ] `version` in `manifest.json` bumped
 - [ ] every `extDesc` in `_locales/*/messages.json` is ≤ 132 characters
-- [ ] every locale defines all 18 keys (`store/package.sh` parses them; the key
-      count is checked by the verification snippet in the commit for v1.4.0)
+- [ ] every language in `i18n.js` defines the identical key set (21 keys as of
+      v1.6.0 — verify with a Node one-liner over `YTCHAT_MESSAGES`, since
+      `store/package.sh` only parses the two-string `_locales/` files)
 - [ ] `permissions` is still `["storage"]` and nothing more; `host_permissions` still absent
 - [ ] `node --check` passes on `dock.js`, `settings.js` and `popup.js`
 - [ ] `python3 -c "import json; json.load(open('manifest.json'))"` passes
 - [ ] Loaded unpacked and verified on a live stream **and** a VOD with chat replay
 - [ ] ZIP contains `manifest.json`, `dock.css`, `dock.js`, `settings.js`,
-      `popup.{html,css,js}`, `_locales/`, `icons/`, `LICENSE` — and nothing else
+      `i18n.js`, `popup.{html,css,js}`, `_locales/`, `icons/`, `LICENSE` — and
+      nothing else
 - [ ] Popup opened once per layout direction (an LTR locale and `ar`), and its
       height confirmed under Chrome's 600px cap in the longest language
 - [ ] `COFFEE_URL` set in `popup.js` — `store/package.sh` refuses to build otherwise
