@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<!--
+  Settings popup.
+
+  Every string is filled in by popup.js from chrome.i18n at load — there is no
+  English hard-coded here, because a half-translated popup is worse than an
+  untranslated one. dir is set from the locale for the same reason.
+-->
+<html>
+<head>
+  <meta charset="utf-8">
+  <link rel="stylesheet" href="popup.css">
+</head>
+<body>
+  <header>
+    <img src="icons/icon48.png" alt="" width="28" height="28">
+    <h1 data-i18n="extName"></h1>
+  </header>
+
+  <main>
+    <label class="row switch">
+      <span class="labels">
+        <span class="title" data-i18n="optEnabled"></span>
+        <span class="hint" data-i18n="optEnabledHint"></span>
+      </span>
+      <input type="checkbox" id="enabled">
+      <span class="track" aria-hidden="true"></span>
+    </label>
+
+    <div id="gated">
+      <label class="row switch">
+        <span class="labels">
+          <span class="title" data-i18n="optSwap"></span>
+          <span class="hint" data-i18n="optSwapHint"></span>
+        </span>
+        <input type="checkbox" id="flip">
+        <span class="track" aria-hidden="true"></span>
+      </label>
+
+      <label class="row switch">
+        <span class="labels">
+          <span class="title" data-i18n="optDivider"></span>
+          <span class="hint" data-i18n="optDividerHint"></span>
+        </span>
+        <input type="checkbox" id="divider">
+        <span class="track" aria-hidden="true"></span>
+      </label>
+
+      <label class="row range">
+        <span class="labels">
+          <span class="title" data-i18n="optPageWidth"></span>
+        </span>
+        <output id="pageWidthOut"></output>
+        <input type="range" id="pageWidth">
+      </label>
+
+      <label class="row range">
+        <span class="labels">
+          <span class="title" data-i18n="optFsWidth"></span>
+        </span>
+        <output id="fsWidthOut"></output>
+        <input type="range" id="fsWidth">
+      </label>
+    </div>
+
+    <p class="note" data-i18n="noteNarrow"></p>
+  </main>
+
+  <footer>
+    <button type="button" id="reset" data-i18n="btnReset"></button>
+    <a id="source" href="https://github.com/cc100053/YouTube-Chat-Dock"
+       target="_blank" rel="noreferrer" data-i18n="linkSource"></a>
+  </footer>
+
+  <div id="toast" role="status" aria-live="polite"></div>
+
+  <!-- settings.js first: it defines the YTCHAT contract popup.js reads. -->
+  <script src="settings.js"></script>
+  <script src="popup.js"></script>
+</body>
+</html>

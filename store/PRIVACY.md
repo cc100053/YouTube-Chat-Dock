@@ -1,11 +1,11 @@
 # Privacy Policy — YouTube Chat Dock
 
-Last updated: 3 August 2026
+Last updated: 3 August 2026 (v1.4.0)
 
 ## Short version
 
-YouTube Chat Dock collects nothing, sends nothing, and stores one thing —
-your chosen panel widths — in your own browser.
+YouTube Chat Dock collects nothing and sends nothing. It stores your own
+settings, on your own device, and nothing else.
 
 ## What is collected
 
@@ -15,15 +15,24 @@ details, or usage analytics.
 
 ## What is stored, and where
 
-Three values are saved in your browser's `localStorage` for `youtube.com`:
+Five values, and only these five:
 
-- the chat panel width you last dragged to in page view,
-- the width you last dragged to in fullscreen,
-- whether you flipped the panel to the other side.
+- the chat panel width you last set in page view,
+- the width you last set in fullscreen,
+- whether you flipped the panel to the other side,
+- whether the extension is switched on,
+- whether the drag divider is shown.
 
-These stay on your computer. They are readable only by the extension and by
-youtube.com in your own browser, and are never uploaded anywhere. Clearing
-site data for youtube.com deletes them and resets the defaults.
+They are held in two places on your own device, for two different reasons.
+`localStorage` for `youtube.com` is read synchronously before the page paints,
+which is what stops the layout flickering on load. `chrome.storage.local` holds
+the same five values so the settings popup — which is a separate extension page
+and cannot reach youtube.com's storage — can change them.
+
+Neither store leaves your computer. `chrome.storage.local` is local storage,
+not synced storage: nothing is written to your Google account. Clearing site
+data for youtube.com resets the first copy; removing the extension removes the
+second.
 
 ## Network activity
 
@@ -34,10 +43,14 @@ when you are not on a YouTube page.
 
 ## Permissions
 
-The extension declares no permissions and no host permissions. It consists of
-one stylesheet and one script injected on `https://www.youtube.com/*` via the
-manifest's `content_scripts.matches`, which requires no permission grant. This
-is why Chrome shows no permission prompt when you install it.
+The extension declares exactly one permission, `storage`, and no host
+permissions at all. `storage` is what lets the settings popup save your choices
+where the content script can read them; it grants no access to your browsing,
+your history, or any site. Chrome shows no permission prompt on install,
+because `storage` is not a permission Chrome warns about.
+
+The extension acts on `https://www.youtube.com/*` and nowhere else, via the
+manifest's `content_scripts.matches`, which requires no permission grant.
 
 ## Data sharing and sale
 
@@ -57,7 +70,7 @@ the extension's public commit history.
 ## Source
 
 The complete source is public and MIT licensed. Every claim above can be
-verified by reading it — it is three files and has no build step.
+verified by reading it — it is a handful of small files and has no build step.
 
 https://github.com/cc100053/YouTube-Chat-Dock
 

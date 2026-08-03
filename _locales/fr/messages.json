@@ -1,0 +1,74 @@
+{
+  "extName": {
+    "message": "YouTube Chat Dock",
+    "description": "Extension name. Not translated — it is the product name."
+  },
+  "extDesc": {
+    "message": "Transforme le chat en direct et sa rediffusion en un panneau latéral redimensionnable. Fonctionne en plein écran.",
+    "description": "Store and manifest description. Hard limit 132 characters."
+  },
+  "optEnabled": {
+    "message": "Activer sur YouTube",
+    "description": "Popup: master on/off switch label."
+  },
+  "optEnabledHint": {
+    "message": "Désactive le panneau sans désinstaller.",
+    "description": "Popup: help text under the on/off switch."
+  },
+  "optSwap": {
+    "message": "Chat de l'autre côté",
+    "description": "Popup: label for the switch that moves chat to the opposite side."
+  },
+  "optSwapHint": {
+    "message": "Se reflète correctement dans les mises en page de droite à gauche.",
+    "description": "Popup: help text under the side switch."
+  },
+  "optDivider": {
+    "message": "Afficher le séparateur",
+    "description": "Popup: label for the switch that shows or hides the drag divider."
+  },
+  "optDividerHint": {
+    "message": "Masquez-le pour garder la mise en page sans redimensionner.",
+    "description": "Popup: help text under the divider switch."
+  },
+  "optPageWidth": {
+    "message": "Largeur en vue normale",
+    "description": "Popup: label for the chat width used in normal page view."
+  },
+  "optFsWidth": {
+    "message": "Largeur en plein écran",
+    "description": "Popup: label for the chat width used in fullscreen."
+  },
+  "unitPx": {
+    "message": "px",
+    "description": "Unit suffix for a pixel value. Usually left as px."
+  },
+  "btnReset": {
+    "message": "Réinitialiser",
+    "description": "Popup: button that restores every setting to its default."
+  },
+  "toastSaved": {
+    "message": "Enregistré",
+    "description": "Popup: brief confirmation shown after a setting changes."
+  },
+  "noteNarrow": {
+    "message": "En dessous de 1000 px de largeur, YouTube place le chat sous la vidéo et le panneau ne s'applique pas.",
+    "description": "Popup: footnote explaining why nothing happens in a narrow window."
+  },
+  "linkSource": {
+    "message": "Code source",
+    "description": "Popup: link to the public source repository."
+  },
+  "dividerTitle": {
+    "message": "Glisser pour redimensionner · double-clic pour réinitialiser",
+    "description": "Tooltip on the drag divider in the page."
+  },
+  "dividerAria": {
+    "message": "Redimensionner le panneau de chat",
+    "description": "Screen-reader label for the drag divider."
+  },
+  "flipAria": {
+    "message": "Déplacer le chat de l'autre côté",
+    "description": "Screen-reader label and tooltip for the side-swap button."
+  }
+}

@@ -1,0 +1,74 @@
+{
+  "extName": {
+    "message": "YouTube Chat Dock",
+    "description": "Extension name. Not translated — it is the product name."
+  },
+  "extDesc": {
+    "message": "حوّل الدردشة المباشرة وإعادة عرضها إلى لوحة جانبية قابلة لتغيير العرض. اسحب الفاصل. تعمل في وضع ملء الشاشة.",
+    "description": "Store and manifest description. Hard limit 132 characters."
+  },
+  "optEnabled": {
+    "message": "تفعيل على YouTube",
+    "description": "Popup: master on/off switch label."
+  },
+  "optEnabledHint": {
+    "message": "أوقف اللوحة دون إلغاء التثبيت.",
+    "description": "Popup: help text under the on/off switch."
+  },
+  "optSwap": {
+    "message": "الدردشة على الجانب الآخر",
+    "description": "Popup: label for the switch that moves chat to the opposite side."
+  },
+  "optSwapHint": {
+    "message": "ينعكس بشكل صحيح في التخطيطات من اليمين إلى اليسار.",
+    "description": "Popup: help text under the side switch."
+  },
+  "optDivider": {
+    "message": "إظهار الفاصل القابل للسحب",
+    "description": "Popup: label for the switch that shows or hides the drag divider."
+  },
+  "optDividerHint": {
+    "message": "أخفِه للإبقاء على التخطيط دون إمكانية تغيير الحجم.",
+    "description": "Popup: help text under the divider switch."
+  },
+  "optPageWidth": {
+    "message": "العرض في العرض العادي",
+    "description": "Popup: label for the chat width used in normal page view."
+  },
+  "optFsWidth": {
+    "message": "العرض في وضع ملء الشاشة",
+    "description": "Popup: label for the chat width used in fullscreen."
+  },
+  "unitPx": {
+    "message": "px",
+    "description": "Unit suffix for a pixel value. Usually left as px."
+  },
+  "btnReset": {
+    "message": "إعادة الضبط الافتراضي",
+    "description": "Popup: button that restores every setting to its default."
+  },
+  "toastSaved": {
+    "message": "تم الحفظ",
+    "description": "Popup: brief confirmation shown after a setting changes."
+  },
+  "noteNarrow": {
+    "message": "عندما يقل عرض النافذة عن 1000 بكسل يضع YouTube الدردشة أسفل الفيديو، ولا تُطبَّق اللوحة.",
+    "description": "Popup: footnote explaining why nothing happens in a narrow window."
+  },
+  "linkSource": {
+    "message": "الشيفرة المصدرية",
+    "description": "Popup: link to the public source repository."
+  },
+  "dividerTitle": {
+    "message": "اسحب لتغيير عرض الدردشة · انقر مرتين لإعادة الضبط",
+    "description": "Tooltip on the drag divider in the page."
+  },
+  "dividerAria": {
+    "message": "تغيير عرض لوحة الدردشة",
+    "description": "Screen-reader label for the drag divider."
+  },
+  "flipAria": {
+    "message": "نقل الدردشة إلى الجانب الآخر",
+    "description": "Screen-reader label and tooltip for the side-swap button."
+  }
+}

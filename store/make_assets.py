@@ -294,47 +294,106 @@ def shot4():
     save(img, "screenshot-4-either-side.png")
 
 
+def toggle(d, x, y, on):
+    """The popup's switch, at the popup's own proportions (38x22)."""
+    rrect(d, (x, y, x + 38, y + 22), 11, fill=BLUE if on else (58, 58, 58))
+    kx = x + 19 if on else x + 3
+    d.ellipse((kx, y + 3, kx + 16, y + 19), fill=TEXT)
+
+
+def slider(d, x, y, w, frac):
+    d.rounded_rectangle((x, y, x + w, y + 4), radius=2, fill=(58, 58, 58))
+    d.rounded_rectangle((x, y, x + w * frac, y + 4), radius=2, fill=BLUE)
+    d.ellipse((x + w * frac - 7, y - 5, x + w * frac + 7, y + 9), fill=BLUE)
+
+
+def popup_mock(d, x, y, w=460):
+    """The settings popup, redrawn at the proportions it actually renders at.
+    Verified against the real popup in Chrome (en, ja and ar) before this was
+    drawn — the switch positions and the two slider values are what it shows."""
+    rows = [
+        ("Enable on YouTube", "Turn the panel off without uninstalling.", True),
+        ("Chat on the other side", "Mirrors correctly in right-to-left layouts.", False),
+        ("Show the drag divider", "Hide it to keep the layout but stop resizing.", True),
+    ]
+    ranges = [("Width in page view", "440 px", 0.33), ("Width in fullscreen", "560 px", 0.45)]
+
+    # Tuned so the whole card clears 800px tall with the headline above it —
+    # the first pass overflowed and cut the Reset button in half.
+    HEAD, ROW, RANGE, FOOT = 92, 70, 84, 100
+    h = HEAD + len(rows) * ROW + len(ranges) * RANGE + FOOT
+    rrect(d, (x, y, x + w, y + h), 16, fill=BG, outline=(52, 52, 52))
+
+    icon_mark(d, x + 24, y + 20, 36)
+    d.text((x + 74, y + 29), "YouTube Chat Dock", font=font(18, True), fill=TEXT)
+    d.line((x, y + 76, x + w, y + 76), fill=LINE, width=1)
+
+    cy = y + HEAD
+    for title, hint, on in rows:
+        d.text((x + 24, cy + 2), title, font=font(16), fill=TEXT)
+        d.text((x + 24, cy + 26), hint, font=font(13), fill=MUTED)
+        toggle(d, x + w - 24 - 38, cy + 8, on)
+        cy += ROW
+        d.line((x + 24, cy - 12, x + w - 24, cy - 12), fill=LINE, width=1)
+
+    for title, val, frac in ranges:
+        d.text((x + 24, cy + 2), title, font=font(16), fill=TEXT)
+        d.text((x + w - 24, cy + 2), val, font=font(16, True), fill=BLUE, anchor="ra")
+        slider(d, x + 24, cy + 42, w - 48, frac)
+        cy += RANGE
+        d.line((x + 24, cy - 12, x + w - 24, cy - 12), fill=LINE, width=1)
+
+    d.text((x + 24, cy), "Below a 1000 px window YouTube stacks chat",
+           font=font(13), fill=MUTED)
+    d.text((x + 24, cy + 18), "under the video, and the panel does not apply.",
+           font=font(13), fill=MUTED)
+    rrect(d, (x + 24, cy + 48, x + 168, cy + 82), 17, fill=SURFACE, outline=LINE)
+    d.text((x + 96, cy + 65), "Reset to defaults", font=font(13), fill=TEXT, anchor="mm")
+    d.text((x + w - 24, cy + 65), "Source code", font=font(13), fill=MUTED, anchor="rm")
+    return h
+
+
 def shot5():
-    """The permissions story, which is the real differentiator on this listing."""
+    """The popup, plus the privacy story it did not cost."""
     img, d = canvas(1280, 800)
     headline(d, 80, 74,
-             "Zero permissions. Nothing leaves your browser.",
-             "No accounts, no analytics, no network requests — the whole extension is three files.")
+             "Settings in one click",
+             "An off switch, both widths and the side toggle — from the toolbar, in 12 languages.")
 
-    rows = [
-        ("Permissions requested", "None"),
-        ("Network requests made", "None"),
-        ("Data collected", "None"),
-        ("Background service worker", "None"),
-        ("Where settings are stored", "Your browser, locally"),
-        ("Source code", "Public, MIT licensed"),
+    popup_mock(d, 80, 200)
+
+    bx = 640
+    claims = [
+        ("No data collected", "Nothing is recorded, transmitted, or sold."),
+        ("No network requests", "No analytics, no telemetry, no remote config."),
+        ("One permission: storage", "So the popup can reach the page. Chrome shows\nno install warning for it."),
+        ("Settings stay local", "In your own browser, never uploaded."),
     ]
-    bx, by, bw = 80, 232, 720
-    rh = 76
-    rrect(d, (bx, by, bx + bw, by + rh * len(rows)), 14, fill=SURFACE, outline=LINE)
-    for i, (k, v) in enumerate(rows):
-        y = by + i * rh
-        if i:
-            d.line((bx + 20, y, bx + bw - 20, y), fill=LINE, width=1)
-        d.text((bx + 26, y + rh / 2), k, font=font(18), fill=MUTED, anchor="lm")
-        d.text((bx + bw - 26, y + rh / 2), v, font=font(18, True),
-               fill=GREEN if v == "None" else TEXT, anchor="rm")
+    y = 224
+    for title, body in claims:
+        d.ellipse((bx, y + 5, bx + 9, y + 14), fill=GREEN)
+        d.text((bx + 24, y), title, font=font(19, True), fill=TEXT)
+        for i, line in enumerate(body.split("\n")):
+            d.text((bx + 24, y + 28 + i * 22), line, font=font(15), fill=MUTED)
+        y += 28 + 24 * len(body.split("\n")) + 34
 
-    # the install dialog Chrome would show — the punchline is that it's empty
-    cx, cy, cw = 850, 232, 350
-    rrect(d, (cx, cy, cx + cw, cy + 236), 14, fill=SURFACE_2, outline=LINE)
-    d.text((cx + 24, cy + 28), "Add “YouTube Chat Dock”?", font=font(16, True), fill=TEXT)
-    d.text((cx + 24, cy + 70), "It can:", font=font(14), fill=MUTED)
-    d.line((cx + 26, cy + 108, cx + 42, cy + 108), fill=FAINT, width=2)
-    d.text((cx + 54, cy + 100), "nothing you have to approve", font=font(14), fill=FAINT)
-    rrect(d, (cx + 24, cy + 168, cx + 150, cy + 204), 18, fill=BLUE)
-    d.text((cx + 87, cy + 186), "Add extension", font=font(13, True), fill=(10, 20, 30), anchor="mm")
-    d.text((cx + 200, cy + 186), "Cancel", font=font(13), fill=MUTED, anchor="lm")
-    # Do not caption this as a real screenshot — it is drawn, like everything
-    # else here. The claim it makes is about behaviour, which is true.
-    d.text((cx + 8, cy + 268), "Chrome has nothing to warn you about.",
-           font=font(14), fill=FAINT)
-    save(img, "screenshot-5-no-permissions.png")
+    d.line((bx, y + 6, 1200, y + 6), fill=LINE, width=1)
+    d.text((bx, y + 26), "Translated into", font=font(15, True), fill=TEXT)
+    # Latin script only: the drawing font has no CJK, Arabic or Devanagari
+    # coverage, and a missing glyph renders as a tofu box.
+    langs = ["English", "Chinese", "Japanese", "Korean", "Spanish", "Portuguese",
+             "French", "German", "Russian", "Arabic", "Hindi"]
+    line, ly = "", y + 54
+    for w_ in langs:
+        trial = (line + " · " + w_) if line else w_
+        if text_w(d, trial, font(15)) > 540:
+            d.text((bx, ly), line, font=font(15), fill=MUTED)
+            ly += 24
+            line = w_
+        else:
+            line = trial
+    d.text((bx, ly), line, font=font(15), fill=MUTED)
+    save(img, "screenshot-5-settings.png")
 
 
 # ------------------------------------------------------------------- tiles
@@ -402,7 +461,7 @@ def small_tile():
     d.line((32, 140, 408, 140), fill=LINE, width=1)
     d.text((32, 160), "Live chat as a resizable", font=font(17), fill=MUTED)
     d.text((32, 184), "side panel — not an overlay.", font=font(17), fill=MUTED)
-    d.text((32, 232), "No permissions  ·  No tracking", font=font(14, True), fill=BLUE)
+    d.text((32, 232), "No tracking  ·  Open source", font=font(14, True), fill=BLUE)
     save(img, "promo-small-440x280.png")
 
 
@@ -412,7 +471,7 @@ def marquee():
     d.text((96, 226), "YouTube Chat Dock", font=font(56, True), fill=TEXT)
     d.text((96, 300), "Live chat as a resizable side panel.", font=font(26), fill=MUTED)
     d.text((96, 336), "Page view, theater, and true fullscreen.", font=font(26), fill=MUTED)
-    d.text((96, 402), "No permissions  ·  No tracking  ·  Open source",
+    d.text((96, 402), "No tracking  ·  Open source  ·  12 languages",
            font=font(19, True), fill=BLUE)
 
     x, y, w, h = 760, 80, 600, 400

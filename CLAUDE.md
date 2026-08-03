@@ -4,16 +4,23 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## What this is
 
-A Manifest V3 Chrome extension that turns YouTube's live chat / chat replay into a fixed, resizable right-side panel with a draggable divider, working in page, theater and true fullscreen. Three source files, no build step, no dependencies, no test framework, no package.json.
+A Manifest V3 Chrome extension that turns YouTube's live chat / chat replay into a fixed, resizable right-side panel with a draggable divider, working in page, theater and true fullscreen. Plus a toolbar settings popup and 12 locales. No build step, no dependencies, no test framework, no package.json.
 
 ## Commands
 
 There is nothing to build or install. Validation is:
 
 ```bash
-node --check dock.js                        # JS syntax
+node --check dock.js && node --check settings.js && node --check popup.js
 python3 -c "import json; json.load(open('manifest.json'))"   # manifest is valid JSON
+./store/package.sh    # runs all of the above, parses every locale, builds the ZIP
 ```
+
+The popup can be rendered outside Chrome for layout work by stubbing
+`chrome.i18n` and `chrome.storage.local` and serving `popup.html` over
+localhost — `file://` is blocked. Do that in **an LTR locale and `ar`**: the
+popup is written with logical CSS properties precisely so it mirrors, and only
+rendering it in RTL proves it does.
 
 To run it: `chrome://extensions/` → Developer mode → **Load unpacked** → repo root. After editing, hit reload on the extension card, then reload the YouTube tab.
 
@@ -37,7 +44,11 @@ Past examples of assumptions that measured false:
 
 **The manifest injects `dock.css` into all frames** (`all_frames: true`), including the chat iframe at `/live_chat`. Therefore **every chat-iframe rule must be scoped under `yt-live-chat-app`** or it leaks onto the watch page. The chat internals are light DOM, so descendant selectors work across them. `dock.js` guards the opposite way with `if (window.top !== window.self) return;` — the iframe gets styling and no script.
 
-**Persistence is `localStorage`, deliberately, not `chrome.storage.local`.** `chrome.storage` is async, so at `document_start` the page would paint the default width and visibly jump on every load, and it would require the `storage` permission and end the zero-permission listing. Do not "modernise" this without re-reading the comment in `dock.js`.
+**Persistence is two stores with asymmetric roles, and the asymmetry is the point.** `localStorage` is the only store readable *synchronously* at `document_start`, so it stays the source of truth for first paint — reading it there is what stops the page painting the default width and visibly jumping. `chrome.storage.local` was added in v1.4.0 only because the popup is an extension page and physically cannot write youtube.com's `localStorage`; it is a channel, not a source. `dock.js` mirrors it *down* into `localStorage`, seeding it *up* only for keys the extension store has never seen (which is what carries pre-1.4.0 widths through the upgrade). Do not collapse these into one store without re-reading the comment block in `dock.js`.
+
+**`settings.js` is loaded into both worlds** — as the first content script, and as a plain script in `popup.html` — so key names, defaults and bounds have one definition. Content scripts share an isolated-world scope, which is why `dock.js` can read `YTCHAT` off a global.
+
+**Every user-facing string comes from `chrome.i18n`**, with the English text repeated inline as a fallback only where a throw is possible (`dock.js` keeps running in orphaned tabs after an extension reload, where all `chrome.*` access throws). `popup.js` has no fallbacks and no hard-coded English: it fills `[data-i18n]` from the message catalogue, so a missing key falls back to `_locales/en` uniformly instead of leaving one control in the wrong language.
 
 **No single event is reliable** for knowing when YouTube has relaid out, so `dock.js` polls every `TICK_MS` (400ms, one `querySelector` + one rect) alongside `resize` / `scroll` / `fullscreenchange` / `yt-navigate-finish`. Everything on that path is wrapped in `safe()`, which caps logging at 3 so a throw can't spam the console 2.5×/second.
 
@@ -47,6 +58,7 @@ Past examples of assumptions that measured false:
 - **`yt-live-chat-app` carries `min-width: 298px`.** Narrower than that, the app refuses to shrink while its iframe does, clipping the right edge of every message. Releasing it plus the `min-width: auto` on its flex descendants is what allows widths below 298px at all.
 - **The chat is a real `<iframe>` and steals `pointermove` mid-drag.** Both `setPointerCapture` *and* the `#ytchat-resizer-shield` overlay are load-bearing; dropping either makes drags die when the cursor crosses into chat.
 - **Widths are clamped against the live viewport**, not just `MAX`, reserving `KEEP_FOR_VIDEO`. A width saved on a large monitor otherwise restores verbatim onto a laptop and leaves the player a sliver.
+- **Every watch-page rule is gated behind `:root:not([data-ytchat-off])`.** The manifest injects `dock.css` statically and nothing can unload it, so the popup's off switch has to be expressed in CSS. `dock.js` sets the attribute at `document_start`, which is what makes "off" mean *no flash of a docked layout* rather than a flicker. Section 4 (chat iframe) is deliberately ungated: `dock.js` is top-frame only, so the attribute can never land there — and those rules only release YouTube's min-widths, so they are inert when the extension is off.
 - **Page-mode sizing is gated behind `@media (min-width: 1000px)`.** Below that YouTube stacks chat under the video; forcing a sidebar width there fights the stock responsive layout. The divider hides at the same breakpoint.
 - **The side toggle stores a flip, never a literal "left"/"right".** It works by
   putting `order: -1` on the chat container, and `order` moves an item to the flex
@@ -64,8 +76,8 @@ the measured character counts; `store/make_assets.py` regenerates all images
 editor; `store/package.sh` builds the upload ZIP and validates first.
 
 - Bump `version` in `manifest.json`.
-- `description` must be **≤ 132 characters** — the store rejects longer, and it has already been over once.
-- Keep `permissions` and `host_permissions` absent. `content_scripts.matches` is sufficient and zero-permission is a deliberate property of the listing.
+- Keep `permissions` at exactly `["storage"]` and `host_permissions` absent. `content_scripts.matches` is sufficient for the host side. `storage` generates no install warning, so the listing can still say Chrome asks the user to approve nothing — but it must say "one permission", never "zero".
+- `description` is `__MSG_extDesc__`; the real strings are in `_locales/*/messages.json` and the 132-character limit applies to **every** locale. Spanish measured 133 on the first pass.
 - Do not use YouTube's logo, wordmark, or red-and-white scheme in the icon or screenshots. Trademark risk on the store lives in visual branding far more than in a descriptive product name.
 
 ## Conventions

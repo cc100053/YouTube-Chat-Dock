@@ -9,7 +9,8 @@ Not a floating overlay. The video is resized to fit beside the chat, never cover
 - **Hover the divider and click ⇄** to move chat to the other side. The choice persists.
 - **Chat replay** on VODs works exactly like live chat.
 - **RTL locales** supported — chat docks left, and the divider flips with it.
-- **No permissions.** No API calls, no network requests, no tracking.
+- **Settings popup** in the toolbar: on/off, both widths, side, reset. 12 languages.
+- **One permission** (`storage`), no host permissions, no network requests, no tracking.
 
 ## Install
 
@@ -22,19 +23,40 @@ Until it's on the Chrome Web Store:
 
 ## Configuration
 
-Widths are set by dragging, and persist in `localStorage`. The bounds live at the top of `dock.js`:
+Click the toolbar icon for the settings popup, or just drag the divider. Both
+write the same five values, so they never disagree.
+
+The bounds live in `settings.js`, which is loaded by both the content script
+and the popup so there is one definition rather than two copies:
 
 ```js
-const MIN = 120;             // narrowest draggable width
-const MAX = 1100;            // widest
-const KEEP_FOR_VIDEO = 480;  // player never squeezed below this
-const TOP_GAP = 72;          // gap under the masthead in page mode
+MIN: 120,             // narrowest draggable width
+MAX: 1100,            // widest
+KEEP_FOR_VIDEO: 480,  // player never squeezed below this
+TOP_GAP: 72,          // gap under the masthead in page mode
 ```
 
 Widths are clamped against the *current* viewport on every load, so a width
 saved on a large monitor won't leave a sliver of video on a laptop.
 
-Defaults (440px page / 560px fullscreen) are in `dock.css` under `:root`.
+Defaults (440px page / 560px fullscreen) live in `settings.js`, mirrored as
+static fallbacks in `dock.css` under `:root`.
+
+### Why two storage backends
+
+`localStorage` is the only store readable *synchronously* at `document_start`,
+and reading it there is what stops the page painting YouTube's default width
+and then jumping. That is why it is still the source of truth for first paint.
+
+`chrome.storage.local` exists because the popup is an extension page and
+physically cannot write to youtube.com's `localStorage` — that origin belongs
+to the page. So it is a channel, not a source: the popup writes it, and
+`dock.js` mirrors it down into `localStorage` on the next load.
+
+The honest consequence: a change made in the popup lands asynchronously on the
+*next* YouTube load, so it can apply a frame late that once. Every load after
+that is synchronous again. Widths dragged on the page write both stores at once
+and never lag.
 
 ## How it works
 
@@ -76,17 +98,26 @@ CSS is injected by the manifest at `document_start`, so it applies before first 
   rule is the same `order: -1` on the same kind of flex row, and its failure mode
   is benign: chat simply stays put. Under RTL the flip works but the gutter
   correction may be cosmetically off.
-- Widths live in `localStorage`, so clearing site data for youtube.com resets them.
-  This is a deliberate trade for zero permissions and no load flicker — see the
-  comment in `dock.js`.
+- Widths live in `localStorage`, so clearing site data for youtube.com resets
+  them. That is the price of applying them before first paint — see the comment
+  in `dock.js`.
+- Switching the extension off leaves the chat-iframe rules in `dock.css`
+  section 4 applied, because `dock.js` runs in the top frame only and cannot
+  set the off-switch attribute inside the iframe. Those rules only *release*
+  YouTube's own min-widths, so with chat back at its default width they change
+  nothing visible.
 
 ## Files
 
 | File | Purpose |
 |---|---|
-| `manifest.json` | MV3, no permissions, one content script |
+| `manifest.json` | MV3, one permission (`storage`), one content script, one popup |
+| `settings.js` | Keys, defaults and bounds. Loaded into both the page and the popup |
 | `dock.css` | Layout, fullscreen sizing, video normalization, chat-iframe fixes, divider styling |
-| `dock.js` | Drag logic. Top frame only — the chat iframe gets CSS and nothing else |
+| `dock.js` | Drag logic and the storage mirror. Top frame only — the chat iframe gets CSS and nothing else |
+| `popup.html/.css/.js` | Settings UI. Logical CSS properties throughout, so it mirrors in RTL |
+| `_locales/` | 12 languages: en, zh_TW, zh_CN, ja, ko, es, pt_BR, fr, de, ru, ar, hi |
+| `store/` | Chrome Web Store listing copy, privacy policy, generated assets, packaging |
 
 ## License
 

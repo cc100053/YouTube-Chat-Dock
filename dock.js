@@ -9,18 +9,22 @@
 
   if (window.top !== window.self) return;
 
-  const MIN = 120;      // narrower than this chat is unreadable, not broken
-  const MAX = 1100;
-  const KEEP_FOR_VIDEO = 480; // never let chat squeeze the player below this
-  const TOP_GAP = 72;
+  /* Bounds, key names and defaults live in settings.js, which the manifest
+     loads immediately before this file and popup.html loads as a plain
+     script. One definition, two worlds — the popup and the page cannot drift
+     apart on what "ytchat-w" means or what its default is. */
+  const MIN = YTCHAT.MIN;
+  const MAX = YTCHAT.MAX;
+  const KEEP_FOR_VIDEO = YTCHAT.KEEP_FOR_VIDEO;
+  const TOP_GAP = YTCHAT.TOP_GAP;
   const TICK_MS = 400;
 
   const MODES = {
-    page: { cssVar: '--ytchat-w', key: 'ytchat-w', def: 440 },
-    fs:   { cssVar: '--ytchat-fsw', key: 'ytchat-fsw', def: 560 },
+    page: { cssVar: '--ytchat-w', key: YTCHAT.K.page, def: Number(YTCHAT.DEF[YTCHAT.K.page]) },
+    fs:   { cssVar: '--ytchat-fsw', key: YTCHAT.K.fs, def: Number(YTCHAT.DEF[YTCHAT.K.fs]) },
   };
 
-  const FLIP_KEY = 'ytchat-flip';
+  const FLIP_KEY = YTCHAT.K.flip;
 
   const root = document.documentElement;
   const inFullscreen = () => !!document.querySelector('ytd-watch-flexy[fullscreen]');
@@ -34,24 +38,70 @@
     return Math.round(Math.min(ceiling, Math.max(MIN, px)));
   }
 
-  /* Inline custom properties beat every stylesheet, so a stored width always
-     wins over the defaults in dock.css.
+  /* ---- storage: two stores, one of them synchronous --------------------
 
-     Storage is localStorage rather than chrome.storage.local on purpose:
-     chrome.storage is async, which would paint the default width first and
-     then jump on every page load, and it would require the "storage"
-     permission. Synchronous read at document_start keeps the extension both
-     flicker-free and permission-free. Trade-off: widths are lost if the user
-     clears site data for youtube.com. */
+     localStorage stays the source of truth for FIRST PAINT. It is the only
+     store readable synchronously at document_start, and reading it there is
+     what stops the page painting the default width and then jumping. That
+     property is why it survived the popup being added.
+
+     chrome.storage.local exists because the popup is an extension page and
+     physically cannot reach youtube.com's localStorage — that origin belongs
+     to the page. So it is the channel, not the source: the popup writes it,
+     and the mirror below copies it down into localStorage.
+
+     Consequence, stated plainly: change a setting in the popup, and the NEXT
+     YouTube load applies it asynchronously, so it can land a frame late.
+     Every load after that is synchronous again, because the mirror has run.
+     Widths dragged on the page are written to both at once and never lag. */
   const applyVar = (m, px) => root.style.setProperty(m.cssVar, px + 'px');
 
-  function readStored(m) {
+  function lsGet(key) {
     try {
-      const px = parseFloat(localStorage.getItem(m.key));
-      return Number.isFinite(px) ? px : m.def;
+      const v = localStorage.getItem(key);
+      return v === null ? YTCHAT.DEF[key] : v;
     } catch (e) {
-      return m.def; // storage disabled / partitioned
+      return YTCHAT.DEF[key]; // storage disabled / partitioned
     }
+  }
+
+  function lsSet(key, value) {
+    try { localStorage.setItem(key, String(value)); } catch (e) { /* ignore */ }
+  }
+
+  /* chrome.* throws rather than returning undefined once the extension is
+     reloaded or updated underneath a still-open tab. Every access is guarded
+     so an orphaned tab degrades to localStorage-only instead of throwing
+     2.5 times a second. */
+  function area() {
+    try {
+      return (typeof chrome !== 'undefined' && chrome.storage && chrome.storage.local)
+        ? chrome.storage.local : null;
+    } catch (e) {
+      return null;
+    }
+  }
+
+  function extSet(key, value) {
+    const a = area();
+    if (!a) return;
+    try {
+      const patch = {};
+      patch[key] = String(value);
+      a.set(patch, () => void chrome.runtime.lastError);
+    } catch (e) { /* orphaned context */ }
+  }
+
+  /* Write-through: the page is the one writer that can reach both stores, so
+     it keeps them byte-identical and the mirror below stays a no-op. */
+  function put(key, value) {
+    lsSet(key, value);
+    extSet(key, value);
+  }
+
+  function readStored(m) {
+    const px = parseFloat(lsGet(m.key));
+    return Number.isFinite(px) ? px : m.def;
   }
 
   /* The side toggle is stored as a *flip*, not as "left"/"right", because
@@ -60,6 +110,8 @@
      in both locales, and the geometric side detection below keeps working
      without knowing why the panel moved. */
   let flipped = false;
+  let enabled = true;
+  let dividerOn = true;
 
   function applyFlip(on) {
     flipped = on;
@@ -68,14 +120,23 @@
     else root.removeAttribute('data-ytchat-flip');
   }
 
+  /* The off switch is an attribute rather than a stylesheet swap, because
+     dock.css is injected statically by the manifest and cannot be unloaded.
+     Every layout rule in it is gated on :root:not([data-ytchat-off]), so
+     setting this attribute at document_start hands the page back to YouTube
+     before first paint — disabled means no flash of a docked layout either. */
+  function applyEnabled(on) {
+    enabled = on;
+    if (on) root.removeAttribute('data-ytchat-off');
+    else root.setAttribute('data-ytchat-off', '');
+  }
+
   function restore() {
+    applyEnabled(YTCHAT.isOn(lsGet(YTCHAT.K.enabled)));
+    dividerOn = YTCHAT.isOn(lsGet(YTCHAT.K.divider));
     for (const m of Object.values(MODES)) applyVar(m, clamp(readStored(m)));
     root.style.setProperty('--ytchat-top', TOP_GAP + 'px');
-    try {
-      applyFlip(localStorage.getItem(FLIP_KEY) === '1');
-    } catch (e) {
-      applyFlip(false); // storage disabled / partitioned
-    }
+    applyFlip(YTCHAT.isOn(lsGet(FLIP_KEY)));
   }
 
   function readWidth() {
@@ -87,7 +148,7 @@
     const m = mode();
     px = clamp(px);
     applyVar(m, px);
-    try { localStorage.setItem(m.key, String(px)); } catch (e) { /* ignore */ }
+    put(m.key, px);
     return px;
   }
 
@@ -117,28 +178,43 @@
     return (panelOnLeft(rect) ? rect.right : rect.left) - 5;
   }
 
+  /* chrome.i18n is synchronous and needs no permission, but it throws in an
+     orphaned content script like everything else on chrome.*, so the English
+     string stays inline as the fallback rather than leaving the control
+     unlabelled for screen readers. */
+  function t(key, fallback) {
+    try {
+      return (chrome.i18n && chrome.i18n.getMessage(key)) || fallback;
+    } catch (e) {
+      return fallback;
+    }
+  }
+
   // ---- divider ---------------------------------------------------------
   const handle = document.createElement('div');
   handle.id = 'ytchat-resizer';
-  handle.title = 'Drag to resize chat · double-click to reset';
+  handle.title = t('dividerTitle', 'Drag to resize chat · double-click to reset');
   handle.setAttribute('role', 'separator');
   handle.setAttribute('aria-orientation', 'vertical');
-  handle.setAttribute('aria-label', 'Resize chat panel');
+  handle.setAttribute('aria-label', t('dividerAria', 'Resize chat panel'));
 
   const readout = document.createElement('span');
   readout.className = 'ytchat-readout';
   handle.appendChild(readout);
 
-  /* The divider is the only surface this extension owns — there is no popup
-     and no chrome.storage — so the side toggle lives on it, revealed on
-     hover. Every listener stops propagation: the divider below it treats
-     pointerdown as "start dragging" and dblclick as "reset width". */
+  /* The side toggle stays on the divider even though the popup now offers the
+     same switch: flipping sides is a thing you want while looking at the
+     layout, and reaching the toolbar to do it means losing fullscreen. The
+     popup and this button write the same key, so they never disagree.
+
+     Every listener stops propagation: the divider below it treats pointerdown
+     as "start dragging" and dblclick as "reset width". */
   const flipBtn = document.createElement('button');
   flipBtn.id = 'ytchat-flip-btn';
   flipBtn.type = 'button';
   flipBtn.textContent = '⇄';
-  flipBtn.title = 'Move chat to the other side';
-  flipBtn.setAttribute('aria-label', 'Move chat to the other side');
+  flipBtn.title = t('flipAria', 'Move chat to the other side');
+  flipBtn.setAttribute('aria-label', t('flipAria', 'Move chat to the other side'));
   handle.appendChild(flipBtn);
 
   let shield = null;
@@ -148,6 +224,8 @@
 
   function reposition() {
     if (dragging) return;
+    // Switched off entirely, or the user kept the layout but hid the handle.
+    if (!enabled || !dividerOn) return hide();
     const el = panel();
     if (!el) return hide();
     const r = el.getBoundingClientRect();
@@ -216,7 +294,7 @@
 
   function toggleSide() {
     applyFlip(!flipped);
-    try { localStorage.setItem(FLIP_KEY, flipped ? '1' : '0'); } catch (e) { /* ignore */ }
+    put(FLIP_KEY, flipped ? '1' : '0');
     window.dispatchEvent(new Event('resize'));
     reposition();
     // YouTube resizes the player asynchronously; re-measure once it has.
@@ -234,6 +312,66 @@
     restore();
     if (document.body && !handle.isConnected) document.body.appendChild(handle);
     reposition();
+  }
+
+  /* Re-apply after a settings change and make YouTube recompute its own
+     player layout, which it does not do on a CSS-driven resize. */
+  function reapply() {
+    restore();
+    window.dispatchEvent(new Event('resize'));
+    reposition();
+    setTimeout(() => safeReposition(), 120);
+  }
+
+  /* ---- mirror: chrome.storage.local -> localStorage --------------------
+
+     Runs once per page load, after first paint has already happened off the
+     synchronous localStorage read. Two directions, and which one wins is not
+     symmetric:
+
+       - a key the extension store has never seen is SEEDED from localStorage,
+         so widths dragged before this version existed survive the upgrade;
+       - a key that differs is copied DOWN into localStorage, because the only
+         writer that can produce a difference is the popup, which cannot write
+         localStorage itself.
+
+     A page drag writes both stores at once, so it never reaches either branch. */
+  function syncFromExtensionStore() {
+    const a = area();
+    if (!a) return;
+    try {
+      a.get(YTCHAT.ALL_KEYS, (got) => {
+        if (chrome.runtime.lastError) return;
+        const seed = {};
+        let changed = false;
+        for (const k of YTCHAT.ALL_KEYS) {
+          const mine = lsGet(k);
+          if (got[k] === undefined) seed[k] = mine;
+          else if (String(got[k]) !== String(mine)) { lsSet(k, got[k]); changed = true; }
+        }
+        if (Object.keys(seed).length) a.set(seed, () => void chrome.runtime.lastError);
+        if (changed) safe(reapply)();
+      });
+    } catch (e) { /* orphaned context */ }
+  }
+
+  /* Live updates while the popup is open, so a toggle is visible on the page
+     behind it without a reload. */
+  function watchExtensionStore() {
+    try {
+      if (!chrome.storage || !chrome.storage.onChanged) return;
+      chrome.storage.onChanged.addListener((changes, where) => {
+        if (where !== 'local') return;
+        let changed = false;
+        for (const k of YTCHAT.ALL_KEYS) {
+          if (!(k in changes)) continue;
+          const v = changes[k].newValue;
+          if (v === undefined) continue;
+          if (String(v) !== String(lsGet(k))) { lsSet(k, v); changed = true; }
+        }
+        if (changed) safe(reapply)();
+      });
+    } catch (e) { /* orphaned context */ }
   }
 
   /* One throw must not kill the loop or spam the console every 400ms. */
@@ -258,6 +396,8 @@
   }
 
   safeMount();
+  safe(syncFromExtensionStore)();
+  safe(watchExtensionStore)();
   if (document.readyState === 'loading') {
     document.addEventListener('DOMContentLoaded', safeMount, { once: true });
   }

@@ -18,6 +18,25 @@
 }
 
 /* -------------------------------------------------------------
+   0. The off switch
+
+   Every watch-page rule below is gated on
+   :root:not([data-ytchat-off]). The manifest injects this file
+   statically and nothing can unload it, so switching the
+   extension off in the popup has to be expressed in CSS — and
+   dock.js sets the attribute at document_start, which means
+   "off" also means no flash of a docked layout before it
+   applies.
+
+   Section 4 (inside the chat iframe) is deliberately NOT gated:
+   dock.js runs in the top frame only, so the attribute never
+   lands on the iframe's <html> and the gate could never match
+   there. Those rules only RELEASE YouTube's own min-widths, so
+   when the extension is off and chat is back at YouTube's
+   default width, they change nothing visible.
+   ------------------------------------------------------------- */
+
+/* -------------------------------------------------------------
    1. Watch page — page + theater mode
 
    Gated on viewport width: below ~1000px YouTube drops to a
@@ -26,20 +45,20 @@
    responsive layout, so we simply don't apply.
    ------------------------------------------------------------- */
 @media (min-width: 1000px) {
-  ytd-watch-flexy {
+  :root:not([data-ytchat-off]) ytd-watch-flexy {
     --ytd-watch-flexy-sidebar-width: var(--ytchat-w) !important;
     --ytd-watch-flexy-sidebar-min-width: var(--ytchat-w) !important;
     --ytd-watch-flexy-chat-max-height: calc(100vh - var(--ytchat-top) - 16px) !important;
   }
 
-  ytd-watch-flexy:not([fullscreen]) #secondary.ytd-watch-flexy {
+  :root:not([data-ytchat-off]) ytd-watch-flexy:not([fullscreen]) #secondary.ytd-watch-flexy {
     width: var(--ytchat-w) !important;
     min-width: var(--ytchat-w) !important;
     max-width: var(--ytchat-w) !important;
     flex: 0 0 var(--ytchat-w) !important;
   }
 
-  ytd-watch-flexy:not([fullscreen]) ytd-live-chat-frame#chat {
+  :root:not([data-ytchat-off]) ytd-watch-flexy:not([fullscreen]) ytd-live-chat-frame#chat {
     position: sticky !important;
     top: var(--ytchat-top) !important;
     width: 100% !important;
@@ -59,11 +78,11 @@
    positioning, no overlay, no z-index fights. Not gated on
    viewport width: fullscreen is always wide.
    ------------------------------------------------------------- */
-ytd-watch-flexy[fullscreen] #full-bleed-container {
+:root:not([data-ytchat-off]) ytd-watch-flexy[fullscreen] #full-bleed-container {
   display: flex !important;
 }
 
-ytd-watch-flexy[fullscreen] #panels-full-bleed-container {
+:root:not([data-ytchat-off]) ytd-watch-flexy[fullscreen] #panels-full-bleed-container {
   flex: 0 0 var(--ytchat-fsw) !important;
   width: var(--ytchat-fsw) !important;
   max-width: var(--ytchat-fsw) !important;
@@ -71,13 +90,13 @@ ytd-watch-flexy[fullscreen] #panels-full-bleed-container {
   overflow: hidden !important;
 }
 
-ytd-watch-flexy[fullscreen] #player-full-bleed-container {
+:root:not([data-ytchat-off]) ytd-watch-flexy[fullscreen] #player-full-bleed-container {
   flex: 1 1 auto !important;
   width: auto !important;
   min-width: 0 !important;
 }
 
-ytd-watch-flexy[fullscreen] .ytp-chrome-bottom {
+:root:not([data-ytchat-off]) ytd-watch-flexy[fullscreen] .ytp-chrome-bottom {
   width: calc(100% - 24px) !important;
   left: 12px !important;
 }
@@ -109,14 +128,14 @@ ytd-watch-flexy[fullscreen] .ytp-chrome-bottom {
    worst case there is a cosmetic 0/32 gutter, not a break.
    ------------------------------------------------------------- */
 @media (min-width: 1000px) {
-  :root[data-ytchat-flip] ytd-watch-flexy:not([fullscreen]) #secondary.ytd-watch-flexy {
+  :root[data-ytchat-flip]:not([data-ytchat-off]) ytd-watch-flexy:not([fullscreen]) #secondary.ytd-watch-flexy {
     order: -1 !important;
     padding-left: var(--ytd-watch-flexy-horizontal-page-margin) !important;
     padding-right: 0 !important;
   }
 }
 
-:root[data-ytchat-flip] ytd-watch-flexy[fullscreen] #panels-full-bleed-container {
+:root[data-ytchat-flip]:not([data-ytchat-off]) ytd-watch-flexy[fullscreen] #panels-full-bleed-container {
   order: -1 !important;
 }
 
@@ -129,12 +148,12 @@ ytd-watch-flexy[fullscreen] .ytp-chrome-bottom {
    cropped after a resize (measured: player 1157x651, video still
    1346x757). Hand sizing back to the browser.
    ------------------------------------------------------------- */
-ytd-watch-flexy .html5-video-container {
+:root:not([data-ytchat-off]) ytd-watch-flexy .html5-video-container {
   width: 100% !important;
   height: 100% !important;
 }
 
-ytd-watch-flexy video.html5-main-video {
+:root:not([data-ytchat-off]) ytd-watch-flexy video.html5-main-video {
   width: 100% !important;
   height: 100% !important;
   left: 0 !important;

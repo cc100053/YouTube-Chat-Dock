@@ -1,0 +1,74 @@
+{
+  "extName": {
+    "message": "YouTube Chat Dock",
+    "description": "Extension name. Not translated — it is the product name."
+  },
+  "extDesc": {
+    "message": "Turn live chat and chat replay into a resizable side panel. Drag the divider to resize. Works in true fullscreen.",
+    "description": "Store and manifest description. Hard limit 132 characters."
+  },
+  "optEnabled": {
+    "message": "Enable on YouTube",
+    "description": "Popup: master on/off switch label."
+  },
+  "optEnabledHint": {
+    "message": "Turn the panel off without uninstalling.",
+    "description": "Popup: help text under the on/off switch."
+  },
+  "optSwap": {
+    "message": "Chat on the other side",
+    "description": "Popup: label for the switch that moves chat to the opposite side."
+  },
+  "optSwapHint": {
+    "message": "Mirrors correctly in right-to-left layouts.",
+    "description": "Popup: help text under the side switch."
+  },
+  "optDivider": {
+    "message": "Show the drag divider",
+    "description": "Popup: label for the switch that shows or hides the drag divider."
+  },
+  "optDividerHint": {
+    "message": "Hide it to keep the layout but stop resizing.",
+    "description": "Popup: help text under the divider switch."
+  },
+  "optPageWidth": {
+    "message": "Width in page view",
+    "description": "Popup: label for the chat width used in normal page view."
+  },
+  "optFsWidth": {
+    "message": "Width in fullscreen",
+    "description": "Popup: label for the chat width used in fullscreen."
+  },
+  "unitPx": {
+    "message": "px",
+    "description": "Unit suffix for a pixel value. Usually left as px."
+  },
+  "btnReset": {
+    "message": "Reset to defaults",
+    "description": "Popup: button that restores every setting to its default."
+  },
+  "toastSaved": {
+    "message": "Saved",
+    "description": "Popup: brief confirmation shown after a setting changes."
+  },
+  "noteNarrow": {
+    "message": "Below a 1000 px window YouTube stacks chat under the video, and the panel does not apply there.",
+    "description": "Popup: footnote explaining why nothing happens in a narrow window."
+  },
+  "linkSource": {
+    "message": "Source code",
+    "description": "Popup: link to the public source repository."
+  },
+  "dividerTitle": {
+    "message": "Drag to resize chat · double-click to reset",
+    "description": "Tooltip on the drag divider in the page."
+  },
+  "dividerAria": {
+    "message": "Resize chat panel",
+    "description": "Screen-reader label for the drag divider."
+  },
+  "flipAria": {
+    "message": "Move chat to the other side",
+    "description": "Screen-reader label and tooltip for the side-swap button."
+  }
+}

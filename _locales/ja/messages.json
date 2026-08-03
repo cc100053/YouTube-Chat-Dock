@@ -1,0 +1,74 @@
+{
+  "extName": {
+    "message": "YouTube Chat Dock",
+    "description": "Extension name. Not translated — it is the product name."
+  },
+  "extDesc": {
+    "message": "ライブチャットとチャットのリプレイを、幅を変えられるサイドパネルに。仕切りをドラッグして調整、全画面でも動作します。",
+    "description": "Store and manifest description. Hard limit 132 characters."
+  },
+  "optEnabled": {
+    "message": "YouTube で有効にする",
+    "description": "Popup: master on/off switch label."
+  },
+  "optEnabledHint": {
+    "message": "アンインストールせずに一時的に無効化できます。",
+    "description": "Popup: help text under the on/off switch."
+  },
+  "optSwap": {
+    "message": "チャットを反対側に",
+    "description": "Popup: label for the switch that moves chat to the opposite side."
+  },
+  "optSwapHint": {
+    "message": "右から左のレイアウトでも正しく反転します。",
+    "description": "Popup: help text under the side switch."
+  },
+  "optDivider": {
+    "message": "ドラッグ用の仕切りを表示",
+    "description": "Popup: label for the switch that shows or hides the drag divider."
+  },
+  "optDividerHint": {
+    "message": "非表示にするとレイアウトはそのまま、サイズ変更だけ止まります。",
+    "description": "Popup: help text under the divider switch."
+  },
+  "optPageWidth": {
+    "message": "通常表示での幅",
+    "description": "Popup: label for the chat width used in normal page view."
+  },
+  "optFsWidth": {
+    "message": "全画面での幅",
+    "description": "Popup: label for the chat width used in fullscreen."
+  },
+  "unitPx": {
+    "message": "px",
+    "description": "Unit suffix for a pixel value. Usually left as px."
+  },
+  "btnReset": {
+    "message": "既定値に戻す",
+    "description": "Popup: button that restores every setting to its default."
+  },
+  "toastSaved": {
+    "message": "保存しました",
+    "description": "Popup: brief confirmation shown after a setting changes."
+  },
+  "noteNarrow": {
+    "message": "ウィンドウ幅が 1000 px 未満だと YouTube はチャットを動画の下に配置するため、パネルは適用されません。",
+    "description": "Popup: footnote explaining why nothing happens in a narrow window."
+  },
+  "linkSource": {
+    "message": "ソースコード",
+    "description": "Popup: link to the public source repository."
+  },
+  "dividerTitle": {
+    "message": "ドラッグで幅を調整 · ダブルクリックで既定に戻す",
+    "description": "Tooltip on the drag divider in the page."
+  },
+  "dividerAria": {
+    "message": "チャットパネルの幅を変更",
+    "description": "Screen-reader label for the drag divider."
+  },
+  "flipAria": {
+    "message": "チャットを反対側に移動",
+    "description": "Screen-reader label and tooltip for the side-swap button."
+  }
+}

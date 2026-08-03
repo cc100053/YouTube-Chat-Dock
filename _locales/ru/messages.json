@@ -1,0 +1,74 @@
+{
+  "extName": {
+    "message": "YouTube Chat Dock",
+    "description": "Extension name. Not translated — it is the product name."
+  },
+  "extDesc": {
+    "message": "Превращает живой чат и его повтор в боковую панель с изменяемой шириной. Работает в полноэкранном режиме.",
+    "description": "Store and manifest description. Hard limit 132 characters."
+  },
+  "optEnabled": {
+    "message": "Включить на YouTube",
+    "description": "Popup: master on/off switch label."
+  },
+  "optEnabledHint": {
+    "message": "Отключить панель без удаления расширения.",
+    "description": "Popup: help text under the on/off switch."
+  },
+  "optSwap": {
+    "message": "Чат с другой стороны",
+    "description": "Popup: label for the switch that moves chat to the opposite side."
+  },
+  "optSwapHint": {
+    "message": "Корректно зеркалится в раскладках справа налево.",
+    "description": "Popup: help text under the side switch."
+  },
+  "optDivider": {
+    "message": "Показывать разделитель",
+    "description": "Popup: label for the switch that shows or hides the drag divider."
+  },
+  "optDividerHint": {
+    "message": "Скройте, чтобы сохранить раскладку, но запретить перетаскивание.",
+    "description": "Popup: help text under the divider switch."
+  },
+  "optPageWidth": {
+    "message": "Ширина в обычном режиме",
+    "description": "Popup: label for the chat width used in normal page view."
+  },
+  "optFsWidth": {
+    "message": "Ширина в полноэкранном режиме",
+    "description": "Popup: label for the chat width used in fullscreen."
+  },
+  "unitPx": {
+    "message": "px",
+    "description": "Unit suffix for a pixel value. Usually left as px."
+  },
+  "btnReset": {
+    "message": "Сбросить настройки",
+    "description": "Popup: button that restores every setting to its default."
+  },
+  "toastSaved": {
+    "message": "Сохранено",
+    "description": "Popup: brief confirmation shown after a setting changes."
+  },
+  "noteNarrow": {
+    "message": "При ширине окна менее 1000 px YouTube размещает чат под видео, и панель не применяется.",
+    "description": "Popup: footnote explaining why nothing happens in a narrow window."
+  },
+  "linkSource": {
+    "message": "Исходный код",
+    "description": "Popup: link to the public source repository."
+  },
+  "dividerTitle": {
+    "message": "Потяните, чтобы изменить ширину · двойной клик — сброс",
+    "description": "Tooltip on the drag divider in the page."
+  },
+  "dividerAria": {
+    "message": "Изменить ширину панели чата",
+    "description": "Screen-reader label for the drag divider."
+  },
+  "flipAria": {
+    "message": "Переместить чат на другую сторону",
+    "description": "Screen-reader label and tooltip for the side-swap button."
+  }
+}

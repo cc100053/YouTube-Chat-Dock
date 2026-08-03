@@ -1,0 +1,74 @@
+{
+  "extName": {
+    "message": "YouTube Chat Dock",
+    "description": "Extension name. Not translated — it is the product name."
+  },
+  "extDesc": {
+    "message": "Convierte el chat en directo y su repetición en un panel lateral redimensionable. Funciona en pantalla completa.",
+    "description": "Store and manifest description. Hard limit 132 characters."
+  },
+  "optEnabled": {
+    "message": "Activar en YouTube",
+    "description": "Popup: master on/off switch label."
+  },
+  "optEnabledHint": {
+    "message": "Desactiva el panel sin desinstalar.",
+    "description": "Popup: help text under the on/off switch."
+  },
+  "optSwap": {
+    "message": "Chat en el otro lado",
+    "description": "Popup: label for the switch that moves chat to the opposite side."
+  },
+  "optSwapHint": {
+    "message": "Se refleja correctamente en diseños de derecha a izquierda.",
+    "description": "Popup: help text under the side switch."
+  },
+  "optDivider": {
+    "message": "Mostrar el divisor",
+    "description": "Popup: label for the switch that shows or hides the drag divider."
+  },
+  "optDividerHint": {
+    "message": "Ocúltalo para mantener el diseño sin poder redimensionar.",
+    "description": "Popup: help text under the divider switch."
+  },
+  "optPageWidth": {
+    "message": "Ancho en vista normal",
+    "description": "Popup: label for the chat width used in normal page view."
+  },
+  "optFsWidth": {
+    "message": "Ancho en pantalla completa",
+    "description": "Popup: label for the chat width used in fullscreen."
+  },
+  "unitPx": {
+    "message": "px",
+    "description": "Unit suffix for a pixel value. Usually left as px."
+  },
+  "btnReset": {
+    "message": "Restablecer valores",
+    "description": "Popup: button that restores every setting to its default."
+  },
+  "toastSaved": {
+    "message": "Guardado",
+    "description": "Popup: brief confirmation shown after a setting changes."
+  },
+  "noteNarrow": {
+    "message": "Con una ventana de menos de 1000 px, YouTube coloca el chat debajo del vídeo y el panel no se aplica.",
+    "description": "Popup: footnote explaining why nothing happens in a narrow window."
+  },
+  "linkSource": {
+    "message": "Código fuente",
+    "description": "Popup: link to the public source repository."
+  },
+  "dividerTitle": {
+    "message": "Arrastra para redimensionar · doble clic para restablecer",
+    "description": "Tooltip on the drag divider in the page."
+  },
+  "dividerAria": {
+    "message": "Redimensionar el panel de chat",
+    "description": "Screen-reader label for the drag divider."
+  },
+  "flipAria": {
+    "message": "Mover el chat al otro lado",
+    "description": "Screen-reader label and tooltip for the side-swap button."
+  }
+}

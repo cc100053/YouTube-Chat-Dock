@@ -18,20 +18,17 @@ the word "YouTube" in an extension name is the low-risk case; the trademark
 exposure on this store lives in visual branding, so the icon and every
 screenshot avoid the logo and the red-and-white scheme entirely.
 
-### Short description — 129 / 132 characters
+### Short description — 113 / 132 characters
 
 ```
-Turn live chat and chat replay into a resizable side panel. Drag the divider to resize. Works in true fullscreen. No permissions.
+Turn live chat and chat replay into a resizable side panel. Drag the divider to resize. Works in true fullscreen.
 ```
 
-Alternate, 126 characters, if you'd rather lead with the layout than the drag:
-
-```
-Live chat and chat replay as a resizable side panel with a draggable divider. Works in page view, theater and true fullscreen.
-```
-
-Keep whichever you pick in sync with `description` in `manifest.json`, which
-carries the same 132-character ceiling and has already been over it once.
+Do not edit this here. Since v1.4.0 the manifest reads `__MSG_extDesc__`, so
+the real string lives in `_locales/<lang>/messages.json` and the store pulls a
+localised one per language. The 132-character ceiling applies to **every**
+locale — Spanish measured 133 on the first pass and had to be shortened, so
+re-run the length check in `store/package.sh` after touching any of them.
 
 ### Detailed description
 
@@ -55,17 +52,21 @@ WHAT IT DOES
 • Narrow chat all the way down to 120px without messages getting clipped.
 • Right-to-left locales are handled properly — chat docks on the correct side
   and the divider flips with it.
+• A settings popup in the toolbar: an on/off switch, both widths, the side
+  toggle, and a reset. Available in 12 languages.
 
-PERMISSIONS: NONE
+ONE PERMISSION, AND NOTHING LEAVES YOUR BROWSER
 
-This extension requests no permissions at all. Installing it shows no warning
-prompt, because there is nothing to warn you about.
+The extension declares a single permission, "storage", and Chrome shows no
+permission prompt for it on install. It exists for one reason: the settings
+popup is a separate page and cannot otherwise reach the tab it is configuring.
 
 • No data is collected, transmitted, or sold. Not anonymised, not aggregated.
 • No network requests. No analytics, no telemetry, no remote configuration.
 • No background service worker. Nothing runs when you are not on YouTube.
-• Your chosen widths are stored locally in your own browser and never leave it.
+• Your settings are stored in your own browser and never leave the device.
 • No account, no sign-in, no cloud sync.
+• No host permissions. It can act on youtube.com and nowhere else.
 
 HOW IT WORKS
 
@@ -82,9 +83,9 @@ KNOWN LIMITATIONS
 • Below a 1000px browser width, YouTube switches to a single-column layout
   where chat sits under the video. The extension deliberately does not apply
   there rather than fight YouTube's own responsive layout.
-• Widths live in your browser's local storage, so clearing site data for
-  youtube.com resets them to the defaults. This is a deliberate trade for
-  requiring zero permissions.
+• Widths are kept in your browser's local storage so they can be applied
+  before the page paints, with no flicker. Clearing site data for youtube.com
+  therefore resets them to the defaults.
 
 Not affiliated with, endorsed by, or sponsored by YouTube or Google.
 ```
@@ -114,12 +115,21 @@ panel beside the video player, with a draggable divider to set its width.
 
 ### Permission justifications
 
-No permissions and no host permissions are declared, so the dashboard asks for
-no justifications. `content_scripts.matches` is sufficient on its own, and
-keeping it that way is a deliberate property of this listing — do not add a
-permission without re-reading this note.
+One permission, `storage`. No host permissions — `content_scripts.matches` is
+sufficient on its own, and keeping it that way is still a deliberate property
+of this listing.
 
-If asked to justify the content script itself:
+`storage` justification:
+
+```
+The settings popup is an extension page and cannot write to youtube.com's own
+storage. chrome.storage.local is the only channel through which a user's choice
+in the popup — on/off, panel side, panel width — can reach the content script
+that lays out the page. Nothing else is stored, and nothing is ever sent off
+the device.
+```
+
+Content script justification, if asked:
 
 ```
 The content script is the extension. It injects one stylesheet that re-lays out
@@ -127,6 +137,11 @@ YouTube's own chat and player elements, and one script that updates three CSS
 custom properties as the user drags the divider. It reads no page content and
 sends nothing anywhere.
 ```
+
+Note that `storage` is not a warning-generating permission: Chrome still shows
+no permission prompt on install. That is worth saying in the listing, and the
+detailed description does — but say "one permission", never "zero", now that
+this is declared.
 
 ### Data usage disclosures
 
@@ -138,7 +153,7 @@ Tick **none** of the collected-data types, then affirm all three certifications:
 
 ### Privacy policy URL
 
-Required even at zero data collection. Use `store/PRIVACY.md` published at:
+Required even though no data is collected. Use `store/PRIVACY.md` published at:
 
 ```
 https://github.com/cc100053/YouTube-Chat-Dock/blob/main/store/PRIVACY.md
@@ -160,7 +175,7 @@ listing avoids. Re-run the script to change any of them.
 | Screenshot 2 | 1280×800 | `assets/screenshot-2-drag-to-resize.png` |
 | Screenshot 3 | 1280×800 | `assets/screenshot-3-fullscreen.png` |
 | Screenshot 4 | 1280×800 | `assets/screenshot-4-either-side.png` |
-| Screenshot 5 | 1280×800 | `assets/screenshot-5-no-permissions.png` |
+| Screenshot 5 | 1280×800 | `assets/screenshot-5-settings.png` |
 | Small promo tile | 440×280 | `assets/promo-small-440x280.png` |
 | Marquee promo tile | 1440×560 | `assets/promo-marquee-1440x560.png` |
 
@@ -170,7 +185,13 @@ with transparent corners, because the 16px copy is the toolbar icon and sits on
 the browser's own background. The store icon fills its frame instead.
 
 Screenshot order is the pitch: what it is, what you do with it, the hard case
-it survives, the option most people want, and then the reason to trust it.
+it survives, the option most people want, and then the settings — which is also
+where the privacy claims sit, since five slots is the store's maximum and the
+popup earns one of them.
+
+The popup in screenshot 5 is drawn to match the real thing, which was rendered
+in Chrome in English, Japanese and Arabic first. The switch states and the two
+slider values in the image are what the popup actually shows at defaults.
 
 ---
 
@@ -204,16 +225,19 @@ YouTube Chat Dock 將直播聊天室與聊天重播，變成一個真正的側�
 • 影片重溫的聊天重播，行為同直播聊天室完全一樣。
 • 聊天室最窄可以收到 120px，訊息不會被切走。
 • 完整支援由右至左的語言介面，聊天室會停在正確的一邊。
+• 工具列設定面板：開關、兩種闊度、左右切換、一鍵回復預設，共 12 種語言。
 
-權限：完全沒有
+只有一個權限，而且沒有任何資料離開你的瀏覽器
 
-本擴充功能不要求任何權限。安裝時不會出現權限警告，因為根本沒有東西需要警告。
+本擴充功能只宣告一個權限 storage，安裝時 Chrome 不會顯示任何權限警告。它存在
+的唯一原因是：設定面板是獨立的頁面，否則無法把你的選擇傳到正在瀏覽的分頁。
 
 • 不收集、不傳送、不出售任何資料。
 • 沒有任何網絡連線，沒有分析、沒有追蹤。
 • 沒有背景程序。不在 YouTube 時完全不會運行。
-• 你設定的闊度只會儲存在你自己的瀏覽器內，永遠不會離開。
+• 你的設定只儲存在你自己的瀏覽器內，永遠不會離開裝置。
 • 不需要帳號，不需要登入。
+• 沒有 host 權限，只能在 youtube.com 上運作。
 
 原始碼公開，採用 MIT 授權：
 https://github.com/cc100053/YouTube-Chat-Dock
@@ -222,8 +246,8 @@ https://github.com/cc100053/YouTube-Chat-Dock
 
 • 瀏覽器闊度低於 1000px 時，YouTube 會切換成單欄版面，聊天室排在影片下方。本擴充功能
   在該情況下刻意不生效，以免與 YouTube 自己的響應式版面打架。
-• 闊度儲存在瀏覽器的 local storage，所以清除 youtube.com 的網站資料會回復預設值。
-  這是為了做到零權限而刻意作出的取捨。
+• 闊度儲存在瀏覽器的 local storage，目的是在頁面繪製前就套用、避免閃動。因此
+  清除 youtube.com 的網站資料會回復預設值。
 
 本擴充功能與 YouTube 及 Google 沒有任何從屬、認可或贊助關係。
 ```
@@ -233,11 +257,15 @@ https://github.com/cc100053/YouTube-Chat-Dock
 ## Pre-submission checklist
 
 - [ ] `version` in `manifest.json` bumped
-- [ ] `description` in `manifest.json` matches the short description above and is ≤ 132 characters
-- [ ] `permissions` and `host_permissions` still absent from `manifest.json`
-- [ ] `node --check dock.js` passes
+- [ ] every `extDesc` in `_locales/*/messages.json` is ≤ 132 characters
+- [ ] every locale defines all 18 keys (`store/package.sh` parses them; the key
+      count is checked by the verification snippet in the commit for v1.4.0)
+- [ ] `permissions` is still `["storage"]` and nothing more; `host_permissions` still absent
+- [ ] `node --check` passes on `dock.js`, `settings.js` and `popup.js`
 - [ ] `python3 -c "import json; json.load(open('manifest.json'))"` passes
 - [ ] Loaded unpacked and verified on a live stream **and** a VOD with chat replay
-- [ ] ZIP contains `manifest.json`, `dock.css`, `dock.js`, `icons/` — and nothing else
+- [ ] ZIP contains `manifest.json`, `dock.css`, `dock.js`, `settings.js`,
+      `popup.{html,css,js}`, `_locales/`, `icons/`, `LICENSE` — and nothing else
+- [ ] Popup opened once per layout direction (an LTR locale and `ar`)
 - [ ] `store/` and `.git/` excluded from the ZIP
 - [ ] Privacy policy URL resolves publicly
