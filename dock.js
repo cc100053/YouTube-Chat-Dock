@@ -370,12 +370,20 @@
   }
 
   /* Re-apply after a settings change and make YouTube recompute its own
-     player layout, which it does not do on a CSS-driven resize. */
+     player layout, which it does not do on a CSS-driven resize.
+
+     The trailing re-measure is coalesced because a popup slider now writes on
+     every animation frame while it is dragged: without the clear, one drag
+     would leave dozens of overlapping timers queued, all re-measuring after
+     the drag had already finished. */
+  let reapplyTimer = 0;
+
   function reapply() {
     restore();
     window.dispatchEvent(new Event('resize'));
     reposition();
-    setTimeout(() => safeReposition(), 120);
+    clearTimeout(reapplyTimer);
+    reapplyTimer = setTimeout(() => safeReposition(), 120);
   }
 
   /* ---- mirror: chrome.storage.local -> localStorage --------------------

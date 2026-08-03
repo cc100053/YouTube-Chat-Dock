@@ -18,9 +18,10 @@ python3 -c "import json; json.load(open('manifest.json'))"   # manifest is valid
 
 The popup can be rendered outside Chrome for layout work by stubbing
 `chrome.i18n` and `chrome.storage.local` and serving `popup.html` over
-localhost — `file://` is blocked. Do that in **an LTR locale and `ar`**: the
-popup is written with logical CSS properties precisely so it mirrors, and only
-rendering it in RTL proves it does.
+localhost — `file://` is blocked. Do that in **an LTR locale and `ar`** — the popup uses logical CSS properties
+precisely so it mirrors, and only rendering it in RTL proves it does — and
+loop the language picker over **all twelve** when changing layout, measuring
+`document.body.getBoundingClientRect().height` each time.
 
 To run it: `chrome://extensions/` → Developer mode → **Load unpacked** → repo root. After editing, hit reload on the extension card, then reload the YouTube tab.
 
@@ -46,6 +47,8 @@ In true fullscreen YouTube hides `#columns` entirely, so fullscreen is *pure fle
 
 **The manifest injects `dock.css` into all frames** (`all_frames: true`), including the chat iframe at `/live_chat`. Therefore **every chat-iframe rule must be scoped under `yt-live-chat-app`** or it leaks onto the watch page. The chat internals are light DOM, so descendant selectors work across them. `dock.js` guards the opposite way with `if (window.top !== window.self) return;` — the iframe gets styling and no script.
 
+**Popup sliders write on every animation frame, not on release**, so the page tracks them the way it tracks the divider. `bindRange` coalesces with `requestAnimationFrame` — measured 60 input events down to 14 writes — and `reapply()` in `dock.js` clears its trailing re-measure timer, or one drag would leave dozens of overlapping timers firing after it ended. The toast stays on `change`; per frame it would sit permanently lit and read as a stuck UI.
+
 **Persistence is two stores with asymmetric roles, and the asymmetry is the point.** `localStorage` is the only store readable *synchronously* at `document_start`, so it stays the source of truth for first paint — reading it there is what stops the page painting the default width and visibly jumping. `chrome.storage.local` was added in v1.4.0 only because the popup is an extension page and physically cannot write youtube.com's `localStorage`; it is a channel, not a source. `dock.js` mirrors it *down* into `localStorage`, seeding it *up* only for keys the extension store has never seen (which is what carries pre-1.4.0 widths through the upgrade). Do not collapse these into one store without re-reading the comment block in `dock.js`.
 
 **`settings.js` is loaded into both worlds** — as the first content script, and as a plain script in `popup.html` — so key names, defaults and bounds have one definition. Content scripts share an isolated-world scope, which is why `dock.js` can read `YTCHAT` off a global.
@@ -62,7 +65,8 @@ In true fullscreen YouTube hides `#columns` entirely, so fullscreen is *pure fle
 - **Widths are clamped against the live viewport**, not just `MAX`, reserving `KEEP_FOR_VIDEO`. A width saved on a large monitor otherwise restores verbatim onto a laptop and leaves the player a sliver.
 - **Every watch-page rule is gated behind `:root:not([data-ytchat-off])`.** The manifest injects `dock.css` statically and nothing can unload it, so the popup's off switch has to be expressed in CSS. `dock.js` sets the attribute at `document_start`, which is what makes "off" mean *no flash of a docked layout* rather than a flicker. Section 4 (chat iframe) is deliberately ungated: `dock.js` is top-frame only, so the attribute can never land there — and those rules only release YouTube's min-widths, so they are inert when the extension is off.
 - **Theater docking is fixed positioning over a slot YouTube already emptied**, and section 2c stays inert until `dock.js` has measured it — `data-ytchat-theater` is set only after a valid rect, so the chat never jumps to a placeholder position. `--ytchat-tw` resizes the reservation itself, which is what keeps the player's width and the chat's width in agreement. Re-measure on every `pointermove` during a theater drag: the panel is fixed, so it does not follow the width on its own.
-- **Popup height is capped at 600px by Chrome.** The panel measures 589 in en, zh_TW and ar; past 600 it grows a scrollbar and the footer, which holds Reset, drops out of sight. Adding a row means taking height back somewhere else — that is why the sliders share a line with their label and the side switch has no hint.
+- **Popup height is capped at 600px by Chrome, and translated UI cannot be height-tuned.** The first attempt tuned the content to fit and measured 589 — in en, zh_TW and ar. Measuring all twelve afterwards found **six** over the cap, Russian at 733. The panel is now a flex column: `header` and `footer` are `flex: none`, `main` is the only scroller (`overflow-y: auto` plus `min-height: 0`, or the flex item refuses to shrink). Short languages still size naturally; long ones scroll the list and keep Reset reachable. Verify a layout change against **all twelve**, not a sample — the sample is what hid this.
+- **Grid column widths must match `popup.html`'s source order.** `.range` is `title, output, range`; it was styled `1fr 88px 46px` as if the slider came second, so the 88px slider landed in the 46px column and its right end was clipped off the popup edge. Measure `getBoundingClientRect().right` against the content edge, not by eye.
 - **Page-mode sizing is gated behind `@media (min-width: 1000px)`.** Below that YouTube stacks chat under the video; forcing a sidebar width there fights the stock responsive layout. The divider hides at the same breakpoint.
 - **The side toggle stores a flip, never a literal "left"/"right".** It works by
   putting `order: -1` on the chat container, and `order` moves an item to the flex

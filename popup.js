@@ -151,9 +151,7 @@
   }
 
   /* ---- wiring ---------------------------------------------------------
-     Switches commit on change. Sliders update their readout on input but
-     only commit on change (pointer release), so a single drag writes once
-     instead of ~40 times. */
+     Switches commit on change. Sliders commit continuously — see bindRange. */
 
   enabled.addEventListener('change', function () {
     if (enabled.checked) gated.removeAttribute('data-off');
@@ -178,8 +176,38 @@
     set(YTCHAT.K.lang, langSel.value);
   });
 
+  /* Sliders write while they move, so the page tracks them the way it tracks
+     the divider being dragged — the whole point of a live preview is seeing
+     the layout, not a number.
+
+     Throttled to one write per animation frame. Without that a single drag
+     fires ~40 input events, each one a storage write, an onChanged in every
+     open YouTube tab and a relayout there. requestAnimationFrame bounds it to
+     the display's refresh rate and drops the intermediate values.
+
+     The toast stays on 'change' only. Firing it per frame would leave "Saved"
+     permanently lit while dragging, which reads as a stuck UI. */
   function bindRange(input, out, key) {
-    input.addEventListener('input', function () { showWidth(out, input.value); });
+    var pending = null;
+    var frame = 0;
+
+    function flush() {
+      frame = 0;
+      if (pending === null) return;
+      var patch = {};
+      patch[key] = String(pending);
+      pending = null;
+      chrome.storage.local.set(patch, function () { void chrome.runtime.lastError; });
+    }
+
+    input.addEventListener('input', function () {
+      showWidth(out, input.value);
+      var px = YTCHAT.clampWidth(input.value);
+      if (px === null) return;
+      pending = px;
+      if (!frame) frame = requestAnimationFrame(flush);
+    });
+
     input.addEventListener('change', function () {
       var px = YTCHAT.clampWidth(input.value);
       if (px !== null) set(key, px);

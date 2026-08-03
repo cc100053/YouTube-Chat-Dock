@@ -49,11 +49,21 @@
 
 * { box-sizing: border-box; }
 
-/* 344 wide, and the content is tuned to stay under Chrome's 600px popup
-   height cap — past that the popup grows a scrollbar and the footer, which
-   holds Reset, drops out of sight. */
+/* Chrome caps the popup at 600px tall. Tuning the content to fit was the
+   first attempt and it was wrong: it was tuned against en, zh_TW and ar, and
+   measuring all twelve afterwards found six over the cap — Russian at 733.
+   Translated UI cannot be height-tuned per language.
+
+   So the panel is a flex column instead. Header and footer are pinned, only
+   the settings list scrolls, and the cap applies to the whole thing. Short
+   languages still size naturally with no scrollbar; long ones scroll the list
+   and keep Reset reachable. This survives a language that is longer still,
+   and a row added later. */
 body {
-  width: 344px;
+  width: 360px;
+  max-height: 600px;
+  display: flex;
+  flex-direction: column;
   margin: 0;
   background: var(--bg);
   color: var(--text);
@@ -65,6 +75,7 @@ body {
 /* ---- header ---------------------------------------------------------- */
 
 header {
+  flex: none;
   display: flex;
   align-items: center;
   gap: 12px;
@@ -92,12 +103,18 @@ header p {
 
 /* ---- sections -------------------------------------------------------- */
 
-main { padding: 4px 18px 0; }
+main {
+  flex: 1 1 auto;
+  min-height: 0;      /* or the flex item refuses to shrink and scroll */
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  padding: 4px 18px 8px;
+}
 
 section + section { margin-block-start: 2px; }
 
 section h2 {
-  margin: 9px 0 0;
+  margin: 10px 0 1px;
   color: var(--muted);
   font-size: 11px;
   font-weight: 650;
@@ -109,21 +126,42 @@ section h2 {
   display: grid;
   align-items: center;
   gap: 0 10px;
-  padding: 7px 0;
+  padding: 7px 8px;
+  /* Bleed the hover surface out to the panel edges without moving the text:
+     the negative margin cancels the padding that gives hover its shape. */
+  margin-inline: -8px;
+  border-radius: 8px;
   border-block-end: 1px solid var(--line-soft);
+  transition: background .12s ease;
 }
 
 .row:last-of-type { border-block-end: 0; }
+
+/* Only the rows that actually do something on click get the affordance. The
+   range rows are dragged, not clicked, so they stay inert. */
+.switch, .select { cursor: pointer; }
+.switch:hover, .select:hover { background: var(--surface); }
+
+/* The whole row reads as the focus target, not just the 40px track. */
+.switch:has(input:focus-visible) { background: var(--surface); }
 
 .switch, .select { grid-template-columns: 1fr auto; }
 
 /* The slider shares its row rather than sitting under it. Stacked, the three
    width rows measured 66px each and pushed the popup to 758 — past Chrome's
-   600px cap, which turns the whole panel into a scroller. */
-.range { grid-template-columns: 1fr 88px 46px; }
+   600px cap, which turns the whole panel into a scroller.
+
+   Column order must match popup.html's source order: title, output, range.
+   It did not at first — the 88px slider was given the 46px column and its
+   right end was clipped off the popup edge. */
+.range { grid-template-columns: 1fr auto 96px; }
 
 .labels { display: block; min-width: 0; }
 .title { display: block; font-weight: 450; }
+
+/* Rows are padded for the hover surface, so their hairline would inset with
+   them. Push it back out to sit flush with the text column. */
+.row { background-clip: padding-box; }
 
 .hint {
   display: block;
@@ -204,6 +242,7 @@ select:focus-visible { outline: 2px solid var(--blue); outline-offset: 1px; }
 /* ---- range ----------------------------------------------------------- */
 
 .range output {
+  min-width: 50px;
   color: var(--blue);
   font-weight: 650;
   font-size: 12.5px;
@@ -212,7 +251,7 @@ select:focus-visible { outline: 2px solid var(--blue); outline-offset: 1px; }
 }
 
 .range input[type=range] {
-  width: 88px;
+  width: 96px;
   margin: 0;
   accent-color: var(--blue);
   cursor: pointer;
@@ -237,11 +276,11 @@ select:focus-visible { outline: 2px solid var(--blue); outline-offset: 1px; }
 }
 
 footer {
+  flex: none;
   display: flex;
   align-items: center;
   justify-content: space-between;
   gap: 12px;
-  margin-block-start: 9px;
   padding: 10px 18px 12px;
   border-block-start: 1px solid var(--line);
 }
@@ -280,6 +319,7 @@ footer a:focus-visible { outline: 2px solid var(--blue); outline-offset: 3px; bo
 }
 
 #reset:hover { border-color: var(--blue); color: var(--blue); }
+#reset:active { transform: translateY(1px); }
 #reset:focus-visible { outline: 2px solid var(--blue); outline-offset: 2px; }
 
 /* The coffee link is hidden unless popup.js has a real URL to point it at —
@@ -309,5 +349,6 @@ footer a:focus-visible { outline: 2px solid var(--blue); outline-offset: 3px; bo
 #toast[data-show] { opacity: 1; }
 
 @media (prefers-reduced-motion: reduce) {
-  #gated, .track, .track::after, #toast, #reset { transition: none; }
+  #gated, .track, .track::after, #toast, #reset, .row { transition: none; }
+  #reset:active { transform: none; }
 }

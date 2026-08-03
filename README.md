@@ -13,6 +13,7 @@ Not a floating overlay. The video is resized to fit beside the chat, never cover
   YouTube leaves there.
 - **Settings popup** in the toolbar: on/off, all three widths, side, reset —
   and a language picker, because the browser's language is not always yours.
+  The width sliders preview live, exactly like dragging the divider.
 - **One permission** (`storage`), no host permissions, no network requests, no tracking.
 
 ## Install

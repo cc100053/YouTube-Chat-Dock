@@ -4,7 +4,7 @@
     "description": "Extension name. Not translated — it is the product name."
   },
   "extDesc": {
-    "message": "將直播聊天室與聊天重播變成可調整寬度的側邊欄。拖曳分隔線即可改變闊度，全螢幕一樣有效。",
+    "message": "將直播聊天室與聊天重播變成可調整寬度的側邊欄。拖曳分隔線即可改變寬度，全螢幕同樣有效。",
     "description": "Store and manifest description. Hard limit 132 characters."
   }
 }
