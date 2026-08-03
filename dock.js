@@ -20,15 +20,25 @@
   const TICK_MS = 400;
 
   const MODES = {
-    page: { cssVar: '--ytchat-w', key: YTCHAT.K.page, def: Number(YTCHAT.DEF[YTCHAT.K.page]) },
-    fs:   { cssVar: '--ytchat-fsw', key: YTCHAT.K.fs, def: Number(YTCHAT.DEF[YTCHAT.K.fs]) },
+    page:    { cssVar: '--ytchat-w', key: YTCHAT.K.page, def: Number(YTCHAT.DEF[YTCHAT.K.page]) },
+    fs:      { cssVar: '--ytchat-fsw', key: YTCHAT.K.fs, def: Number(YTCHAT.DEF[YTCHAT.K.fs]) },
+    theater: { cssVar: '--ytchat-tw', key: YTCHAT.K.tw, def: Number(YTCHAT.DEF[YTCHAT.K.tw]) },
   };
 
   const FLIP_KEY = YTCHAT.K.flip;
 
   const root = document.documentElement;
   const inFullscreen = () => !!document.querySelector('ytd-watch-flexy[fullscreen]');
-  const mode = () => (inFullscreen() ? MODES.fs : MODES.page);
+  /* Theater and fullscreen are separate attributes and can both be present
+     during the transition, so theater must exclude fullscreen explicitly. */
+  const inTheater = () =>
+    !!document.querySelector('ytd-watch-flexy[theater]:not([fullscreen])');
+
+  function mode() {
+    if (inFullscreen()) return MODES.fs;
+    if (inTheater()) return MODES.theater;
+    return MODES.page;
+  }
 
   /* A width saved on a 2560px monitor must not be restored verbatim onto a
      1280px laptop — that would leave the player a sliver. Clamp against the
@@ -112,6 +122,8 @@
   let flipped = false;
   let enabled = true;
   let dividerOn = true;
+  let theaterOn = true;
+  let lang = 'en';
 
   function applyFlip(on) {
     flipped = on;
@@ -134,6 +146,9 @@
   function restore() {
     applyEnabled(YTCHAT.isOn(lsGet(YTCHAT.K.enabled)));
     dividerOn = YTCHAT.isOn(lsGet(YTCHAT.K.divider));
+    theaterOn = YTCHAT.isOn(lsGet(YTCHAT.K.theater));
+    lang = ytchatResolveLang(lsGet(YTCHAT.K.lang), uiLanguage());
+    relabel();
     for (const m of Object.values(MODES)) applyVar(m, clamp(readStored(m)));
     root.style.setProperty('--ytchat-top', TOP_GAP + 'px');
     applyFlip(YTCHAT.isOn(lsGet(FLIP_KEY)));
@@ -152,12 +167,41 @@
     return px;
   }
 
-  /* In fullscreen YouTube moves chat into #panels-full-bleed-container and
-     hides #columns, so the element to measure differs per mode. */
+  /* Three modes, three different elements, because YouTube reparents chat.
+     Measured: page mode #chat-container sits in #secondary-inner; theater
+     mode the same element is a direct child of #columns; fullscreen uses
+     #panels-full-bleed-container instead. */
   function panel() {
-    return inFullscreen()
-      ? document.querySelector('ytd-watch-flexy[fullscreen] #panels-full-bleed-container')
-      : document.querySelector('ytd-watch-flexy:not([fullscreen]) ytd-live-chat-frame#chat');
+    if (inFullscreen()) {
+      return document.querySelector('ytd-watch-flexy[fullscreen] #panels-full-bleed-container');
+    }
+    if (inTheater()) {
+      // Docking off in theater means YouTube's stock layout, and no divider.
+      return theaterOn
+        ? document.querySelector('ytd-watch-flexy[theater] #chat-container')
+        : null;
+    }
+    return document.querySelector('ytd-watch-flexy:not([fullscreen]) ytd-live-chat-frame#chat');
+  }
+
+  /* Theater is the one mode whose panel is positioned by us rather than by
+     flex, so its box has to be measured off the slot YouTube reserves and
+     handed to CSS. data-ytchat-theater is set only once the numbers are real,
+     which is what keeps section 2c inert (and the chat unmoved) until then. */
+  function syncTheater() {
+    if (!enabled || !theaterOn || !inTheater()) {
+      root.removeAttribute('data-ytchat-theater');
+      return;
+    }
+    const slot = document.querySelector(
+      'ytd-watch-flexy[theater]:not([fullscreen]) #panels-full-bleed-container');
+    if (!slot) return root.removeAttribute('data-ytchat-theater');
+    const r = slot.getBoundingClientRect();
+    if (r.width < 1 || r.height < 1) return root.removeAttribute('data-ytchat-theater');
+    root.style.setProperty('--ytchat-tt', Math.round(r.top) + 'px');
+    root.style.setProperty('--ytchat-tl', Math.round(r.left) + 'px');
+    root.style.setProperty('--ytchat-th', Math.round(r.height) + 'px');
+    root.setAttribute('data-ytchat-theater', '');
   }
 
   /* RTL locales mirror the layout and put chat on the LEFT, which flips both
@@ -178,25 +222,25 @@
     return (panelOnLeft(rect) ? rect.right : rect.left) - 5;
   }
 
-  /* chrome.i18n is synchronous and needs no permission, but it throws in an
-     orphaned content script like everything else on chrome.*, so the English
-     string stays inline as the fallback rather than leaving the control
-     unlabelled for screen readers. */
-  function t(key, fallback) {
+  /* Strings come from the table in i18n.js, not chrome.i18n, because
+     chrome.i18n always resolves to the browser's UI language and gives the
+     user no way to override it. Only the browser's language *default* still
+     comes from chrome.i18n, and that call can throw in an orphaned tab. */
+  function uiLanguage() {
     try {
-      return (chrome.i18n && chrome.i18n.getMessage(key)) || fallback;
+      return (chrome.i18n && chrome.i18n.getUILanguage()) || 'en';
     } catch (e) {
-      return fallback;
+      return 'en';
     }
   }
+
+  const t = (key) => ytchatMsg(key, lang);
 
   // ---- divider ---------------------------------------------------------
   const handle = document.createElement('div');
   handle.id = 'ytchat-resizer';
-  handle.title = t('dividerTitle', 'Drag to resize chat · double-click to reset');
   handle.setAttribute('role', 'separator');
   handle.setAttribute('aria-orientation', 'vertical');
-  handle.setAttribute('aria-label', t('dividerAria', 'Resize chat panel'));
 
   const readout = document.createElement('span');
   readout.className = 'ytchat-readout';
@@ -213,9 +257,16 @@
   flipBtn.id = 'ytchat-flip-btn';
   flipBtn.type = 'button';
   flipBtn.textContent = '⇄';
-  flipBtn.title = t('flipAria', 'Move chat to the other side');
-  flipBtn.setAttribute('aria-label', t('flipAria', 'Move chat to the other side'));
   handle.appendChild(flipBtn);
+
+  /* Re-run on every restore(), so switching language in the popup relabels a
+     tab that is already open instead of waiting for a reload. */
+  function relabel() {
+    handle.title = t('dividerTitle');
+    handle.setAttribute('aria-label', t('dividerAria'));
+    flipBtn.title = t('flipAria');
+    flipBtn.setAttribute('aria-label', t('flipAria'));
+  }
 
   let shield = null;
   let dragging = false;
@@ -224,6 +275,7 @@
 
   function reposition() {
     if (dragging) return;
+    syncTheater();
     // Switched off entirely, or the user kept the layout but hid the handle.
     if (!enabled || !dividerOn) return hide();
     const el = panel();
@@ -275,6 +327,9 @@
       /* Widen by dragging toward the video: left in LTR, right in RTL. */
       const delta = onLeft ? (ev.clientX - startX) : (startX - ev.clientX);
       const px = writeWidth(startW + delta);
+      // In theater the panel is fixed-positioned, so its box only follows the
+      // width if the measured geometry is refreshed on every move.
+      syncTheater();
       readout.textContent = px + 'px';
       const el = panel();
       if (el) handle.style.left = innerEdge(el.getBoundingClientRect()) + 'px';

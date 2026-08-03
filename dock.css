@@ -12,9 +12,17 @@
    ============================================================= */
 
 :root {
-  --ytchat-w: 440px;    /* page + theater mode; dock.js overrides inline */
+  --ytchat-w: 440px;    /* page mode; dock.js overrides inline */
   --ytchat-fsw: 560px;  /* true fullscreen */
+  --ytchat-tw: 450px;   /* theater — YouTube's own reservation is 450 */
   --ytchat-top: 72px;   /* gap under the masthead */
+
+  /* Theater geometry, measured and written by dock.js every tick. The static
+     values here are placeholders only — section 2c is gated behind
+     data-ytchat-theater, which dock.js sets *after* writing real ones. */
+  --ytchat-tt: 56px;
+  --ytchat-tl: 0px;
+  --ytchat-th: 600px;
 }
 
 /* -------------------------------------------------------------
@@ -37,7 +45,13 @@
    ------------------------------------------------------------- */
 
 /* -------------------------------------------------------------
-   1. Watch page — page + theater mode
+   1. Watch page — page mode only
+
+   Theater is excluded deliberately, and this used to be wrong:
+   these rules only said :not([fullscreen]), so they applied in
+   theater too and sized #secondary to the chat width — but in
+   theater #secondary holds the related-video list and chat has
+   been reparented out of it entirely. Theater is section 2c.
 
    Gated on viewport width: below ~1000px YouTube drops to a
    single-column layout where #secondary sits UNDER the video.
@@ -45,20 +59,20 @@
    responsive layout, so we simply don't apply.
    ------------------------------------------------------------- */
 @media (min-width: 1000px) {
-  :root:not([data-ytchat-off]) ytd-watch-flexy {
+  :root:not([data-ytchat-off]) ytd-watch-flexy:not([theater]) {
     --ytd-watch-flexy-sidebar-width: var(--ytchat-w) !important;
     --ytd-watch-flexy-sidebar-min-width: var(--ytchat-w) !important;
     --ytd-watch-flexy-chat-max-height: calc(100vh - var(--ytchat-top) - 16px) !important;
   }
 
-  :root:not([data-ytchat-off]) ytd-watch-flexy:not([fullscreen]) #secondary.ytd-watch-flexy {
+  :root:not([data-ytchat-off]) ytd-watch-flexy:not([fullscreen]):not([theater]) #secondary.ytd-watch-flexy {
     width: var(--ytchat-w) !important;
     min-width: var(--ytchat-w) !important;
     max-width: var(--ytchat-w) !important;
     flex: 0 0 var(--ytchat-w) !important;
   }
 
-  :root:not([data-ytchat-off]) ytd-watch-flexy:not([fullscreen]) ytd-live-chat-frame#chat {
+  :root:not([data-ytchat-off]) ytd-watch-flexy:not([fullscreen]):not([theater]) ytd-live-chat-frame#chat {
     position: sticky !important;
     top: var(--ytchat-top) !important;
     width: 100% !important;
@@ -128,7 +142,7 @@
    worst case there is a cosmetic 0/32 gutter, not a break.
    ------------------------------------------------------------- */
 @media (min-width: 1000px) {
-  :root[data-ytchat-flip]:not([data-ytchat-off]) ytd-watch-flexy:not([fullscreen]) #secondary.ytd-watch-flexy {
+  :root[data-ytchat-flip]:not([data-ytchat-off]) ytd-watch-flexy:not([fullscreen]):not([theater]) #secondary.ytd-watch-flexy {
     order: -1 !important;
     padding-left: var(--ytd-watch-flexy-horizontal-page-margin) !important;
     padding-right: 0 !important;
@@ -137,6 +151,79 @@
 
 :root[data-ytchat-flip]:not([data-ytchat-off]) ytd-watch-flexy[fullscreen] #panels-full-bleed-container {
   order: -1 !important;
+}
+
+/* -------------------------------------------------------------
+   2c. Theater mode
+
+   Measured on a live stream at 1920x769, extension ON and OFF,
+   and the two were byte-identical — so the chat dropping below
+   the video in theater is YouTube's own behaviour, not damage
+   this extension was doing.
+
+   What YouTube actually does in theater:
+     #full-bleed-container   0..1905  (already display:flex)
+       #player-full-bleed-container   0..1455
+       #panels-full-bleed-container   1455..1905, 450 wide, EMPTY
+     #columns (below, y=656)
+       #primary | #secondary | #chat-container   <- chat is here
+
+   So it narrows the player by exactly 450 to reserve a side
+   slot, then leaves that slot empty and renders chat underneath.
+   #chat-container is a direct child of #columns here; in page
+   mode the same element sits in #secondary-inner. YouTube
+   reparents it, which is why panel() cannot use one selector.
+
+   CSS cannot move a node into a sibling container, so the only
+   way to fill that reserved slot is to position #chat-container
+   over it. That is not an overlay in the sense this project
+   avoids: the slot is empty and YouTube already shrank the
+   player to make it, so nothing is covered. dock.js measures
+   #panels-full-bleed-container and writes the three geometry
+   variables; the rules below stay inert until it has, because
+   data-ytchat-theater is set only after a valid measurement.
+   ------------------------------------------------------------- */
+@media (min-width: 1000px) {
+  /* Resize the reservation itself, so the player still gives back exactly
+     the width the user picked. */
+  :root:not([data-ytchat-off]) ytd-watch-flexy[theater]:not([fullscreen]) #panels-full-bleed-container {
+    flex: 0 0 var(--ytchat-tw) !important;
+    width: var(--ytchat-tw) !important;
+    max-width: var(--ytchat-tw) !important;
+    min-width: 0 !important;
+  }
+
+  :root:not([data-ytchat-off]) ytd-watch-flexy[theater]:not([fullscreen]) #player-full-bleed-container {
+    flex: 1 1 auto !important;
+    width: auto !important;
+    min-width: 0 !important;
+  }
+
+  :root[data-ytchat-theater]:not([data-ytchat-off]) ytd-watch-flexy[theater]:not([fullscreen]) #chat-container {
+    position: fixed !important;
+    top: var(--ytchat-tt) !important;
+    left: var(--ytchat-tl) !important;
+    width: var(--ytchat-tw) !important;
+    height: var(--ytchat-th) !important;
+    margin: 0 !important;
+    z-index: 1 !important;
+  }
+
+  :root[data-ytchat-theater]:not([data-ytchat-off]) ytd-watch-flexy[theater]:not([fullscreen]) #chat-container ytd-live-chat-frame#chat {
+    position: static !important;
+    width: 100% !important;
+    height: 100% !important;
+    max-height: none !important;
+    min-height: 0 !important;
+    margin: 0 !important;
+  }
+
+  /* The flip needs no new mechanism: order:-1 moves the reservation to the
+     row's start, and the fixed chat follows because its geometry is measured
+     off that same element. */
+  :root[data-ytchat-flip]:not([data-ytchat-off]) ytd-watch-flexy[theater]:not([fullscreen]) #panels-full-bleed-container {
+    order: -1 !important;
+  }
 }
 
 /* -------------------------------------------------------------

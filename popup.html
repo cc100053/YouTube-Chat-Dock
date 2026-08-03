@@ -2,9 +2,10 @@
 <!--
   Settings popup.
 
-  Every string is filled in by popup.js from chrome.i18n at load — there is no
-  English hard-coded here, because a half-translated popup is worse than an
-  untranslated one. dir is set from the locale for the same reason.
+  Every string is filled in by popup.js from the table in i18n.js at load —
+  there is no English hard-coded here, because a half-translated popup is
+  worse than an untranslated one, and because the user can pick a language
+  that is not the browser's.
 -->
 <html>
 <head>
@@ -13,27 +14,51 @@
 </head>
 <body>
   <header>
-    <img src="icons/icon48.png" alt="" width="28" height="28">
-    <h1 data-i18n="extName"></h1>
+    <img src="icons/icon48.png" alt="" width="32" height="32">
+    <div class="head-text">
+      <h1 data-i18n="extName"></h1>
+      <p id="version"></p>
+    </div>
   </header>
 
   <main>
-    <label class="row switch">
-      <span class="labels">
-        <span class="title" data-i18n="optEnabled"></span>
-        <span class="hint" data-i18n="optEnabledHint"></span>
-      </span>
-      <input type="checkbox" id="enabled">
-      <span class="track" aria-hidden="true"></span>
-    </label>
+    <section>
+      <h2 data-i18n="secGeneral"></h2>
 
-    <div id="gated">
+      <label class="row switch">
+        <span class="labels">
+          <span class="title" data-i18n="optEnabled"></span>
+          <span class="hint" data-i18n="optEnabledHint"></span>
+        </span>
+        <input type="checkbox" id="enabled">
+        <span class="track" aria-hidden="true"></span>
+      </label>
+
+      <label class="row select">
+        <span class="labels">
+          <span class="title" data-i18n="optLanguage"></span>
+        </span>
+        <select id="lang"></select>
+      </label>
+    </section>
+
+    <section id="gated">
+      <h2 data-i18n="secLayout"></h2>
+
       <label class="row switch">
         <span class="labels">
           <span class="title" data-i18n="optSwap"></span>
-          <span class="hint" data-i18n="optSwapHint"></span>
         </span>
         <input type="checkbox" id="flip">
+        <span class="track" aria-hidden="true"></span>
+      </label>
+
+      <label class="row switch">
+        <span class="labels">
+          <span class="title" data-i18n="optTheater"></span>
+          <span class="hint" data-i18n="optTheaterHint"></span>
+        </span>
+        <input type="checkbox" id="theater">
         <span class="track" aria-hidden="true"></span>
       </label>
 
@@ -47,35 +72,43 @@
       </label>
 
       <label class="row range">
-        <span class="labels">
-          <span class="title" data-i18n="optPageWidth"></span>
-        </span>
+        <span class="title" data-i18n="optPageWidth"></span>
         <output id="pageWidthOut"></output>
         <input type="range" id="pageWidth">
       </label>
 
       <label class="row range">
-        <span class="labels">
-          <span class="title" data-i18n="optFsWidth"></span>
-        </span>
+        <span class="title" data-i18n="optTheaterWidth"></span>
+        <output id="twWidthOut"></output>
+        <input type="range" id="twWidth">
+      </label>
+
+      <label class="row range">
+        <span class="title" data-i18n="optFsWidth"></span>
         <output id="fsWidthOut"></output>
         <input type="range" id="fsWidth">
       </label>
-    </div>
 
-    <p class="note" data-i18n="noteNarrow"></p>
+      <p class="note" data-i18n="noteNarrow"></p>
+    </section>
   </main>
 
   <footer>
     <button type="button" id="reset" data-i18n="btnReset"></button>
-    <a id="source" href="https://github.com/cc100053/YouTube-Chat-Dock"
-       target="_blank" rel="noreferrer" data-i18n="linkSource"></a>
+    <nav>
+      <a id="source" href="https://github.com/cc100053/YouTube-Chat-Dock"
+         target="_blank" rel="noreferrer" data-i18n="linkSource"></a>
+      <a id="coffee" target="_blank" rel="noreferrer">
+        <span aria-hidden="true">☕</span><span data-i18n="linkCoffee"></span>
+      </a>
+    </nav>
   </footer>
 
   <div id="toast" role="status" aria-live="polite"></div>
 
-  <!-- settings.js first: it defines the YTCHAT contract popup.js reads. -->
+  <!-- settings.js defines the YTCHAT contract; i18n.js the message table. -->
   <script src="settings.js"></script>
+  <script src="i18n.js"></script>
   <script src="popup.js"></script>
 </body>
 </html>

@@ -15,6 +15,7 @@ out="store/yt-chat-dock-${version}.zip"
 node --check dock.js
 node --check settings.js
 node --check popup.js
+node --check i18n.js
 python3 -c "import json; json.load(open('manifest.json'))"
 # A malformed messages.json fails the upload with a generic error, so parse
 # every locale here rather than finding out from the dashboard.
@@ -23,8 +24,16 @@ import glob, json
 for f in sorted(glob.glob('_locales/*/messages.json')): json.load(open(f, encoding='utf-8'))
 print('locales ok:', len(glob.glob('_locales/*/messages.json')))"
 
+# A donate link that 404s is worse than no donate link, and popup.js hides
+# the button while COFFEE_URL is empty. Refuse to build rather than ship a
+# store listing whose coffee button silently does not exist.
+if grep -q "^  var COFFEE_URL = '';" popup.js; then
+  echo "COFFEE_URL is still empty in popup.js — set it or delete this check." >&2
+  exit 1
+fi
+
 rm -f "$out"
-zip -r -q "$out" manifest.json dock.css dock.js settings.js \
+zip -r -q "$out" manifest.json dock.css dock.js settings.js i18n.js \
     popup.html popup.css popup.js _locales icons LICENSE
 
 echo "$out"

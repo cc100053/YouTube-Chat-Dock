@@ -11,7 +11,7 @@ A Manifest V3 Chrome extension that turns YouTube's live chat / chat replay into
 There is nothing to build or install. Validation is:
 
 ```bash
-node --check dock.js && node --check settings.js && node --check popup.js
+node --check dock.js && node --check settings.js && node --check popup.js && node --check i18n.js
 python3 -c "import json; json.load(open('manifest.json'))"   # manifest is valid JSON
 ./store/package.sh    # runs all of the above, parses every locale, builds the ZIP
 ```
@@ -38,9 +38,11 @@ Past examples of assumptions that measured false:
 
 ## Architecture
 
-**Two layout modes, two different containers.** In page/theater mode chat lives in `#secondary` as `ytd-live-chat-frame#chat`. In true fullscreen YouTube hides `#columns` entirely and moves chat into `#panels-full-bleed-container`, a flex sibling of `#player-full-bleed-container` inside `#full-bleed-container`. So fullscreen is *pure flex sizing* — no fixed positioning, no z-index. `panel()` in `dock.js` is the single place that resolves which element represents "the chat panel" right now; everything else measures whatever it returns.
+**Three layout modes, three different containers, because YouTube reparents chat.** Page mode: `#chat-container` inside `#secondary-inner`. Theater: the same `#chat-container` as a direct child of `#columns`, with chat rendered *below* the video — measured identical with the extension on and off, so it is YouTube's behaviour, not ours. Fullscreen: `#panels-full-bleed-container`. `panel()` in `dock.js` is the single place that resolves which element is "the chat panel" right now.
 
-**CSS variables are the only interface between the two files.** `dock.css` declares `--ytchat-w` (page), `--ytchat-fsw` (fullscreen) and `--ytchat-top` with static defaults; `dock.js` overrides them as *inline* properties on `documentElement`, which outranks any stylesheet. Layout logic belongs in CSS, and JS should only ever move those three numbers.
+In true fullscreen YouTube hides `#columns` entirely, so fullscreen is *pure flex sizing* — no fixed positioning, no z-index. Theater is the one mode that needs fixed positioning, and only because CSS cannot reparent a node into the slot YouTube reserved for it.
+
+**CSS variables are the only interface between `dock.css` and `dock.js`.** `dock.css` declares `--ytchat-w` (page), `--ytchat-tw` (theater), `--ytchat-fsw` (fullscreen), `--ytchat-top`, and the three measured theater geometry values `--ytchat-tt/-tl/-th`, all with static defaults; `dock.js` overrides them as *inline* properties on `documentElement`, which outranks any stylesheet. Layout logic belongs in CSS, and JS should only ever move those numbers.
 
 **The manifest injects `dock.css` into all frames** (`all_frames: true`), including the chat iframe at `/live_chat`. Therefore **every chat-iframe rule must be scoped under `yt-live-chat-app`** or it leaks onto the watch page. The chat internals are light DOM, so descendant selectors work across them. `dock.js` guards the opposite way with `if (window.top !== window.self) return;` — the iframe gets styling and no script.
 
@@ -48,7 +50,7 @@ Past examples of assumptions that measured false:
 
 **`settings.js` is loaded into both worlds** — as the first content script, and as a plain script in `popup.html` — so key names, defaults and bounds have one definition. Content scripts share an isolated-world scope, which is why `dock.js` can read `YTCHAT` off a global.
 
-**Every user-facing string comes from `chrome.i18n`**, with the English text repeated inline as a fallback only where a throw is possible (`dock.js` keeps running in orphaned tabs after an extension reload, where all `chrome.*` access throws). `popup.js` has no fallbacks and no hard-coded English: it fills `[data-i18n]` from the message catalogue, so a missing key falls back to `_locales/en` uniformly instead of leaving one control in the wrong language.
+**UI strings are a table in `i18n.js`, deliberately not `chrome.i18n`.** `chrome.i18n` always resolves to the browser's UI language and offers no runtime override, so a user-selectable language is impossible with it. `_locales/` survives holding exactly two strings — `extName` and `extDesc` — because Chrome and the Web Store read those, and only those. Both `dock.js` and `popup.js` fill every string from the table, with no hard-coded English anywhere: a missing key falls back to `en` uniformly inside `ytchatMsg`, rather than leaving one control in the wrong language. `ytchatResolveLang` maps browser tags onto the twelve catalogues (`zh-HK` → `zh_TW`, `pt-PT` → `pt_BR`) instead of dropping to English on a near miss.
 
 **No single event is reliable** for knowing when YouTube has relaid out, so `dock.js` polls every `TICK_MS` (400ms, one `querySelector` + one rect) alongside `resize` / `scroll` / `fullscreenchange` / `yt-navigate-finish`. Everything on that path is wrapped in `safe()`, which caps logging at 3 so a throw can't spam the console 2.5×/second.
 
@@ -59,6 +61,8 @@ Past examples of assumptions that measured false:
 - **The chat is a real `<iframe>` and steals `pointermove` mid-drag.** Both `setPointerCapture` *and* the `#ytchat-resizer-shield` overlay are load-bearing; dropping either makes drags die when the cursor crosses into chat.
 - **Widths are clamped against the live viewport**, not just `MAX`, reserving `KEEP_FOR_VIDEO`. A width saved on a large monitor otherwise restores verbatim onto a laptop and leaves the player a sliver.
 - **Every watch-page rule is gated behind `:root:not([data-ytchat-off])`.** The manifest injects `dock.css` statically and nothing can unload it, so the popup's off switch has to be expressed in CSS. `dock.js` sets the attribute at `document_start`, which is what makes "off" mean *no flash of a docked layout* rather than a flicker. Section 4 (chat iframe) is deliberately ungated: `dock.js` is top-frame only, so the attribute can never land there — and those rules only release YouTube's min-widths, so they are inert when the extension is off.
+- **Theater docking is fixed positioning over a slot YouTube already emptied**, and section 2c stays inert until `dock.js` has measured it — `data-ytchat-theater` is set only after a valid rect, so the chat never jumps to a placeholder position. `--ytchat-tw` resizes the reservation itself, which is what keeps the player's width and the chat's width in agreement. Re-measure on every `pointermove` during a theater drag: the panel is fixed, so it does not follow the width on its own.
+- **Popup height is capped at 600px by Chrome.** The panel measures 589 in en, zh_TW and ar; past 600 it grows a scrollbar and the footer, which holds Reset, drops out of sight. Adding a row means taking height back somewhere else — that is why the sliders share a line with their label and the side switch has no hint.
 - **Page-mode sizing is gated behind `@media (min-width: 1000px)`.** Below that YouTube stacks chat under the video; forcing a sidebar width there fights the stock responsive layout. The divider hides at the same breakpoint.
 - **The side toggle stores a flip, never a literal "left"/"right".** It works by
   putting `order: -1` on the chat container, and `order` moves an item to the flex

@@ -52,8 +52,11 @@ WHAT IT DOES
 • Narrow chat all the way down to 120px without messages getting clipped.
 • Right-to-left locales are handled properly — chat docks on the correct side
   and the divider flips with it.
-• A settings popup in the toolbar: an on/off switch, both widths, the side
-  toggle, and a reset. Available in 12 languages.
+• Theater mode is docked too. YouTube narrows the player there to reserve a
+  side slot, then leaves it empty and drops chat underneath — this fills it.
+• A settings popup in the toolbar: an on/off switch, all three widths, the
+  side toggle, theater docking, and a reset.
+• Pick your own interface language from 12, independently of your browser's.
 
 ONE PERMISSION, AND NOTHING LEAVES YOUR BROWSER
 
@@ -110,7 +113,8 @@ add it under **Store listing → add language** once the English one is live.
 
 ```
 Re-lays out YouTube's existing live chat and chat replay as a resizable side
-panel beside the video player, with a draggable divider to set its width.
+panel beside the video player, in page view, theater mode and fullscreen, with
+a draggable divider to set its width.
 ```
 
 ### Permission justifications
@@ -190,8 +194,8 @@ where the privacy claims sit, since five slots is the store's maximum and the
 popup earns one of them.
 
 The popup in screenshot 5 is drawn to match the real thing, which was rendered
-in Chrome in English, Japanese and Arabic first. The switch states and the two
-slider values in the image are what the popup actually shows at defaults.
+in Chrome in English, Traditional Chinese and Arabic first. The switch states
+and the three slider values are what the popup shows at defaults.
 
 ---
 
@@ -225,7 +229,10 @@ YouTube Chat Dock 將直播聊天室與聊天重播，變成一個真正的側�
 • 影片重溫的聊天重播，行為同直播聊天室完全一樣。
 • 聊天室最窄可以收到 120px，訊息不會被切走。
 • 完整支援由右至左的語言介面，聊天室會停在正確的一邊。
-• 工具列設定面板：開關、兩種闊度、左右切換、一鍵回復預設，共 12 種語言。
+• 劇院模式一樣停靠。YouTube 在該模式下會收窄播放器預留一格側邊位，卻留空並把
+  聊天室排到下面 —— 本擴充功能會填返嗰格。
+• 工具列設定面板：開關、三種闊度、左右切換、劇院模式停靠、一鍵回復預設。
+• 介面語言可自行從 12 種語言中選擇，不必跟隨瀏覽器。
 
 只有一個權限，而且沒有任何資料離開你的瀏覽器
 
@@ -266,6 +273,9 @@ https://github.com/cc100053/YouTube-Chat-Dock
 - [ ] Loaded unpacked and verified on a live stream **and** a VOD with chat replay
 - [ ] ZIP contains `manifest.json`, `dock.css`, `dock.js`, `settings.js`,
       `popup.{html,css,js}`, `_locales/`, `icons/`, `LICENSE` — and nothing else
-- [ ] Popup opened once per layout direction (an LTR locale and `ar`)
+- [ ] Popup opened once per layout direction (an LTR locale and `ar`), and its
+      height confirmed under Chrome's 600px cap in the longest language
+- [ ] `COFFEE_URL` set in `popup.js` — `store/package.sh` refuses to build otherwise
+- [ ] Theater mode checked on a live stream: chat beside the video, video uncropped
 - [ ] `store/` and `.git/` excluded from the ZIP
 - [ ] Privacy policy URL resolves publicly

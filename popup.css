@@ -1,86 +1,143 @@
 /* =============================================================
    Settings popup.
 
-   Independent of dock.css — this file styles an extension page,
+   Independent of dock.css — this styles an extension page,
    dock.css styles youtube.com. They share only the accent
    colour, which is the divider blue.
 
-   Written logical-first (inline-start / inline-end, not left /
-   right) because the popup renders in ar with dir="rtl", where
-   physical properties would leave the switches on the wrong
-   edge. Measured in Arabic before shipping.
+   Written logical-first (inline-start / inline-end / margin-
+   block, never left / right / margin-top) because the popup
+   renders in ar with dir="rtl", where physical properties leave
+   every control on the wrong edge. Verified in Chrome in ar,
+   not reasoned about.
+
+   Light and dark are both supported. The popup is opened from
+   the browser chrome, not from inside YouTube, so it should
+   follow the OS the way the rest of the browser UI does rather
+   than assume YouTube's dark theme.
    ============================================================= */
 
 :root {
-  color-scheme: dark;
-  --bg: #0f0f0f;
-  --surface: #181818;
-  --line: #303030;
-  --text: #f1f1f1;
-  --muted: #9a9a9a;
-  --blue: #3ea6ff;
+  color-scheme: light dark;
+
+  --bg: #ffffff;
+  --surface: #f5f5f5;
+  --line: #e3e3e3;
+  --line-soft: #ededed;
+  --text: #0f0f0f;
+  --muted: #606060;
+  --blue: #065fd4;
+  --track: #d0d0d0;
+  --knob: #ffffff;
+  --shadow: 0 1px 2px rgba(0, 0, 0, .08);
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --bg: #0f0f0f;
+    --surface: #1c1c1c;
+    --line: #303030;
+    --line-soft: #242424;
+    --text: #f1f1f1;
+    --muted: #a0a0a0;
+    --blue: #3ea6ff;
+    --track: #3f3f3f;
+    --knob: #f1f1f1;
+    --shadow: none;
+  }
 }
 
 * { box-sizing: border-box; }
 
+/* 344 wide, and the content is tuned to stay under Chrome's 600px popup
+   height cap — past that the popup grows a scrollbar and the footer, which
+   holds Reset, drops out of sight. */
 body {
-  width: 320px;
+  width: 344px;
   margin: 0;
-  padding: 0;
   background: var(--bg);
   color: var(--text);
   /* System stack: Roboto is not installed on stock macOS or Windows. */
   font: 400 13px/1.45 system-ui, -apple-system, "Segoe UI", Roboto, Arial, sans-serif;
+  -webkit-font-smoothing: antialiased;
 }
+
+/* ---- header ---------------------------------------------------------- */
 
 header {
   display: flex;
   align-items: center;
-  gap: 10px;
-  padding: 14px 16px;
+  gap: 12px;
+  padding: 13px 18px;
   border-block-end: 1px solid var(--line);
 }
 
+header img { border-radius: 8px; }
+
+.head-text { min-width: 0; }
+
 header h1 {
   margin: 0;
-  font-size: 14px;
-  font-weight: 600;
+  font-size: 14.5px;
+  font-weight: 650;
+  letter-spacing: -0.01em;
 }
 
-main { padding: 6px 16px 4px; }
+header p {
+  margin: 1px 0 0;
+  color: var(--muted);
+  font-size: 11.5px;
+  font-variant-numeric: tabular-nums;
+}
+
+/* ---- sections -------------------------------------------------------- */
+
+main { padding: 4px 18px 0; }
+
+section + section { margin-block-start: 2px; }
+
+section h2 {
+  margin: 9px 0 0;
+  color: var(--muted);
+  font-size: 11px;
+  font-weight: 650;
+  letter-spacing: .06em;
+  text-transform: uppercase;
+}
 
 .row {
   display: grid;
   align-items: center;
-  gap: 0 12px;
-  padding: 12px 0;
-  border-block-end: 1px solid var(--line);
+  gap: 0 10px;
+  padding: 7px 0;
+  border-block-end: 1px solid var(--line-soft);
 }
 
-.switch { grid-template-columns: 1fr auto; }
-.range  { grid-template-columns: 1fr auto; }
+.row:last-of-type { border-block-end: 0; }
 
-.labels { display: block; }
-.title { display: block; }
+.switch, .select { grid-template-columns: 1fr auto; }
+
+/* The slider shares its row rather than sitting under it. Stacked, the three
+   width rows measured 66px each and pushed the popup to 758 — past Chrome's
+   600px cap, which turns the whole panel into a scroller. */
+.range { grid-template-columns: 1fr 88px 46px; }
+
+.labels { display: block; min-width: 0; }
+.title { display: block; font-weight: 450; }
 
 .hint {
   display: block;
-  margin-block-start: 2px;
+  margin-block-start: 3px;
   color: var(--muted);
   font-size: 11.5px;
-  line-height: 1.35;
+  line-height: 1.4;
 }
 
-/* Disabled-looking, but not disabled: the master switch dims the rest so it
-   reads as inert, while the controls stay reachable by keyboard. Fully
-   disabling them would silently discard a keyboard user's tab order. */
-#gated {
-  transition: opacity .15s ease;
-}
-
-#gated[data-off] {
-  opacity: .4;
-}
+/* Dimmed, but never `disabled`: fully disabling the controls would drop them
+   out of the tab order, so a keyboard user who switched the extension off
+   could not switch anything back without a mouse. */
+#gated { transition: opacity .15s ease; }
+#gated[data-off] { opacity: .45; }
 
 /* ---- switch ---------------------------------------------------------- */
 
@@ -93,11 +150,11 @@ main { padding: 6px 16px 4px; }
 
 .track {
   position: relative;
-  width: 38px;
-  height: 22px;
-  border-radius: 11px;
-  background: #3a3a3a;
-  transition: background .15s ease;
+  width: 40px;
+  height: 24px;
+  border-radius: 12px;
+  background: var(--track);
+  transition: background .16s ease;
   flex: none;
 }
 
@@ -106,16 +163,19 @@ main { padding: 6px 16px 4px; }
   position: absolute;
   inset-block-start: 3px;
   inset-inline-start: 3px;
-  width: 16px;
-  height: 16px;
+  width: 18px;
+  height: 18px;
   border-radius: 50%;
-  background: #f1f1f1;
-  transition: translate .15s ease;
+  background: var(--knob);
+  box-shadow: var(--shadow);
+  transition: translate .16s ease;
 }
 
 .switch input:checked ~ .track { background: var(--blue); }
+
 /* Logical translate: in RTL the knob must travel toward the inline end,
-   which is the left. A hard-coded +16px would move it the wrong way. */
+   which is the left. A hard-coded +16px moves it the wrong way — this was
+   wrong on the first pass and caught by rendering the popup in ar. */
 .switch input:checked ~ .track::after { translate: 16px 0; }
 :dir(rtl) .switch input:checked ~ .track::after { translate: -16px 0; }
 
@@ -124,28 +184,56 @@ main { padding: 6px 16px 4px; }
   outline-offset: 2px;
 }
 
+/* ---- select ---------------------------------------------------------- */
+
+select {
+  min-width: 150px;
+  padding: 6px 10px;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background: var(--surface);
+  color: var(--text);
+  font: inherit;
+  font-size: 12.5px;
+  cursor: pointer;
+}
+
+select:hover { border-color: var(--muted); }
+select:focus-visible { outline: 2px solid var(--blue); outline-offset: 1px; }
+
 /* ---- range ----------------------------------------------------------- */
 
 .range output {
   color: var(--blue);
-  font-weight: 600;
+  font-weight: 650;
+  font-size: 12.5px;
   font-variant-numeric: tabular-nums;
+  text-align: end;
 }
 
 .range input[type=range] {
-  grid-column: 1 / -1;
-  width: 100%;
-  margin: 10px 0 0;
+  width: 88px;
+  margin: 0;
   accent-color: var(--blue);
+  cursor: pointer;
 }
 
-/* ---- footer ---------------------------------------------------------- */
+.range input[type=range]:focus-visible {
+  outline: 2px solid var(--blue);
+  outline-offset: 4px;
+  border-radius: 2px;
+}
+
+/* ---- note + footer --------------------------------------------------- */
 
 .note {
-  margin: 12px 0 0;
+  margin: 9px 0 0;
+  padding: 8px 10px;
+  border-radius: 8px;
+  background: var(--surface);
   color: var(--muted);
   font-size: 11.5px;
-  line-height: 1.4;
+  line-height: 1.45;
 }
 
 footer {
@@ -153,44 +241,64 @@ footer {
   align-items: center;
   justify-content: space-between;
   gap: 12px;
-  padding: 12px 16px 14px;
+  margin-block-start: 9px;
+  padding: 10px 18px 12px;
+  border-block-start: 1px solid var(--line);
 }
 
+footer nav {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+}
+
+footer a {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  color: var(--muted);
+  font-size: 12px;
+  text-decoration: none;
+  white-space: nowrap;
+}
+
+footer a:hover { color: var(--blue); }
+footer a:focus-visible { outline: 2px solid var(--blue); outline-offset: 3px; border-radius: 3px; }
+
 #reset {
-  padding: 7px 12px;
+  padding: 8px 14px;
   border: 1px solid var(--line);
-  border-radius: 16px;
+  border-radius: 18px;
   background: var(--surface);
   color: var(--text);
   font: inherit;
   font-size: 12px;
+  font-weight: 500;
+  white-space: nowrap;
   cursor: pointer;
+  transition: border-color .12s ease, color .12s ease;
 }
 
 #reset:hover { border-color: var(--blue); color: var(--blue); }
 #reset:focus-visible { outline: 2px solid var(--blue); outline-offset: 2px; }
 
-#source {
-  color: var(--muted);
-  font-size: 12px;
-  text-decoration: none;
-}
-
-#source:hover { color: var(--blue); }
+/* The coffee link is hidden unless popup.js has a real URL to point it at —
+   see COFFEE_URL. Shipping a dead donate link is worse than shipping none. */
+#coffee[hidden] { display: none; }
 
 /* ---- toast ----------------------------------------------------------- */
 
 #toast {
   position: fixed;
-  inset-block-end: 12px;
+  inset-block-end: 14px;
   inset-inline-start: 50%;
   translate: -50% 0;
-  padding: 5px 12px;
-  border-radius: 12px;
+  padding: 6px 14px;
+  border-radius: 14px;
   background: var(--blue);
-  color: #0f0f0f;
+  color: var(--bg);
   font-size: 11.5px;
-  font-weight: 600;
+  font-weight: 650;
   opacity: 0;
   pointer-events: none;
   transition: opacity .18s ease;
@@ -201,5 +309,5 @@ footer {
 #toast[data-show] { opacity: 1; }
 
 @media (prefers-reduced-motion: reduce) {
-  #gated, .track, .track::after, #toast { transition: none; }
+  #gated, .track, .track::after, #toast, #reset { transition: none; }
 }

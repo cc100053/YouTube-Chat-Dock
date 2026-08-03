@@ -308,48 +308,75 @@ def slider(d, x, y, w, frac):
 
 
 def popup_mock(d, x, y, w=460):
-    """The settings popup, redrawn at the proportions it actually renders at.
-    Verified against the real popup in Chrome (en, ja and ar) before this was
-    drawn — the switch positions and the two slider values are what it shows."""
-    rows = [
-        ("Enable on YouTube", "Turn the panel off without uninstalling.", True),
-        ("Chat on the other side", "Mirrors correctly in right-to-left layouts.", False),
+    """The settings popup, drawn at the proportions it actually renders at.
+
+    Checked against the real popup in Chrome (en, zh_TW and ar) first: the
+    switch states, the three width values and the section order are what it
+    shows at defaults. Heights here are tracked with one running cursor
+    because the first version computed the card height from a formula that
+    forgot the language block, and the card overflowed the slide."""
+    rows_general = [("Enable on YouTube", "Turn the panel off without uninstalling.", True)]
+    rows_layout = [
+        ("Chat on the other side", "", False),
+        ("Dock chat in theater mode", "Fills the empty slot YouTube leaves there.", True),
         ("Show the drag divider", "Hide it to keep the layout but stop resizing.", True),
     ]
-    ranges = [("Width in page view", "440 px", 0.33), ("Width in fullscreen", "560 px", 0.45)]
+    ranges = [("Width in page view", "440 px", 0.33),
+              ("Width in theater mode", "450 px", 0.34),
+              ("Width in fullscreen", "560 px", 0.45)]
 
-    # Tuned so the whole card clears 800px tall with the headline above it —
-    # the first pass overflowed and cut the Reset button in half.
-    HEAD, ROW, RANGE, FOOT = 92, 70, 84, 100
-    h = HEAD + len(rows) * ROW + len(ranges) * RANGE + FOOT
+    ROW_HINT, ROW_PLAIN, RANGE = 56, 40, 42
+    h = (78 + 32                                    # header, GENERAL label
+         + ROW_HINT + 46 + 30                       # enable, language, LAYOUT label
+         + ROW_PLAIN + ROW_HINT * 2                 # layout switches
+         + RANGE * len(ranges) + 76)                # widths, note + button
     rrect(d, (x, y, x + w, y + h), 16, fill=BG, outline=(52, 52, 52))
 
-    icon_mark(d, x + 24, y + 20, 36)
-    d.text((x + 74, y + 29), "YouTube Chat Dock", font=font(18, True), fill=TEXT)
-    d.line((x, y + 76, x + w, y + 76), fill=LINE, width=1)
+    icon_mark(d, x + 24, y + 18, 34)
+    d.text((x + 70, y + 26), "YouTube Chat Dock", font=font(17, True), fill=TEXT)
+    d.line((x, y + 70, x + w, y + 70), fill=LINE, width=1)
 
-    cy = y + HEAD
-    for title, hint, on in rows:
-        d.text((x + 24, cy + 2), title, font=font(16), fill=TEXT)
-        d.text((x + 24, cy + 26), hint, font=font(13), fill=MUTED)
-        toggle(d, x + w - 24 - 38, cy + 8, on)
-        cy += ROW
-        d.line((x + 24, cy - 12, x + w - 24, cy - 12), fill=LINE, width=1)
+    def switch_row(cy, title, hint, on):
+        d.text((x + 24, cy + (8 if not hint else 0)), title, font=font(15), fill=TEXT)
+        if hint:
+            d.text((x + 24, cy + 22), hint, font=font(12), fill=MUTED)
+        toggle(d, x + w - 24 - 38, cy + 2, on)
+        step = ROW_HINT if hint else ROW_PLAIN
+        d.line((x + 24, cy + step - 10, x + w - 24, cy + step - 10), fill=LINE, width=1)
+        return cy + step
+
+    cy = y + 92
+    d.text((x + 24, cy - 14), "GENERAL", font=font(11, True), fill=FAINT)
+    for title, hint, on in rows_general:
+        cy = switch_row(cy, title, hint, on)
+
+    d.text((x + 24, cy + 8), "Language", font=font(15), fill=TEXT)
+    rrect(d, (x + w - 24 - 150, cy, x + w - 24, cy + 30), 8, fill=SURFACE, outline=LINE)
+    # Helvetica Neue has no CJK coverage, so the mock shows the auto entry
+    # rather than an autonym that would render as tofu boxes.
+    d.text((x + w - 99, cy + 15), "Auto", font=font(13), fill=TEXT, anchor="mm")
+    cy += 46
+
+    d.text((x + 24, cy), "LAYOUT", font=font(11, True), fill=FAINT)
+    cy += 30
+    for title, hint, on in rows_layout:
+        cy = switch_row(cy, title, hint, on)
 
     for title, val, frac in ranges:
-        d.text((x + 24, cy + 2), title, font=font(16), fill=TEXT)
-        d.text((x + w - 24, cy + 2), val, font=font(16, True), fill=BLUE, anchor="ra")
-        slider(d, x + 24, cy + 42, w - 48, frac)
+        d.text((x + 24, cy), title, font=font(15), fill=TEXT)
+        d.text((x + 24 + 250, cy), val, font=font(14, True), fill=BLUE, anchor="ra")
+        slider(d, x + w - 24 - 110, cy + 9, 110, frac)
         cy += RANGE
-        d.line((x + 24, cy - 12, x + w - 24, cy - 12), fill=LINE, width=1)
+        d.line((x + 24, cy - 10, x + w - 24, cy - 10), fill=LINE, width=1)
 
-    d.text((x + 24, cy), "Below a 1000 px window YouTube stacks chat",
-           font=font(13), fill=MUTED)
-    d.text((x + 24, cy + 18), "under the video, and the panel does not apply.",
-           font=font(13), fill=MUTED)
-    rrect(d, (x + 24, cy + 48, x + 168, cy + 82), 17, fill=SURFACE, outline=LINE)
-    d.text((x + 96, cy + 65), "Reset to defaults", font=font(13), fill=TEXT, anchor="mm")
-    d.text((x + w - 24, cy + 65), "Source code", font=font(13), fill=MUTED, anchor="rm")
+    rrect(d, (x + 24, cy + 2, x + w - 24, cy + 44), 8, fill=SURFACE)
+    d.text((x + 34, cy + 8), "Below a 1000 px window YouTube stacks chat under",
+           font=font(12), fill=MUTED)
+    d.text((x + 34, cy + 24), "the video, and the panel does not apply there.",
+           font=font(12), fill=MUTED)
+    rrect(d, (x + 24, cy + 52, x + 160, cy + 86), 17, fill=SURFACE, outline=LINE)
+    d.text((x + 92, cy + 69), "Reset to defaults", font=font(13), fill=TEXT, anchor="mm")
+    d.text((x + w - 24, cy + 69), "Source code", font=font(13), fill=MUTED, anchor="rm")
     return h
 
 
@@ -358,9 +385,9 @@ def shot5():
     img, d = canvas(1280, 800)
     headline(d, 80, 74,
              "Settings in one click",
-             "An off switch, both widths and the side toggle — from the toolbar, in 12 languages.")
+             "An off switch, every width, and a language of your own choosing — from the toolbar.")
 
-    popup_mock(d, 80, 200)
+    popup_mock(d, 80, 184)
 
     bx = 640
     claims = [

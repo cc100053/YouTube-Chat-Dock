@@ -29,6 +29,9 @@ var YTCHAT = {
     flip: 'ytchat-flip',
     enabled: 'ytchat-enabled',
     divider: 'ytchat-divider',
+    tw: 'ytchat-tw',
+    theater: 'ytchat-theater',
+    lang: 'ytchat-lang',
   },
 
   DEF: {
@@ -37,6 +40,15 @@ var YTCHAT = {
     'ytchat-flip': '0',
     'ytchat-enabled': '1',
     'ytchat-divider': '1',
+    /* 450 is YouTube's own theater-mode reservation, measured. Matching it
+       means the default layout is exactly what YouTube already made room
+       for, and nothing shifts the first time theater is opened. */
+    'ytchat-tw': '450',
+    'ytchat-theater': '1',
+    /* 'auto' means follow the browser. Stored as a literal rather than
+       resolved at write time so that changing the browser language keeps
+       working for anyone who never touched the picker. */
+    'ytchat-lang': 'auto',
   },
 };
 

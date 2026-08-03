@@ -9,7 +9,10 @@ Not a floating overlay. The video is resized to fit beside the chat, never cover
 - **Hover the divider and click ⇄** to move chat to the other side. The choice persists.
 - **Chat replay** on VODs works exactly like live chat.
 - **RTL locales** supported — chat docks left, and the divider flips with it.
-- **Settings popup** in the toolbar: on/off, both widths, side, reset. 12 languages.
+- **Theater mode** docks chat beside the video too, filling the empty slot
+  YouTube leaves there.
+- **Settings popup** in the toolbar: on/off, all three widths, side, reset —
+  and a language picker, because the browser's language is not always yours.
 - **One permission** (`storage`), no host permissions, no network requests, no tracking.
 
 ## Install
@@ -42,6 +45,19 @@ saved on a large monitor won't leave a sliver of video on a laptop.
 Defaults (440px page / 560px fullscreen) live in `settings.js`, mirrored as
 static fallbacks in `dock.css` under `:root`.
 
+### Language
+
+The popup has a language picker, so the twelve UI languages are a plain table
+in `i18n.js` rather than `chrome.i18n`. `chrome.i18n` always resolves to the
+browser's UI language and offers no runtime override, which makes a picker
+impossible with it. `_locales/` still exists, holding exactly two strings —
+the extension name and description — because those are read by Chrome and by
+the Web Store, not by us.
+
+`auto` maps the browser tag onto the nearest catalogue rather than dropping to
+English on a near miss: `zh-HK` and `zh-MO` resolve to `zh_TW`, `pt-PT` to
+`pt_BR`, `en-GB` to `en`.
+
 ### Why two storage backends
 
 `localStorage` is the only store readable *synchronously* at `document_start`,
@@ -60,7 +76,20 @@ and never lag.
 
 ## How it works
 
-Six non-obvious things make this work, each of which took measuring the live DOM to find.
+Seven non-obvious things make this work, each of which took measuring the live DOM to find.
+
+**Theater mode drops chat below the video, and that is YouTube's doing.**
+Measured on a live stream at 1920x769 with the extension both on and off: the
+two were identical, so this was never something the extension broke. What
+YouTube does in theater is narrow the player by exactly 450px to reserve a side
+slot — `#panels-full-bleed-container`, 1455..1905 — then leave that slot
+**empty** and render chat underneath in `#columns`. It also reparents
+`#chat-container`: in page mode it sits in `#secondary-inner`, in theater it is
+a direct child of `#columns`, which is why one selector cannot find the chat
+panel in every mode. CSS cannot move a node into a sibling container, so the
+slot is filled by positioning `#chat-container` over it from measured
+geometry. Verified: slot and chat both land on `1345,56 560x600`, and the video
+fills its player box `1345x600` uncropped.
 
 **Fullscreen is not an overlay problem.** YouTube already docks chat in fullscreen — it hides `#columns` entirely and moves chat into `#panels-full-bleed-container`, a flex sibling of the player inside `#full-bleed-container`. So resizing is pure flex sizing. No `position: fixed`, no z-index fights. The whole fullscreen section is a handful of `flex` declarations.
 
@@ -116,7 +145,8 @@ CSS is injected by the manifest at `document_start`, so it applies before first 
 | `dock.css` | Layout, fullscreen sizing, video normalization, chat-iframe fixes, divider styling |
 | `dock.js` | Drag logic and the storage mirror. Top frame only — the chat iframe gets CSS and nothing else |
 | `popup.html/.css/.js` | Settings UI. Logical CSS properties throughout, so it mirrors in RTL |
-| `_locales/` | 12 languages: en, zh_TW, zh_CN, ja, ko, es, pt_BR, fr, de, ru, ar, hi |
+| `i18n.js` | Every UI string, 12 languages. Loaded into both the page and the popup |
+| `_locales/` | Two strings only — the name and description Chrome and the store read |
 | `store/` | Chrome Web Store listing copy, privacy policy, generated assets, packaging |
 
 ## License
