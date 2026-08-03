@@ -61,6 +61,7 @@ var YTCHAT_MESSAGES = {
     "dividerAria": "Resize chat panel",
     "flipAria": "Move chat to the other side",
     "linkCoffee": "Buy me a coffee",
+    "linkSupport": "Support",
   },
   "zh_TW": {
     "extName": "YouTube Chat Dock",
@@ -83,6 +84,7 @@ var YTCHAT_MESSAGES = {
     "dividerAria": "調整聊天室寬度",
     "flipAria": "將聊天室移至另一側",
     "linkCoffee": "請我喝杯咖啡",
+    "linkSupport": "支持",
   },
   "zh_CN": {
     "extName": "YouTube Chat Dock",
@@ -105,6 +107,7 @@ var YTCHAT_MESSAGES = {
     "dividerAria": "调整聊天面板宽度",
     "flipAria": "将聊天移至另一侧",
     "linkCoffee": "请我喝杯咖啡",
+    "linkSupport": "支持",
   },
   "ja": {
     "extName": "YouTube Chat Dock",
@@ -127,6 +130,7 @@ var YTCHAT_MESSAGES = {
     "dividerAria": "チャットパネルの幅を変更",
     "flipAria": "チャットを反対側に移動",
     "linkCoffee": "コーヒーを奢る",
+    "linkSupport": "支援する",
   },
   "ko": {
     "extName": "YouTube Chat Dock",
@@ -149,6 +153,7 @@ var YTCHAT_MESSAGES = {
     "dividerAria": "채팅 패널 크기 조절",
     "flipAria": "채팅을 반대쪽으로 이동",
     "linkCoffee": "커피 한 잔 사주기",
+    "linkSupport": "후원하기",
   },
   "es": {
     "extName": "YouTube Chat Dock",
@@ -171,6 +176,7 @@ var YTCHAT_MESSAGES = {
     "dividerAria": "Redimensionar el panel de chat",
     "flipAria": "Mover el chat al otro lado",
     "linkCoffee": "Invítame a un café",
+    "linkSupport": "Apoyar",
   },
   "pt_BR": {
     "extName": "YouTube Chat Dock",
@@ -193,6 +199,7 @@ var YTCHAT_MESSAGES = {
     "dividerAria": "Redimensionar o painel de chat",
     "flipAria": "Mover o chat para o outro lado",
     "linkCoffee": "Me pague um café",
+    "linkSupport": "Apoiar",
   },
   "fr": {
     "extName": "YouTube Chat Dock",
@@ -215,6 +222,7 @@ var YTCHAT_MESSAGES = {
     "dividerAria": "Redimensionner le panneau de chat",
     "flipAria": "Déplacer le chat de l'autre côté",
     "linkCoffee": "Offrez-moi un café",
+    "linkSupport": "Soutenir",
   },
   "de": {
     "extName": "YouTube Chat Dock",
@@ -237,6 +245,7 @@ var YTCHAT_MESSAGES = {
     "dividerAria": "Chat-Panel-Breite ändern",
     "flipAria": "Chat auf die andere Seite verschieben",
     "linkCoffee": "Spendier mir einen Kaffee",
+    "linkSupport": "Unterstützen",
   },
   "ru": {
     "extName": "YouTube Chat Dock",
@@ -259,6 +268,7 @@ var YTCHAT_MESSAGES = {
     "dividerAria": "Изменить ширину панели чата",
     "flipAria": "Переместить чат на другую сторону",
     "linkCoffee": "Купить мне кофе",
+    "linkSupport": "Поддержать",
   },
   "ar": {
     "extName": "YouTube Chat Dock",
@@ -281,6 +291,7 @@ var YTCHAT_MESSAGES = {
     "dividerAria": "تغيير عرض لوحة الدردشة",
     "flipAria": "نقل الدردشة إلى الجانب الآخر",
     "linkCoffee": "ادعُني إلى قهوة",
+    "linkSupport": "ادعم",
   },
   "hi": {
     "extName": "YouTube Chat Dock",
@@ -303,6 +314,7 @@ var YTCHAT_MESSAGES = {
     "dividerAria": "चैट पैनल का आकार बदलें",
     "flipAria": "चैट को दूसरी ओर ले जाएँ",
     "linkCoffee": "मुझे कॉफ़ी पिलाएँ",
+    "linkSupport": "सहयोग करें",
   },
 };
 

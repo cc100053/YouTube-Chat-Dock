@@ -136,6 +136,8 @@ against YouTube's live DOM and turned out false. Three of them:
 The comments in the source carry the measurements. They are the real
 documentation.
 
+<a id="support"></a>
+
 ## ❤️ Support
 
 If this saved you some squinting:
@@ -149,6 +151,8 @@ If this saved you some squinting:
 
 A star costs nothing and helps people find it.
 
+<a id="crypto"></a>
+
 ### Crypto
 
 <div align="center">
@@ -156,7 +160,7 @@ A star costs nothing and helps people find it.
 | <img src="store/assets/donate/evm.png" width="170" alt="QR code for the EVM address"> | <img src="store/assets/donate/sol.png" width="170" alt="QR code for the Solana address"> |
 |:---:|:---:|
 | **EVM** | **Solana** |
-| Ethereum · Base · BNB Smart Chain · Arbitrum | |
+| ![Ethereum](https://img.shields.io/badge/Ethereum-3C3C3D?logo=ethereum&logoColor=white) ![Base](https://img.shields.io/badge/Base-0052FF?logoColor=white) ![BNB Smart Chain](https://img.shields.io/badge/BNB%20Smart%20Chain-F0B90B?logo=bnbchain&logoColor=white) ![Arbitrum](https://img.shields.io/badge/Arbitrum-213147?logoColor=white) | ![Solana](https://img.shields.io/badge/Solana-9945FF?logo=solana&logoColor=white) |
 
 </div>
 
