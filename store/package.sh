@@ -24,13 +24,21 @@ import glob, json
 for f in sorted(glob.glob('_locales/*/messages.json')): json.load(open(f, encoding='utf-8'))
 print('locales ok:', len(glob.glob('_locales/*/messages.json')))"
 
-# A donate link that 404s is worse than no donate link, and popup.js hides
-# the button while COFFEE_URL is empty. Refuse to build rather than ship a
-# store listing whose coffee button silently does not exist.
-if grep -q "^  var COFFEE_URL = '';" popup.js; then
-  echo "COFFEE_URL is still empty in popup.js — set it or delete this check." >&2
-  exit 1
-fi
+# A donate link that 404s is worse than no donate link, and popup.js hides the
+# button unless COFFEE_URL is an absolute https URL. Fail the build rather than
+# ship a coffee button that silently does not exist. Checked here too, not just
+# at runtime, because a hidden button is easy to miss in a manual smoke test.
+coffee=$(sed -n "s/^  var COFFEE_URL = '\(.*\)';$/\1/p" popup.js)
+case "$coffee" in
+  https://*.*/*)
+    echo "coffee link: $coffee" ;;
+  '')
+    echo "COFFEE_URL is unset in popup.js — set it or delete this check." >&2
+    exit 1 ;;
+  *)
+    echo "COFFEE_URL must be an absolute https URL, got: $coffee" >&2
+    exit 1 ;;
+esac
 
 rm -f "$out"
 zip -r -q "$out" manifest.json dock.css dock.js settings.js i18n.js \

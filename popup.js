@@ -12,13 +12,15 @@
   /* ------------------------------------------------------------------
      SET THIS BEFORE PUBLISHING.
 
-     Your Buy Me a Coffee (or Ko-fi, or GitHub Sponsors) page. While it is
-     empty the link is hidden rather than rendered dead — a donate button
-     that 404s is worse than no donate button, and a *guessed* donation URL
-     is worse still, because the money would go to whoever does own it.
+     Your Buy Me a Coffee (or Ko-fi, or GitHub Sponsors) page. Must be an
+     absolute https URL, e.g. 'https://buymeacoffee.com/yourname'.
 
-     store/package.sh refuses to build the upload ZIP while this is empty,
-     so it cannot reach the store by accident.
+     While it is unset the link is hidden rather than rendered dead — a donate
+     button that 404s is worse than no donate button, and a *guessed* donation
+     URL is worse still, because the money would go to whoever does own it.
+
+     store/package.sh refuses to build the upload ZIP while this is unset or
+     malformed, so neither can reach the store by accident.
      ------------------------------------------------------------------ */
   var COFFEE_URL = '';
 
@@ -103,8 +105,18 @@
     $('version').textContent = 'v' + chrome.runtime.getManifest().version;
   } catch (e) { /* not fatal — the version line just stays empty */ }
 
+  /* Absolute https only. A bare "buymeacoffee.com/name" would pass a
+     non-empty check and then resolve against chrome-extension://<id>/, giving
+     a link that looks fine in the popup and 404s on click. Anything that is
+     not a valid https URL leaves the button hidden. */
   var coffee = $('coffee');
-  if (COFFEE_URL) coffee.href = COFFEE_URL;
+  var coffeeOk = false;
+  try {
+    coffeeOk = !!COFFEE_URL && new URL(COFFEE_URL).protocol === 'https:';
+  } catch (e) {
+    coffeeOk = false;
+  }
+  if (coffeeOk) coffee.href = COFFEE_URL;
   else coffee.hidden = true;
 
   /* ---- state ---------------------------------------------------------- */
