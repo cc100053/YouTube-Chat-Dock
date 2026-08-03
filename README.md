@@ -149,6 +149,34 @@ If this saved you some squinting:
 
 A star costs nothing and helps people find it.
 
+### Crypto
+
+<div align="center">
+
+| <img src="store/assets/donate/evm.png" width="170" alt="QR code for the EVM address"> | <img src="store/assets/donate/sol.png" width="170" alt="QR code for the Solana address"> |
+|:---:|:---:|
+| **EVM** | **Solana** |
+| Ethereum · Base · BNB Smart Chain · Arbitrum | |
+
+</div>
+
+**EVM** — same address on Ethereum, Base, BNB Smart Chain and Arbitrum:
+
+```
+0x69c04f5Ec02fADBd71d09A7a5C494481C12c95aE
+```
+
+**Solana:**
+
+```
+EmgfSiuaZ7tvXd1bmV4nps53ydsXjfmNsL7kGxMf9JbQ
+```
+
+> [!IMPORTANT]
+> Send only on the networks listed above. Anything sent on another chain, or
+> as an unsupported token, is unrecoverable. Always check the first and last
+> few characters after pasting.
+
 ## 📄 License
 
 [MIT](LICENSE). Not affiliated with, endorsed by, or sponsored by YouTube or
