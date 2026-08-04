@@ -59,6 +59,37 @@
    responsive layout, so we simply don't apply.
    ------------------------------------------------------------- */
 @media (min-width: 1000px) {
+  /* Keep the chat against the window edge once the player stops growing.
+
+     #primary carries a max-width YouTube computes from the viewport height to
+     hold the player at 16:9 — measured 1713.78px on a 1920x1080 window, which
+     is a 963.6px-tall player. Below the chat width at which the player reaches
+     that cap, narrowing the chat no longer widens the video, so the difference
+     becomes surplus space in #columns — and #columns is justify-content:center,
+     which splits the surplus down both sides.
+
+     The visible result was the bug this fixes: drag the chat narrower and the
+     chat detached from the right edge of the window, with the gap growing on
+     both sides as you dragged. Measured with the cap forced to 900px to make
+     the surplus large: chat 1261..1561 with 345px of empty page on each side,
+     against 1589..1889 and the usual 16px gutter with the rule below.
+
+     flex-end rather than space-between: the pair should stay docked together —
+     splitting them parks the surplus between the video and the chat, which
+     reads as a broken layout rather than a margin. Both keywords are
+     writing-direction relative, so this needs no RTL special case; the flipped
+     rule mirrors it because order:-1 moves chat to the row's START.
+
+     Inert while the player still has room to grow, since there is no surplus
+     to distribute then. */
+  :root:not([data-ytchat-off]) ytd-watch-flexy:not([fullscreen]):not([theater]) #columns {
+    justify-content: flex-end !important;
+  }
+
+  :root[data-ytchat-flip]:not([data-ytchat-off]) ytd-watch-flexy:not([fullscreen]):not([theater]) #columns {
+    justify-content: flex-start !important;
+  }
+
   :root:not([data-ytchat-off]) ytd-watch-flexy:not([theater]) {
     --ytd-watch-flexy-sidebar-width: var(--ytchat-w) !important;
     --ytd-watch-flexy-sidebar-min-width: var(--ytchat-w) !important;
