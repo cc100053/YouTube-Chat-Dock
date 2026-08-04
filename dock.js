@@ -332,7 +332,29 @@
     const slot = first(SLOT_TH);
     if (!slot) return setAttr('data-ytchat-theater', false);
     const r = slot.getBoundingClientRect();
-    if (r.width < 1 || r.height < 1) return setAttr('data-ytchat-theater', false);
+    /* A degenerate box is not the only unusable one, and checking only for
+       area is what shipped the bug below.
+
+       Measured on two live streams, theater mode with chat COLLAPSED, in a
+       1920px viewport: YouTube parks this container at left 1905 with a
+       perfectly healthy 610x656 rect. It is not a reservation there, it is a
+       leftover — the same measurement with our CSS gated out puts it at
+       1905..2487, so the off-screen position is YouTube's, not ours. The old
+       guard saw non-zero width and height, accepted it, and docking pinned
+       #chat-container to it: 15px of a 610px panel left on screen, carrying
+       the collapsed chat's "Show chat" button off the right edge with it.
+
+       So require enough of the slot to actually be inside the viewport to
+       hold a usable panel, not merely that it has area somewhere. MIN is the
+       width below which chat is unreadable anyway, which is the same question.
+
+       Rejecting leaves data-ytchat-theater off, section 2c inert, and chat
+       wherever YouTube put it — measured correct: with chat expanded, stock
+       theater renders it at 1323..1905, beside the video and full height. */
+    const visible = Math.min(r.right, window.innerWidth) - Math.max(r.left, 0);
+    if (r.width < 1 || r.height < 1 || visible < MIN) {
+      return setAttr('data-ytchat-theater', false);
+    }
     setVar('--ytchat-tt', Math.round(r.top) + 'px');
     setVar('--ytchat-tl', Math.round(r.left) + 'px');
     setVar('--ytchat-th', Math.round(r.height) + 'px');
