@@ -52,6 +52,61 @@ var YTCHAT = {
   },
 };
 
+/* ---- the DOM contract with YouTube ----------------------------------
+
+   Every name this extension borrows from YouTube, in one table, because
+   a rename on their side is the single most likely way this breaks and
+   the fix should be a diff here rather than a hunt through dock.js.
+
+   Each entry is an ORDERED preference list, most specific first, and
+   dock.js walks it with one querySelector per entry. It deliberately does
+   NOT pass them as one comma-separated list: a selector list returns the
+   first match in DOCUMENT order, not the first selector that matched, so
+   a comma list would silently prefer whichever candidate happens to sit
+   higher in the tree. That is the opposite of a fallback chain.
+
+   Selectors here are unscoped; dock.js prefixes them with the watch
+   element and the mode attributes, so nothing matches outside the player.
+
+   Stability, measured against how YouTube actually churns:
+     - custom element tags (ytd-*, yt-*) are Polymer component names and
+       have survived years;
+     - ids are internal to a component's template, so they go when that
+       component is rewritten — these are what the fallbacks are for;
+     - FRAME_PATH is the chat iframe's URL, which YouTube cannot rename
+       without breaking its own chat. It is the only name in this file
+       that is not YouTube's to change, which is why the health tripwire
+       in dock.js is built on it rather than on any id. */
+YTCHAT.SEL = {
+  // The spine. dock.css is keyed on this too, and CSS has no fallback
+  // mechanism, so losing it is unrecoverable rather than degraded.
+  watch: ['ytd-watch-flexy'],
+
+  /* Ground truth that this page has chat. Matched against each iframe's
+     contentWindow.location.pathname, NOT against a [src] selector.
+
+     Measured on a live stream: the chat iframe has src="" as a property and
+     NO src attribute at all (getAttribute returns null) — YouTube populates
+     the frame without ever setting one. `iframe[src*="/live_chat"]` therefore
+     matches nothing, on a page whose chat is open and working. The frame's
+     contentWindow.location.pathname reads exactly "/live_chat", and the
+     document is same-origin, so dock.js can reach it. */
+  framePath: '/live_chat',
+
+  // Page mode: the frame element inside #secondary.
+  panelPage: ['ytd-live-chat-frame#chat', 'ytd-live-chat-frame', '#chat-container'],
+
+  // Theater: the same chat, reparented to a direct child of #columns.
+  panelTheater: ['#chat-container', 'ytd-live-chat-frame#chat', 'ytd-live-chat-frame'],
+
+  // True fullscreen: a different container entirely.
+  panelFs: ['#panels-full-bleed-container', '#panels-container'],
+
+  // The empty reservation theater docking is positioned over. No frame
+  // fallback is possible: in theater the chat is NOT in this element.
+  slotTheater: ['#panels-full-bleed-container'],
+};
+
 YTCHAT.ALL_KEYS = Object.keys(YTCHAT.DEF);
 
 /* Widths are clamped against MIN/MAX here and again against the live viewport

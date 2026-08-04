@@ -28,11 +28,38 @@
   const FLIP_KEY = YTCHAT.K.flip;
 
   const root = document.documentElement;
-  const inFullscreen = () => !!document.querySelector('ytd-watch-flexy[fullscreen]');
+
+  /* Every borrowed name comes from the table in settings.js. Resolution walks
+     the list in order and stops at the first hit — one querySelector per
+     candidate rather than one comma-separated list, because a selector list
+     returns the first match in document order, not the first selector that
+     matched. See the comment on YTCHAT.SEL.
+
+     Cost is unchanged on the healthy path: the preferred selector hits on the
+     first try, so the 400ms tick still runs exactly one querySelector. Only a
+     miss pays for the rest of the list. */
+  function first(sels) {
+    for (let i = 0; i < sels.length; i++) {
+      const el = document.querySelector(sels[i]);
+      if (el) return el;
+    }
+    return null;
+  }
+
+  const SEL = YTCHAT.SEL;
+  const WATCH = SEL.watch[0];
+  const scoped = (prefix, sels) => sels.map((s) => prefix + ' ' + s);
+
+  const inFullscreen = () => !!document.querySelector(WATCH + '[fullscreen]');
   /* Theater and fullscreen are separate attributes and can both be present
      during the transition, so theater must exclude fullscreen explicitly. */
   const inTheater = () =>
-    !!document.querySelector('ytd-watch-flexy[theater]:not([fullscreen])');
+    !!document.querySelector(WATCH + '[theater]:not([fullscreen])');
+
+  const PANEL_FS = scoped(WATCH + '[fullscreen]', SEL.panelFs);
+  const PANEL_TH = scoped(WATCH + '[theater]', SEL.panelTheater);
+  const PANEL_PG = scoped(WATCH + ':not([fullscreen])', SEL.panelPage);
+  const SLOT_TH = scoped(WATCH + '[theater]:not([fullscreen])', SEL.slotTheater);
 
   function mode() {
     if (inFullscreen()) return MODES.fs;
@@ -147,6 +174,7 @@
   let dividerOn = true;
   let theaterOn = true;
   let lang = 'en';
+  let healthy = true;
 
   function applyFlip(on) {
     flipped = on;
@@ -161,7 +189,69 @@
      before first paint — disabled means no flash of a docked layout either. */
   function applyEnabled(on) {
     enabled = on;
-    setAttr('data-ytchat-off', !on);
+    applyGate();
+  }
+
+  /* One attribute, two independent reasons to be off: the user's switch and
+     the health tripwire below. Kept as separate booleans on purpose — a
+     tripped tripwire must never be written back to storage, or a YouTube
+     experiment that lasts an afternoon would leave the extension latched off
+     for a user who never touched the setting. */
+  function applyGate() {
+    setAttr('data-ytchat-off', !(enabled && healthy));
+  }
+
+  /* ---- health: notice YouTube renaming the DOM out from under us -------
+
+     dock.css borrows the same names dock.js does, and CSS has no fallback
+     mechanism: if YouTube renames #secondary or ytd-watch-flexy, every layout
+     rule simply stops matching and nothing JS can do puts the dock back. So
+     the goal here is not rescue, it is a clean failure — stop drawing a
+     divider that resizes something no longer listening, and hand the page back
+     to YouTube whole rather than half-docked.
+
+     The hard part is telling a rename apart from the many ordinary reasons the
+     panel is absent: chat closed, an ordinary video with no chat at all, a
+     non-watch page, theater docking switched off, below the 1000px breakpoint.
+     The discriminator is the chat iframe matched on its /live_chat URL — the
+     one name in the contract that is not YouTube's to rename, since changing
+     it breaks their own chat. A visible /live_chat iframe with no resolvable
+     panel anywhere around it is a rename and nothing else.
+
+     Held for MISS_TICKS (1.6s) before acting so an SPA navigation caught
+     mid-relayout cannot trip it, and released the instant a panel resolves
+     again — a transient must not latch. */
+  const MISS_TICKS = 4;
+  let missStreak = 0;
+  let healthLogged = false;
+
+  function setHealthy(on) {
+    if (healthy === on) return;
+    healthy = on;
+    applyGate();
+    setAttr('data-ytchat-degraded', !on);
+    ensureMounted();
+    if (!on && !healthLogged) {
+      healthLogged = true;
+      console.warn('[YouTube Chat Dock] chat is present but its container no ' +
+        'longer matches any known selector — standing down so the page keeps ' +
+        "YouTube's own layout. Please report this: " +
+        'https://github.com/cc100053/YouTube-Chat-Dock/issues');
+    }
+  }
+
+  function probeHealth() {
+    if (!enabled) return;
+    // Cheapest path first, and the only one that runs when nothing is wrong.
+    if (panel()) { missStreak = 0; return setHealthy(true); }
+    // Theater docking switched off is a deliberate null, not a miss.
+    if (inTheater() && !theaterOn) return void (missStreak = 0);
+    const f = chatFrame();
+    if (!f) return void (missStreak = 0);   // no chat on this page at all
+    const r = f.getBoundingClientRect();
+    // Chat collapsed, hidden, or the page below the single-column breakpoint.
+    if (r.width < 1 || r.height < 40) return void (missStreak = 0);
+    if (++missStreak >= MISS_TICKS) setHealthy(false);
   }
 
   function restore() {
@@ -193,16 +283,42 @@
      mode the same element is a direct child of #columns; fullscreen uses
      #panels-full-bleed-container instead. */
   function panel() {
-    if (inFullscreen()) {
-      return document.querySelector('ytd-watch-flexy[fullscreen] #panels-full-bleed-container');
-    }
+    if (inFullscreen()) return first(PANEL_FS);
     if (inTheater()) {
       // Docking off in theater means YouTube's stock layout, and no divider.
-      return theaterOn
-        ? document.querySelector('ytd-watch-flexy[theater] #chat-container')
-        : null;
+      return theaterOn ? first(PANEL_TH) : null;
     }
-    return document.querySelector('ytd-watch-flexy:not([fullscreen]) ytd-live-chat-frame#chat');
+    return first(PANEL_PG);
+  }
+
+  /* The chat iframe, found by its URL rather than by any name YouTube owns.
+
+     It has to be found by walking the iframes and reading each one's location:
+     measured on a live stream with chat open, the chat frame carries no src
+     attribute at all (getAttribute -> null, .src -> ""), so the obvious
+     `iframe[src*="/live_chat"]` matches nothing. Its contentWindow.location
+     .pathname is "/live_chat" and the document is same-origin.
+
+     Cross-origin frames on the watch page (accounts.youtube.com, the identity
+     frame) throw SecurityError on that read, so every access is guarded — the
+     throw is the normal case for those, not an error worth reporting.
+
+     Deliberately NOT used as a panel fallback, even though its rect is the
+     right box: the divider it would place has nothing behind it. dock.css is
+     keyed on the same ids panel() is, and CSS cannot fall back — if those ids
+     are gone the layout is already YouTube's stock, so a divider drawn off the
+     iframe would drag a width that nothing responds to. That is a worse
+     failure than no divider. Its job here is detection only, which is also why
+     it is only ever called after panel() has already missed. */
+  function chatFrame() {
+    const frames = document.getElementsByTagName('iframe');
+    for (let i = 0; i < frames.length; i++) {
+      try {
+        const p = frames[i].contentWindow.location.pathname;
+        if (p && p.indexOf(YTCHAT.SEL.framePath) === 0) return frames[i];
+      } catch (e) { /* cross-origin frame — not ours, and not a problem */ }
+    }
+    return null;
   }
 
   /* Theater is the one mode whose panel is positioned by us rather than by
@@ -210,9 +326,10 @@
      handed to CSS. data-ytchat-theater is set only once the numbers are real,
      which is what keeps section 2c inert (and the chat unmoved) until then. */
   function syncTheater() {
-    if (!enabled || !theaterOn || !inTheater()) return setAttr('data-ytchat-theater', false);
-    const slot = document.querySelector(
-      'ytd-watch-flexy[theater]:not([fullscreen]) #panels-full-bleed-container');
+    if (!enabled || !healthy || !theaterOn || !inTheater()) {
+      return setAttr('data-ytchat-theater', false);
+    }
+    const slot = first(SLOT_TH);
     if (!slot) return setAttr('data-ytchat-theater', false);
     const r = slot.getBoundingClientRect();
     if (r.width < 1 || r.height < 1) return setAttr('data-ytchat-theater', false);
@@ -307,8 +424,9 @@
   function reposition() {
     if (dragging) return;
     syncTheater();
-    // Switched off entirely, or the user kept the layout but hid the handle.
-    if (!enabled || !dividerOn) return hide();
+    // Switched off entirely, stood down by the health tripwire, or the user
+    // kept the layout but hid the handle.
+    if (!enabled || !healthy || !dividerOn) return hide();
     const el = panel();
     if (!el) return hide();
     const r = el.getBoundingClientRect();
@@ -442,7 +560,7 @@
      400ms tick re-appended it, so a user who switched the extension off still
      carried an element on every watch page. */
   function ensureMounted() {
-    const wanted = enabled && dividerOn;
+    const wanted = enabled && healthy && dividerOn;
     if (!wanted) {
       if (handle.isConnected) handle.remove();
       return;
@@ -540,6 +658,10 @@
   const safeMount = safe(mount);
 
   function tick() {
+    /* Only the 400ms tick probes health, not reposition() — reposition also
+       runs on every scroll event, and the probe's extra queries have no reason
+       to run at that rate. */
+    probeHealth();
     // YouTube can replace <body> wholesale on some navigations.
     ensureMounted();
     reposition();
