@@ -74,16 +74,40 @@
      the surplus large: chat 1261..1561 with 345px of empty page on each side,
      against 1589..1889 and the usual 16px gutter with the rule below.
 
-     flex-end rather than space-between: the pair should stay docked together —
-     splitting them parks the surplus between the video and the chat, which
-     reads as a broken layout rather than a margin. Both keywords are
-     writing-direction relative, so this needs no RTL special case; the flipped
-     rule mirrors it because order:-1 moves chat to the row's START.
+     This was flex-end first, on the reasoning that the pair should stay docked
+     together and that splitting them would read as a broken layout rather than
+     a margin. That was reasoned, not measured, and it was wrong: flex-end puts
+     the whole surplus BEFORE the video, so narrowing the chat walks the player
+     rightwards across the page. Measured at 1920x1080 with chat dragged to the
+     120px minimum: #primary 493..1769 with 493px of empty page to its left, the
+     video starting at x=493 instead of the usual 16px gutter. Reported as the
+     player following the chat to the right.
 
-     Inert while the player still has room to grow, since there is no surplus
-     to distribute then. */
+     space-between puts the surplus between the two instead, which is the only
+     one of the three that satisfies both requirements at once — measured, same
+     window, chat at 120px:
+
+       flex-end       video at 493, chat flush right   player walks right
+       flex-start     video at  16, chat 492px short   the detach bug above
+       space-between  video at  16, chat flush right   477px gap in the middle
+
+     At the 440px default the two are byte-identical (video 16, chat flush
+     right, a 157px gap that lives INSIDE #primary rather than in the flex row),
+     so this only changes anything once the chat is dragged narrow. Inert while
+     the player still has room to grow, since there is no surplus then.
+
+     Writing-direction relative, so RTL needs no special case: in RTL the row
+     starts at the right, and space-between still anchors the video to its own
+     gutter and the chat to the far edge.
+
+     The flipped rule below stays flex-start and is NOT the mirror of this one.
+     With order:-1 the chat comes first, so the video's natural home is
+     immediately after it, not against the far edge — measured flipped at 120px,
+     flex-start keeps the video at 152 while space-between shoves it to 629.
+     Both rules leave the content block anchored to the row's start; that is the
+     invariant, and flex-end broke it. */
   :root:not([data-ytchat-off]) ytd-watch-flexy:not([fullscreen]):not([theater]) #columns {
-    justify-content: flex-end !important;
+    justify-content: space-between !important;
   }
 
   :root[data-ytchat-flip]:not([data-ytchat-off]) ytd-watch-flexy:not([fullscreen]):not([theater]) #columns {
