@@ -162,9 +162,10 @@ code{background:var(--card); border:1px solid var(--line); border-radius:5px; pa
 
 <h2>How do I put YouTube live chat next to the video?</h2>
 <p class="answer">
-  Install a browser extension that docks it &mdash; YouTube itself has no setting
-  for it. YouTube only offers chat as a fixed-width sidebar in page view, and it
-  gives you nothing at all in fullscreen.
+  Install a browser extension that docks it &mdash; YouTube itself gives you no
+  control over this. Chat is a fixed-width sidebar in page view, and in
+  fullscreen it becomes an overlay sitting on top of the video. Neither can be
+  resized, and neither puts chat beside the video.
 </p>
 <p>
   YouTube Chat Dock re-lays out the chat that is already on the page, so it stays
@@ -207,9 +208,10 @@ code{background:var(--card); border:1px solid var(--line); border-radius:5px; pa
 
 <h2>Does live chat work in fullscreen on YouTube?</h2>
 <p class="answer">
-  Not on its own &mdash; YouTube hides chat entirely in true fullscreen. With this
-  extension the chat stays docked beside the video in fullscreen, at its own
-  remembered width, and the video is not cropped to make room.
+  Yes, but only as an overlay. YouTube&rsquo;s fullscreen chat sits on top of the
+  video at a width you cannot change. With this extension it is docked beside
+  the video instead, at its own remembered width, covering nothing and cropping
+  nothing.
 </p>
 <figure>
   <img class="shot" src="assets/screenshot-3-fullscreen.png" width="1280" height="800"
@@ -375,7 +377,7 @@ code{background:var(--card); border:1px solid var(--line); border-radius:5px; pa
       "featureList": [
         "Docks YouTube live chat as a resizable side panel beside the video",
         "Draggable divider, with separate remembered widths for page view, theater mode and fullscreen",
-        "Works in true fullscreen, where YouTube hides chat entirely",
+        "Works in true fullscreen, where YouTube only offers chat as an overlay on top of the video",
         "Fills the empty side slot YouTube reserves in theater mode",
         "Chat replay on VODs behaves exactly like live chat",
         "Chat can be moved to either side",
@@ -392,7 +394,7 @@ code{background:var(--card); border:1px solid var(--line); border-radius:5px; pa
           "name": "How do I put YouTube live chat next to the video?",
           "acceptedAnswer": {
             "@type": "Answer",
-            "text": "Install a browser extension that docks it — YouTube itself has no setting for it. YouTube only offers chat as a fixed-width sidebar in page view, and it gives you nothing at all in fullscreen."
+            "text": "Install a browser extension that docks it — YouTube itself gives you no control over this. Chat is a fixed-width sidebar in page view, and in fullscreen it becomes an overlay sitting on top of the video. Neither can be resized, and neither puts chat beside the video."
           }
         },
         {
@@ -416,7 +418,7 @@ code{background:var(--card); border:1px solid var(--line); border-radius:5px; pa
           "name": "Does live chat work in fullscreen on YouTube?",
           "acceptedAnswer": {
             "@type": "Answer",
-            "text": "Not on its own — YouTube hides chat entirely in true fullscreen. With this extension the chat stays docked beside the video in fullscreen, at its own remembered width, and the video is not cropped to make room."
+            "text": "Yes, but only as an overlay. YouTube’s fullscreen chat sits on top of the video at a width you cannot change. With this extension it is docked beside the video instead, at its own remembered width, covering nothing and cropping nothing."
           }
         },
         {

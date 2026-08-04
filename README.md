@@ -113,9 +113,10 @@ one object, no build step.
 
 ### How do I put YouTube live chat next to the video?
 
-Install an extension that docks it — YouTube itself has no setting for this. It
-offers chat only as a fixed-width sidebar in page view, and nothing at all in
-fullscreen. This extension re-lays out the chat already on the page, so it stays
+Install an extension that docks it — YouTube itself gives you no control over
+this. Chat is a fixed-width sidebar in page view and an overlay on top of the
+video in fullscreen; neither can be resized, and neither puts chat beside the
+video. This extension re-lays out the chat already on the page, so it stays
 YouTube's own chat, with Super Chat, emotes, badges and moderation tools intact.
 
 ### Can I resize YouTube's live chat?
@@ -133,9 +134,9 @@ slot with the chat it was reserved for, and resizes the reservation with it.
 
 ### Does live chat work in fullscreen on YouTube?
 
-Not on its own — YouTube hides chat entirely in true fullscreen. With this
-extension chat stays docked beside the video at its own remembered width, and
-the video is not cropped to make room.
+Yes, but only as an overlay. YouTube's fullscreen chat sits on top of the video
+at a width you cannot change. With this extension it is docked beside the video
+instead, at its own remembered width, covering nothing and cropping nothing.
 
 ### Does this work with chat replay on old streams?
 
