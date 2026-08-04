@@ -9,6 +9,7 @@
 Turns YouTube's live chat and chat replay into a resizable side panel —
 in page view, theater mode, and true fullscreen.
 
+[![Chrome Web Store](https://img.shields.io/chrome-web-store/v/bkmbhlkcjbkjapbamkidacajjfhoiiam?label=Chrome%20Web%20Store&color=3ea6ff)](https://chromewebstore.google.com/detail/youtube-chat-dock/bkmbhlkcjbkjapbamkidacajjfhoiiam)
 [![License](https://img.shields.io/github/license/cc100053/YouTube-Chat-Dock?color=blue)](LICENSE)
 ![Manifest V3](https://img.shields.io/badge/Manifest-V3-3ea6ff)
 ![Chrome 88+](https://img.shields.io/badge/Chrome-88%2B-3ea6ff)
@@ -41,9 +42,10 @@ in page view, theater mode, and true fullscreen.
 
 ## 📥 Install
 
-> [!NOTE]
-> Not on the Chrome Web Store yet. Until it is, load it unpacked — about thirty
-> seconds, and there is nothing to build or install first.
+**[Get it from the Chrome Web Store](https://chromewebstore.google.com/detail/youtube-chat-dock/bkmbhlkcjbkjapbamkidacajjfhoiiam)**
+
+Or load it unpacked — about thirty seconds, and there is nothing to build or
+install first:
 
 1. [Download the repo as a ZIP](https://github.com/cc100053/YouTube-Chat-Dock/archive/refs/heads/main.zip) and unzip it, or `git clone` it
 2. Open `chrome://extensions/`

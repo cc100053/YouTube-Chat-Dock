@@ -3,6 +3,13 @@
 Everything the Developer Dashboard asks for, in the order it asks for it.
 Character counts are the store's own limits and were measured, not estimated.
 
+Published at:
+https://chromewebstore.google.com/detail/youtube-chat-dock/bkmbhlkcjbkjapbamkidacajjfhoiiam
+
+This file stays the source of truth for listing copy — edit here, then copy
+into the dashboard, rather than editing the dashboard directly and letting it
+drift out of sync with the repo.
+
 ---
 
 ## Store listing tab
