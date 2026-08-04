@@ -19,8 +19,8 @@
      button that 404s is worse than no donate button, and a *guessed* donation
      URL is worse still, because the money would go to whoever does own it.
 
-     store/package.sh refuses to build the upload ZIP while this is unset or
-     malformed, so neither can reach the store by accident.
+     The packaging script refuses to build the upload ZIP while this is unset
+     or malformed, so neither can reach the store by accident.
      ------------------------------------------------------------------ */
   var COFFEE_URL = 'https://ko-fi.com/hangyodev';
 

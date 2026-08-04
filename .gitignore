@@ -13,5 +13,20 @@ CLAUDE.md
 .env
 .env.*
 
-# Build output from store/package.sh (covered by *.zip, kept explicit).
-store/*.zip
+# store/ is the publishing workspace, and most of it is working material in the
+# same sense CLAUDE.md is: listing copy, the launch plan, the asset generator
+# and the build script. Two things in it are load-bearing on the public side
+# and stay tracked:
+#
+#   PRIVACY.md — this exact path is the privacy policy URL registered on the
+#                live Chrome Web Store listing. A 404 there is a required field
+#                gone missing, not a broken link.
+#   assets/    — the README renders its screenshots and donation QR codes from
+#                here. (docs/ keeps its own copies, so the landing page does
+#                not depend on this.)
+#
+# Ordering matters: store/* has to exclude entries individually, or git will
+# not descend into store/assets/ to see the re-include below it.
+store/*
+!store/PRIVACY.md
+!store/assets/
