@@ -13,6 +13,13 @@ CLAUDE.md
 .env
 .env.*
 
+# Local dev tooling, same rule as store/'s build scripts: this repo is public,
+# and a canary that drives a browser against YouTube is working material, not
+# product. Carries its own node_modules, a Chrome profile and failure
+# screenshots, none of which belong in a repo whose whole pitch is that the
+# extension is readable end to end in ten minutes.
+tools/
+
 # SEO/AEO strategy, target queries, channel plans and outreach drafts. Working
 # material by definition, and the outreach drafts in particular stop working the
 # moment they are public — a reply template anyone can read is not a reply.
