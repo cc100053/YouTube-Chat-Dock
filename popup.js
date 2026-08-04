@@ -163,12 +163,24 @@
 
   function readAll(cb) {
     chrome.storage.local.get(YTCHAT.ALL_KEYS, function (got) {
+      if (chrome.runtime.lastError) return;
       var s = {};
       YTCHAT.ALL_KEYS.forEach(function (k) {
         s[k] = got[k] === undefined ? YTCHAT.DEF[k] : got[k];
       });
       cb(s);
     });
+  }
+
+  /* This popup is itself a writer, and onChanged fires for its own writes —
+     including one per animation frame while a slider is dragged. Re-rendering
+     on that echo re-labelled every string in the UI ~60 times a second and
+     wrote back into the range input the user still had hold of. Remember what
+     we wrote and ignore the echo; a change from anywhere else still renders. */
+  var selfWrites = Object.create(null);
+
+  function remember(patch) {
+    Object.keys(patch).forEach(function (k) { selfWrites[k] = String(patch[k]); });
   }
 
   var toastTimer = null;
@@ -181,6 +193,7 @@
   }
 
   function save(patch) {
+    remember(patch);
     chrome.storage.local.set(patch, function () {
       if (!chrome.runtime.lastError) toast();
     });
@@ -231,6 +244,7 @@
       var patch = {};
       patch[key] = String(pending);
       pending = null;
+      remember(patch);
       chrome.storage.local.set(patch, function () { void chrome.runtime.lastError; });
     }
 
@@ -262,7 +276,14 @@
   /* A drag on the page itself, or another window's popup, can change these
      while this one is open. Re-render rather than let the two disagree. */
   chrome.storage.onChanged.addListener(function (changes, where) {
-    if (where === 'local') readAll(render);
+    if (where !== 'local') return;
+    var foreign = false;
+    Object.keys(changes).forEach(function (k) {
+      var v = changes[k].newValue;
+      if (selfWrites[k] !== undefined && String(v) === selfWrites[k]) return;
+      foreign = true;
+    });
+    if (foreign) readAll(render);
   });
 
   readAll(render);

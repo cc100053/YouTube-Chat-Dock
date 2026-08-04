@@ -313,9 +313,18 @@ yt-live-chat-app yt-live-chat-text-message-renderer {
 }
 
 #ytchat-resizer:hover::before,
-#ytchat-resizer.dragging::before {
+#ytchat-resizer:focus-visible::before,
+#ytchat-resizer.dragging::before,
+#ytchat-resizer.keying::before {
   background: #3ea6ff;
   height: 90px;
+}
+
+/* The handle is 10px wide and mostly transparent, so a focus ring drawn
+   outside it would float in the middle of the video. Inset it onto the bar. */
+#ytchat-resizer:focus-visible {
+  outline: 2px solid #3ea6ff;
+  outline-offset: -1px;
 }
 
 #ytchat-resizer.dragging {
@@ -337,7 +346,12 @@ yt-live-chat-app yt-live-chat-text-message-renderer {
   transition: opacity .12s ease;
 }
 
-#ytchat-resizer.dragging .ytchat-readout {
+/* .keying is the keyboard equivalent of .dragging for the readout only: a
+   resize with no number is a resize you cannot aim. It deliberately does not
+   tint the bar or hide the flip button the way .dragging does, because there
+   is no pointer to keep clear of. */
+#ytchat-resizer.dragging .ytchat-readout,
+#ytchat-resizer.keying .ytchat-readout {
   opacity: 1;
 }
 
@@ -414,5 +428,20 @@ yt-live-chat-app yt-live-chat-text-message-renderer {
   #ytchat-resizer .ytchat-readout,
   #ytchat-flip-btn {
     transition: none;
+  }
+}
+
+/* Keyboard hint on the divider's tooltip needs no CSS, but the flip button
+   must stay reachable once the divider itself is focusable: tabbing from the
+   handle lands on it, and :focus-visible already reveals it. */
+@media (forced-colors: active) {
+  #ytchat-resizer::before {
+    background: CanvasText;
+  }
+  #ytchat-flip-btn {
+    background: Canvas;
+    color: CanvasText;
+    border: 1px solid CanvasText;
+    forced-color-adjust: none;
   }
 }

@@ -64,7 +64,30 @@
      YouTube load applies it asynchronously, so it can land a frame late.
      Every load after that is synchronous again, because the mirror has run.
      Widths dragged on the page are written to both at once and never lag. */
-  const applyVar = (m, px) => root.style.setProperty(m.cssVar, px + 'px');
+  /* Writing a custom property on documentElement invalidates style for the
+     WHOLE document, so writing one that has not changed is not free — and the
+     400ms tick plus every pointermove in a theater drag was rewriting the same
+     six values unconditionally. Cache the last value written and skip the
+     no-ops; only real changes reach the style system now.
+
+     The cache mirrors inline properties on <html>, which YouTube never touches
+     and never replaces. It is still reset on navigation, because a stale cache
+     would silently stop applying a width and that failure would be invisible. */
+  const varCache = Object.create(null);
+
+  function setVar(name, value) {
+    if (varCache[name] === value) return;
+    varCache[name] = value;
+    root.style.setProperty(name, value);
+  }
+
+  function setAttr(name, on) {
+    if (root.hasAttribute(name) === on) return;
+    if (on) root.setAttribute(name, '');
+    else root.removeAttribute(name);
+  }
+
+  const applyVar = (m, px) => setVar(m.cssVar, px + 'px');
 
   function lsGet(key) {
     try {
@@ -128,8 +151,7 @@
   function applyFlip(on) {
     flipped = on;
     // Attribute, not a class: YouTube owns className on <html>, nothing owns this.
-    if (on) root.setAttribute('data-ytchat-flip', '');
-    else root.removeAttribute('data-ytchat-flip');
+    setAttr('data-ytchat-flip', on);
   }
 
   /* The off switch is an attribute rather than a stylesheet swap, because
@@ -139,8 +161,7 @@
      before first paint — disabled means no flash of a docked layout either. */
   function applyEnabled(on) {
     enabled = on;
-    if (on) root.removeAttribute('data-ytchat-off');
-    else root.setAttribute('data-ytchat-off', '');
+    setAttr('data-ytchat-off', !on);
   }
 
   function restore() {
@@ -150,7 +171,7 @@
     lang = ytchatResolveLang(lsGet(YTCHAT.K.lang), uiLanguage());
     relabel();
     for (const m of Object.values(MODES)) applyVar(m, clamp(readStored(m)));
-    root.style.setProperty('--ytchat-top', TOP_GAP + 'px');
+    setVar('--ytchat-top', TOP_GAP + 'px');
     applyFlip(YTCHAT.isOn(lsGet(FLIP_KEY)));
   }
 
@@ -189,19 +210,16 @@
      handed to CSS. data-ytchat-theater is set only once the numbers are real,
      which is what keeps section 2c inert (and the chat unmoved) until then. */
   function syncTheater() {
-    if (!enabled || !theaterOn || !inTheater()) {
-      root.removeAttribute('data-ytchat-theater');
-      return;
-    }
+    if (!enabled || !theaterOn || !inTheater()) return setAttr('data-ytchat-theater', false);
     const slot = document.querySelector(
       'ytd-watch-flexy[theater]:not([fullscreen]) #panels-full-bleed-container');
-    if (!slot) return root.removeAttribute('data-ytchat-theater');
+    if (!slot) return setAttr('data-ytchat-theater', false);
     const r = slot.getBoundingClientRect();
-    if (r.width < 1 || r.height < 1) return root.removeAttribute('data-ytchat-theater');
-    root.style.setProperty('--ytchat-tt', Math.round(r.top) + 'px');
-    root.style.setProperty('--ytchat-tl', Math.round(r.left) + 'px');
-    root.style.setProperty('--ytchat-th', Math.round(r.height) + 'px');
-    root.setAttribute('data-ytchat-theater', '');
+    if (r.width < 1 || r.height < 1) return setAttr('data-ytchat-theater', false);
+    setVar('--ytchat-tt', Math.round(r.top) + 'px');
+    setVar('--ytchat-tl', Math.round(r.left) + 'px');
+    setVar('--ytchat-th', Math.round(r.height) + 'px');
+    setAttr('data-ytchat-theater', true);
   }
 
   /* RTL locales mirror the layout and put chat on the LEFT, which flips both
@@ -241,6 +259,15 @@
   handle.id = 'ytchat-resizer';
   handle.setAttribute('role', 'separator');
   handle.setAttribute('aria-orientation', 'vertical');
+  /* A focusable separator is the ARIA window-splitter pattern, and it needs a
+     value to be one. Without tabIndex the resize was pointer-only: the popup
+     sliders were the sole keyboard route, and they are two clicks away in
+     another surface. The handle is display:none whenever it is not applicable,
+     which takes it out of the tab order too — so this adds exactly one stop on
+     a watch page with chat open, and none anywhere else. */
+  handle.tabIndex = 0;
+  handle.setAttribute('aria-valuemin', String(MIN));
+  handle.setAttribute('aria-valuemax', String(MAX));
 
   const readout = document.createElement('span');
   readout.className = 'ytchat-readout';
@@ -261,7 +288,11 @@
 
   /* Re-run on every restore(), so switching language in the popup relabels a
      tab that is already open instead of waiting for a reload. */
+  let labelledLang = null;
+
   function relabel() {
+    if (labelledLang === lang) return;
+    labelledLang = lang;
     handle.title = t('dividerTitle');
     handle.setAttribute('aria-label', t('dividerAria'));
     flipBtn.title = t('flipAria');
@@ -287,6 +318,7 @@
     handle.style.left = innerEdge(r) + 'px';
     handle.style.top = r.top + 'px';
     handle.style.height = r.height + 'px';
+    handle.setAttribute('aria-valuenow', String(Math.round(readWidth())));
     // Keep the px readout on the video side of the divider in both directions.
     handle.classList.toggle('ytchat-flip', panelOnLeft(r));
   }
@@ -341,6 +373,48 @@
     handle.addEventListener('pointercancel', onUp);
   });
 
+  /* Keyboard resizing, mirroring the drag exactly: widening means moving
+     toward the video, which is rightwards when the panel is on the left and
+     leftwards when it is on the right. Resolved from geometry per keystroke
+     for the same reason the drag resolves it once at pointerdown — the side is
+     never assumed.
+
+     The readout is shown briefly after each keystroke, because a resize with
+     no number is a resize you cannot aim. */
+  let keyEchoTimer = 0;
+
+  handle.addEventListener('keydown', safe((e) => {
+    if (e.altKey || e.ctrlKey || e.metaKey) return;
+    const el = panel();
+    if (!el) return;
+    const onLeft = panelOnLeft(el.getBoundingClientRect());
+    const step = (e.shiftKey ? 5 : 1) * YTCHAT.STEP;
+    let px;
+    switch (e.key) {
+      case 'ArrowLeft':  px = readWidth() + (onLeft ? -step : step); break;
+      case 'ArrowRight': px = readWidth() + (onLeft ? step : -step); break;
+      case 'Home':       px = MIN; break;
+      case 'End':        px = MAX; break;   // clamp() cuts this to the viewport
+      case 'Enter':
+      case ' ':          px = mode().def; break;
+      default: return;
+    }
+    /* stopPropagation matters as much as preventDefault here: YouTube binds
+       its own shortcuts at document level, where arrows seek the video and
+       Space toggles playback. preventDefault alone would not stop those —
+       handlers that never check defaultPrevented would still fire, so
+       resizing with the keyboard would also scrub the video. */
+    e.preventDefault();
+    e.stopPropagation();
+    const set = writeWidth(px);
+    readout.textContent = set + 'px';
+    handle.classList.add('keying');
+    clearTimeout(keyEchoTimer);
+    keyEchoTimer = setTimeout(() => handle.classList.remove('keying'), 900);
+    window.dispatchEvent(new Event('resize'));
+    reposition();
+  }));
+
   handle.addEventListener('dblclick', () => {
     writeWidth(mode().def);
     window.dispatchEvent(new Event('resize'));
@@ -363,9 +437,22 @@
     toggleSide();
   }));
 
+  /* "Off" should mean nothing of ours is in the page, not merely that our node
+     is display:none. Previously the divider was appended regardless and the
+     400ms tick re-appended it, so a user who switched the extension off still
+     carried an element on every watch page. */
+  function ensureMounted() {
+    const wanted = enabled && dividerOn;
+    if (!wanted) {
+      if (handle.isConnected) handle.remove();
+      return;
+    }
+    if (document.body && !handle.isConnected) document.body.appendChild(handle);
+  }
+
   function mount() {
     restore();
-    if (document.body && !handle.isConnected) document.body.appendChild(handle);
+    ensureMounted();
     reposition();
   }
 
@@ -454,7 +541,7 @@
 
   function tick() {
     // YouTube can replace <body> wholesale on some navigations.
-    if (document.body && !handle.isConnected) document.body.appendChild(handle);
+    ensureMounted();
     reposition();
   }
 
@@ -471,6 +558,9 @@
   addEventListener('scroll', safeReposition, { passive: true });
   addEventListener('fullscreenchange', () => setTimeout(safeReposition, 120));
   addEventListener('yt-navigate-finish', safe(() => {
+    // A stale cache would silently stop applying a width, and that failure is
+    // invisible — so drop it on navigation rather than trust it across one.
+    for (const k in varCache) delete varCache[k];
     mount();
     setTimeout(safeReposition, 400);
   }));
