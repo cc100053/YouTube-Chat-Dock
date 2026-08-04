@@ -109,27 +109,28 @@
      non-empty check and then resolve against chrome-extension://<id>/, giving
      a link that looks fine in the popup and 404s on click. Anything that is
      not a valid https URL leaves the button hidden. */
-  /* The review page lives at a URL containing the extension's own id, which
-     is not known until the item is published — so it is read from
-     chrome.runtime.id rather than hard-coded, and can never go stale.
+  /* The review page lives at a URL containing the extension's id.
 
-     Visibility keys off update_url, which Chrome injects into the manifest it
-     hands back only for store-installed copies. An unpacked development copy
-     has no update_url and no listing to review, so the button stays hidden
-     rather than pointing at a 404. The hidden path is verified; the visible
-     one cannot be until the item is actually published. */
+     A store-installed copy reports its own id, and that is preferred: it
+     cannot go stale, whatever happens to the constant below. Chrome injects
+     update_url into the manifest only for store-installed copies, which is
+     how those are told apart.
+
+     An unpacked development copy has neither, and used to hide the link
+     entirely. That meant the control could never be seen while working on
+     the popup — it was reported as having "vanished unexpectedly", and the
+     answer was that in a development build it had never once been visible.
+     Since the listing is published, its id is fixed and public (it is in the
+     store URL), so a dev copy can point at the real listing instead of
+     hiding. The link now has no hidden path at all. */
+  var STORE_ID = 'bkmbhlkcjbkjapbamkidacajjfhoiiam';
   var rate = $('rate');
+  var rateId = STORE_ID;
   try {
     var mf = chrome.runtime.getManifest();
-    if (mf && mf.update_url && chrome.runtime.id) {
-      rate.href = 'https://chromewebstore.google.com/detail/'
-                + chrome.runtime.id + '/reviews';
-    } else {
-      rate.hidden = true;
-    }
-  } catch (e) {
-    rate.hidden = true;
-  }
+    if (mf && mf.update_url && chrome.runtime.id) rateId = chrome.runtime.id;
+  } catch (e) { /* orphaned context — the published id is still correct */ }
+  rate.href = 'https://chromewebstore.google.com/detail/' + rateId + '/reviews';
 
   var coffee = $('coffee');
   var coffeeOk = false;
