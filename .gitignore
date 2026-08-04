@@ -13,6 +13,11 @@ CLAUDE.md
 .env
 .env.*
 
+# SEO/AEO strategy, target queries, channel plans and outreach drafts. Working
+# material by definition, and the outreach drafts in particular stop working the
+# moment they are public — a reply template anyone can read is not a reply.
+seo/
+
 # store/ is the publishing workspace, and most of it is working material in the
 # same sense CLAUDE.md is: listing copy, the launch plan, the asset generator
 # and the build script. Two things in it are load-bearing on the public side
