@@ -1,10 +1,10 @@
 {
   "manifest_version": 3,
   "name": "__MSG_extName__",
-  "version": "1.6.0",
+  "version": "1.7.0",
   "default_locale": "en",
   "description": "__MSG_extDesc__",
-  "homepage_url": "https://github.com/cc100053/YouTube-Chat-Dock",
+  "homepage_url": "https://cc100053.github.io/YouTube-Chat-Dock/",
   "minimum_chrome_version": "88",
   "icons": {
     "16": "icons/icon16.png",
@@ -13,7 +13,7 @@
   },
   "action": {
     "default_popup": "popup.html",
-    "default_title": "__MSG_extName__"
+    "default_title": "__MSG_extNameShort__"
   },
   "permissions": [
     "storage"

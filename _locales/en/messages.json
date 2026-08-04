@@ -1,10 +1,14 @@
 {
   "extName": {
+    "message": "YouTube Chat Dock — Side Panel for Live Chat & Replay",
+    "description": "Store title and manifest name. 75-char ceiling. The brand token stays fixed; the suffix carries the words store search is matched against, localised per store."
+  },
+  "extNameShort": {
     "message": "YouTube Chat Dock",
-    "description": "Extension name. Not translated — it is the product name."
+    "description": "Toolbar tooltip only. Separate from extName because the store title is keyword-loaded and would be absurd as a tooltip."
   },
   "extDesc": {
-    "message": "Turn live chat and chat replay into a resizable side panel. Drag the divider to resize. Works in true fullscreen.",
+    "message": "Live chat side by side with the video: a resizable side panel for chat and replay, in theater mode and fullscreen.",
     "description": "Store and manifest description. Hard limit 132 characters."
   }
 }

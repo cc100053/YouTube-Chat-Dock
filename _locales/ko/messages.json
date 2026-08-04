@@ -1,10 +1,14 @@
 {
   "extName": {
+    "message": "YouTube Chat Dock — 실시간 채팅 사이드 패널",
+    "description": "Store title and manifest name. 75-char ceiling. The brand token stays fixed; the suffix carries the words store search is matched against, localised per store."
+  },
+  "extNameShort": {
     "message": "YouTube Chat Dock",
-    "description": "Extension name. Not translated — it is the product name."
+    "description": "Toolbar tooltip only. Separate from extName because the store title is keyword-loaded and would be absurd as a tooltip."
   },
   "extDesc": {
-    "message": "실시간 채팅과 채팅 다시보기를 크기 조절 가능한 사이드 패널로. 구분선을 끌어 조절하며 전체화면에서도 작동합니다.",
+    "message": "채팅을 영상 옆에 나란히: 크기 조절 가능한 실시간 채팅·다시보기 사이드 패널, 극장모드와 전체화면에서도 작동.",
     "description": "Store and manifest description. Hard limit 132 characters."
   }
 }

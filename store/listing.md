@@ -14,21 +14,40 @@ drift out of sync with the repo.
 
 ## Store listing tab
 
-### Name — 17 / 75 characters
+### Name — 53 / 75 characters (en)
 
 ```
-YouTube Chat Dock
+YouTube Chat Dock — Side Panel for Live Chat & Replay
 ```
+
+Do not edit this here either. Since v1.7.0 the manifest reads
+`__MSG_extName__`, so the name is localised per store alongside the
+description, and `store/package.sh` measures every locale against the 75-char
+ceiling. The measured lengths are in the table under *Localised name and short
+description* below.
+
+The suffix was added in v1.7.0 for store search, which is largely keyword
+matching weighted heavily toward the title. "YouTube Chat Dock" alone contains
+none of the words anyone types — the queries this is trying to be found for are
+"chat side by side", "chat next to video", "resize youtube chat",
+"chat in fullscreen" and "theater mode chat". The brand token stays first so
+the title still reads as a product name rather than a keyword list, which is
+also what keeps it inside the store's policy on title stuffing.
+
+The toolbar tooltip does **not** use this string. `action.default_title` reads a
+separate `__MSG_extNameShort__` key, because a 53-character tooltip hanging off
+the toolbar icon is absurd. The popup's own `<h1>` is unaffected either way — it
+comes from the table in `i18n.js`, not from `_locales/`.
 
 Descriptive, no YouTube logo or wordmark styling. A plain descriptive use of
 the word "YouTube" in an extension name is the low-risk case; the trademark
 exposure on this store lives in visual branding, so the icon and every
 screenshot avoid the logo and the red-and-white scheme entirely.
 
-### Short description — 113 / 132 characters
+### Short description — 114 / 132 characters (en)
 
 ```
-Turn live chat and chat replay into a resizable side panel. Drag the divider to resize. Works in true fullscreen.
+Live chat side by side with the video: a resizable side panel for chat and replay, in theater mode and fullscreen.
 ```
 
 Do not edit this here. Since v1.4.0 the manifest reads `__MSG_extDesc__`, so
@@ -37,12 +56,44 @@ localised one per language. The 132-character ceiling applies to **every**
 locale — Spanish measured 133 on the first pass and had to be shortened, so
 re-run the length check in `store/package.sh` after touching any of them.
 
+Rewritten in v1.7.0 to front-load the query language. The store truncates this
+in results, so the words that matter go first, and "theater mode" was traded in
+for "drag the divider" — the divider is the better feature but nobody searches
+for it, and theater mode is a query with real intent behind it.
+
+### Localised name and short description — measured
+
+Both strings, in all twelve locales, as measured by `store/package.sh`. Neither
+ceiling is a suggestion: the dashboard rejects the upload rather than truncating.
+
+| Locale | Name (≤75) | Short description (≤132) |
+|---|---|---|
+| ar | 48 | 102 |
+| de | 49 | 117 |
+| en | 53 | 114 |
+| es | 57 | 123 |
+| fr | 58 | 124 |
+| hi | 38 | 96 |
+| ja | 34 | 52 |
+| ko | 33 | 62 |
+| pt_BR | 54 | 120 |
+| ru | 39 | 100 |
+| zh_CN | 27 | 39 |
+| zh_TW | 28 | 42 |
+
+French is the longest name at 58 and the longest description at 124, so it is
+the locale that will break first if either string grows.
+
 ### Detailed description
 
+The store surfaces only the **first two lines** in search results, so those two
+lines carry the query language and not the product name — the name is already
+on the row above them. The old opening spent both lines restating the title.
+
 ```
-YouTube Chat Dock turns live chat and chat replay into a proper side panel —
-one you can resize by dragging, that stays put in page view, theater mode and
-true fullscreen.
+Put YouTube live chat side by side with the video: a resizable side panel for
+live chat and chat replay that works in page view, theater mode and true
+fullscreen, where YouTube hides chat entirely.
 
 It is not a floating overlay. The video is resized to fit beside the chat, so
 chat never covers the thing you came to watch, and the video is never cropped
@@ -84,6 +135,9 @@ One stylesheet and one small script, injected only on youtube.com. The
 stylesheet does the layout; the script does nothing but move three CSS numbers
 when you drag. There is no build step and no third-party dependency of any
 kind — you can read the entire extension in about ten minutes.
+
+Full feature list and FAQ:
+https://cc100053.github.io/YouTube-Chat-Dock/
 
 The source is public and MIT licensed:
 https://github.com/cc100053/YouTube-Chat-Dock
@@ -208,27 +262,30 @@ and the three slider values are what the popup shows at defaults.
 
 ## Traditional Chinese (zh-TW / zh-HK) listing
 
-### 名稱
+### 名稱 — 28 / 75 characters
+
+Pulled from `_locales/zh_TW/messages.json`, like the English one.
 
 ```
-YouTube Chat Dock
+YouTube Chat Dock — 直播聊天室側邊欄
 ```
 
-### 簡短說明 — 48 / 132 characters
+### 簡短說明 — 42 / 132 characters
 
 Pulled from `_locales/zh_TW/messages.json` at build time, not typed into the
 dashboard. The old wording claimed "不需要任何權限", which stopped being true
 in v1.4.0.
 
 ```
-將直播聊天室與聊天重播變成可調整寬度的側邊欄，拖曳分隔線即可改變寬度，劇院模式與全螢幕同樣有效。
+聊天室與影片並排：可調整寬度的直播聊天室與聊天重播側邊欄，劇院模式與全螢幕同樣有效。
 ```
 
 ### 詳細說明
 
 ```
-YouTube Chat Dock 將直播聊天室與聊天重播變成一個真正的側邊欄 —— 可以拖曳調整寬度，
-在一般播放頁、劇院模式與真正的全螢幕都同樣有效。
+讓直播聊天室與影片並排：可拖曳調整寬度的側邊欄，支援直播聊天與聊天重播，
+在一般播放頁、劇院模式與真正的全螢幕都同樣有效 —— 全螢幕下 YouTube 原本
+會完全隱藏聊天室。
 
 它不是浮動視窗。影片會自動縮小以配合聊天室，因此聊天室不會遮住影片，影片也不會被裁切。
 
@@ -258,6 +315,9 @@ YouTube Chat Dock 將直播聊天室與聊天重播變成一個真正的側邊�
 • 不需要帳號，不需要登入。
 • 沒有 host 權限，僅能在 youtube.com 上運作。
 
+完整功能說明與常見問題：
+https://cc100053.github.io/YouTube-Chat-Dock/
+
 原始碼公開，採用 MIT 授權：
 https://github.com/cc100053/YouTube-Chat-Dock
 
@@ -276,7 +336,12 @@ https://github.com/cc100053/YouTube-Chat-Dock
 ## Pre-submission checklist
 
 - [ ] `version` in `manifest.json` bumped
-- [ ] every `extDesc` in `_locales/*/messages.json` is ≤ 132 characters
+- [ ] every `extDesc` in `_locales/*/messages.json` is ≤ 132 characters and
+      every `extName` is ≤ 75 — `store/package.sh` measures both and fails
+- [ ] `extNameShort` present in every locale, or the toolbar tooltip inherits
+      the keyword-loaded store title
+- [ ] `docs/index.html` FAQ JSON-LD still matches the visible answers —
+      `store/package.sh` checks this too
 - [ ] every language in `i18n.js` defines the identical key set (21 keys as of
       v1.6.0 — verify with a Node one-liner over `YTCHAT_MESSAGES`, since
       `store/package.sh` only parses the two-string `_locales/` files)

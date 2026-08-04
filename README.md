@@ -10,6 +10,7 @@ Turns YouTube's live chat and chat replay into a resizable side panel —
 in page view, theater mode, and true fullscreen.
 
 [![Chrome Web Store](https://img.shields.io/chrome-web-store/v/bkmbhlkcjbkjapbamkidacajjfhoiiam?label=Chrome%20Web%20Store&color=3ea6ff)](https://chromewebstore.google.com/detail/youtube-chat-dock/bkmbhlkcjbkjapbamkidacajjfhoiiam)
+[![Website](https://img.shields.io/badge/website-cc100053.github.io-3ea6ff)](https://cc100053.github.io/YouTube-Chat-Dock/)
 [![License](https://img.shields.io/github/license/cc100053/YouTube-Chat-Dock?color=blue)](LICENSE)
 ![Manifest V3](https://img.shields.io/badge/Manifest-V3-3ea6ff)
 ![Chrome 88+](https://img.shields.io/badge/Chrome-88%2B-3ea6ff)
@@ -43,6 +44,7 @@ in page view, theater mode, and true fullscreen.
 ## 📥 Install
 
 **[Get it from the Chrome Web Store](https://chromewebstore.google.com/detail/youtube-chat-dock/bkmbhlkcjbkjapbamkidacajjfhoiiam)**
+— or read the [feature overview and FAQ](https://cc100053.github.io/YouTube-Chat-Dock/) first.
 
 Or load it unpacked — about thirty seconds, and there is nothing to build or
 install first:
@@ -99,7 +101,64 @@ The picker is independent of the browser's language, so Chrome can be in one
 language and this in another. Missing yours? Add it to [`i18n.js`](i18n.js) —
 one object, no build step.
 
-## ❓ Known limitations
+## ❓ FAQ
+
+<!--
+  Each heading is a question people actually type, and each answer opens with a
+  direct sentence rather than a preamble. That first sentence is what search
+  engines and LLMs lift; burying it after two clauses of context wastes it.
+  Keep these in sync with docs/index.html, which carries the same answers as
+  FAQPage structured data.
+-->
+
+### How do I put YouTube live chat next to the video?
+
+Install an extension that docks it — YouTube itself has no setting for this. It
+offers chat only as a fixed-width sidebar in page view, and nothing at all in
+fullscreen. This extension re-lays out the chat already on the page, so it stays
+YouTube's own chat, with Super Chat, emotes, badges and moderation tools intact.
+
+### Can I resize YouTube's live chat?
+
+Yes — drag the divider between the video and the chat. Page view, theater and
+fullscreen each remember their own width, so going fullscreen doesn't undo your
+layout. Double-click the divider to snap back to the default.
+
+### Why does YouTube put chat below the video in theater mode?
+
+Because YouTube narrows the player in theater mode to reserve a side slot, then
+leaves that slot empty and renders chat underneath instead. That's YouTube's own
+behaviour — measured identical with this extension on and off. This fills the
+slot with the chat it was reserved for, and resizes the reservation with it.
+
+### Does live chat work in fullscreen on YouTube?
+
+Not on its own — YouTube hides chat entirely in true fullscreen. With this
+extension chat stays docked beside the video at its own remembered width, and
+the video is not cropped to make room.
+
+### Does this work with chat replay on old streams?
+
+Yes. Chat replay on a VOD is docked and resized exactly like live chat on an
+active stream, with no separate setting.
+
+### Can I move YouTube chat to the left side?
+
+Yes — hover the divider and click the ⇄ toggle, or flip the switch in the popup.
+The choice persists. In right-to-left languages it mirrors with the layout
+rather than inverting, so "the other side" always means what it looks like.
+
+### Does it collect any data?
+
+No. It collects nothing, transmits nothing, and makes no network requests of any
+kind. See [Permissions and privacy](#-permissions-and-privacy) above.
+
+### Does it work in Edge, Brave, Opera or Arc?
+
+Yes — Chrome 88+ and any Chromium browser. Install it from the Chrome Web Store,
+which those browsers can all install from. It is not a Firefox add-on.
+
+## ⚠️ Known limitations
 
 - **Below a 1000px window**, YouTube switches to a single-column layout with
   chat under the video. The extension deliberately does not apply there, rather

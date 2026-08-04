@@ -1,10 +1,14 @@
 {
   "extName": {
+    "message": "YouTube Chat Dock — 直播聊天室側邊欄",
+    "description": "Store title and manifest name. 75-char ceiling. The brand token stays fixed; the suffix carries the words store search is matched against, localised per store."
+  },
+  "extNameShort": {
     "message": "YouTube Chat Dock",
-    "description": "Extension name. Not translated — it is the product name."
+    "description": "Toolbar tooltip only. Separate from extName because the store title is keyword-loaded and would be absurd as a tooltip."
   },
   "extDesc": {
-    "message": "將直播聊天室與聊天重播變成可調整寬度的側邊欄。拖曳分隔線即可改變寬度，全螢幕同樣有效。",
+    "message": "聊天室與影片並排：可調整寬度的直播聊天室與聊天重播側邊欄，劇院模式與全螢幕同樣有效。",
     "description": "Store and manifest description. Hard limit 132 characters."
   }
 }

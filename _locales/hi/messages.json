@@ -1,10 +1,14 @@
 {
   "extName": {
+    "message": "YouTube Chat Dock — लाइव चैट साइड पैनल",
+    "description": "Store title and manifest name. 75-char ceiling. The brand token stays fixed; the suffix carries the words store search is matched against, localised per store."
+  },
+  "extNameShort": {
     "message": "YouTube Chat Dock",
-    "description": "Extension name. Not translated — it is the product name."
+    "description": "Toolbar tooltip only. Separate from extName because the store title is keyword-loaded and would be absurd as a tooltip."
   },
   "extDesc": {
-    "message": "लाइव चैट और चैट रीप्ले को आकार बदलने योग्य साइड पैनल में बदलें। डिवाइडर खींचें। पूर्ण स्क्रीन में भी काम करता है।",
+    "message": "चैट वीडियो के साथ-साथ: लाइव चैट और रीप्ले के लिए आकार बदलने योग्य साइड पैनल, फुल स्क्रीन में भी।",
     "description": "Store and manifest description. Hard limit 132 characters."
   }
 }
