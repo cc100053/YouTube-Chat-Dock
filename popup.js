@@ -27,22 +27,40 @@
   /* ------------------------------------------------------------------
      SET THIS BEFORE PUBLISHING.
 
-     The feedback form — a hosted form (Tally, Google Forms) with a free-text
-     box and a "what would you like it to do" field. Absolute https URL.
+     The feedback forms — hosted Tally forms, one per language. Absolute
+     https URLs.
 
      A hosted form rather than the GitHub issue tracker because the people
      with the most ordinary complaints are YouTube viewers, not developers,
      and requiring an account filters out exactly the feedback worth having.
      The GitHub link stays in the nav below for the ones who prefer it.
 
+     Three forms rather than one, because Tally has no multi-language forms:
+     its language setting translates the submit button and validation text
+     and nothing an author writes. A form is therefore one language, and the
+     only way to ask a Japanese user a question in Japanese is a second form.
+
      Nothing is sent from the popup. The button is a plain link: the request
      happens in the tab Chrome opens, only after the user clicks, which is
      what keeps "the extension makes no network requests" true of the
      extension itself.
 
-     Unset leaves the button hidden rather than dead, same as COFFEE_URL.
+     An unset `en` leaves the button hidden rather than dead, same as
+     COFFEE_URL. The other two are optional: an unset one falls back to `en`
+     rather than hiding, because a form in the wrong language still collects
+     the report, and no button collects nothing.
      ------------------------------------------------------------------ */
-  var FEEDBACK_URL = '';
+  var FEEDBACK_URLS = {
+    en: '',
+    zh_TW: '',
+    ja: ''
+  };
+
+  /* zh_CN is routed to the Traditional form, not to English. A Simplified
+     reader gets far more from 繁體中文 than from English, even unconverted;
+     the reverse of the usual fallback logic, and deliberate. Delete this line
+     to send them to the English form instead. */
+  FEEDBACK_URLS.zh_CN = FEEDBACK_URLS.zh_TW;
 
   var $ = function (id) { return document.getElementById(id); };
 
@@ -183,7 +201,7 @@
     var el = $('feedback');
     if (!el) return;
     try {
-      var fu = new URL(FEEDBACK_URL);
+      var fu = new URL(FEEDBACK_URLS[lang] || FEEDBACK_URLS.en);
       if (fu.protocol !== 'https:') throw 0;
       fu.searchParams.set('v', chrome.runtime.getManifest().version);
       fu.searchParams.set('lang', lang);
