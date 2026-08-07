@@ -24,6 +24,26 @@
      ------------------------------------------------------------------ */
   var COFFEE_URL = 'https://ko-fi.com/hangyodev';
 
+  /* ------------------------------------------------------------------
+     SET THIS BEFORE PUBLISHING.
+
+     The feedback form — a hosted form (Tally, Google Forms) with a free-text
+     box and a "what would you like it to do" field. Absolute https URL.
+
+     A hosted form rather than the GitHub issue tracker because the people
+     with the most ordinary complaints are YouTube viewers, not developers,
+     and requiring an account filters out exactly the feedback worth having.
+     The GitHub link stays in the nav below for the ones who prefer it.
+
+     Nothing is sent from the popup. The button is a plain link: the request
+     happens in the tab Chrome opens, only after the user clicks, which is
+     what keeps "the extension makes no network requests" true of the
+     extension itself.
+
+     Unset leaves the button hidden rather than dead, same as COFFEE_URL.
+     ------------------------------------------------------------------ */
+  var FEEDBACK_URL = '';
+
   var $ = function (id) { return document.getElementById(id); };
 
   /* ---- language -------------------------------------------------------
@@ -58,6 +78,10 @@
     if (langSel.options.length) {
       langSel.options[0].textContent = AUTO_MARK + '\u00A0 ' + msg('langAuto');
     }
+
+    // The feedback URL carries the resolved language, so it is stale until
+    // this runs \u2014 see setFeedbackHref.
+    setFeedbackHref();
 
     unit = msg('unitPx');
     showWidth(pageOut, pageWidth.value);
@@ -141,6 +165,36 @@
   }
   if (coffeeOk) coffee.href = COFFEE_URL;
   else coffee.hidden = true;
+
+  /* Version and UI language ride along as query params, because the first
+     question every bug report needs answered is "which version, which
+     language" and asking costs a round trip that most reporters never make.
+     Both are already visible in the popup; neither identifies anyone.
+
+     Appended with URLSearchParams on the parsed URL so a form URL that
+     already carries its own query (Google Forms' ?usp=..., Tally's hidden
+     fields) keeps it instead of being truncated by a naive '?' + params.
+
+     Rebuilt on every applyLanguage rather than once at init: `lang` is still
+     the 'en' default here, because the stored preference does not arrive
+     until readAll's callback. Setting the href once sent every report from
+     every locale in as English. */
+  function setFeedbackHref() {
+    var el = $('feedback');
+    if (!el) return;
+    try {
+      var fu = new URL(FEEDBACK_URL);
+      if (fu.protocol !== 'https:') throw 0;
+      fu.searchParams.set('v', chrome.runtime.getManifest().version);
+      fu.searchParams.set('lang', lang);
+      el.href = fu.href;
+      el.hidden = false;
+    } catch (e) {
+      el.removeAttribute('href');
+      el.hidden = true;
+    }
+  }
+  setFeedbackHref();
 
   /* ---- state ---------------------------------------------------------- */
 

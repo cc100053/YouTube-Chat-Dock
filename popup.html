@@ -75,7 +75,14 @@
   </main>
 
   <footer>
-    <button type="button" id="reset" data-i18n="btnReset"></button>
+    <!-- Feedback is an <a>, not a <button>, because it navigates: an anchor
+         gets middle-click, "copy link" and the status bar for free, and needs
+         no tabs API. It is styled to match Reset, which is what puts it at the
+         prominence a feature-request channel needs. -->
+    <div class="acts">
+      <button type="button" id="reset" data-i18n="btnReset"></button>
+      <a id="feedback" target="_blank" rel="noreferrer" data-i18n="btnFeedback"></a>
+    </div>
     <nav>
       <a id="rate" target="_blank" rel="noreferrer">
         <span aria-hidden="true">⭐</span><span data-i18n="linkRate"></span>

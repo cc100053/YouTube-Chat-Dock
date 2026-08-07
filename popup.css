@@ -314,7 +314,22 @@ footer a {
 footer a:hover { color: var(--blue); }
 footer a:focus-visible { outline: 2px solid var(--blue); outline-offset: 3px; border-radius: 3px; }
 
-#reset {
+/* Reset and Feedback share a row that wraps rather than a fixed pair: the two
+   labels together are 20 chars in en and 44 in de ("Auf Standard zurücksetzen"
+   + "Feedback geben"), which is wider than the 324px content box. Wrapping
+   stacks them instead of clipping the second off the edge. */
+.acts {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px;
+}
+
+/* One rule for both, so the anchor cannot drift from the button it is meant
+   to match. #feedback outranks the `footer a` colour and font-size above on
+   id specificity, which is why those do not need overriding here. */
+#reset,
+#feedback {
   padding: 8px 14px;
   border: 1px solid var(--line);
   border-radius: 18px;
@@ -328,13 +343,25 @@ footer a:focus-visible { outline: 2px solid var(--blue); outline-offset: 3px; bo
   transition: border-color .12s ease, color .12s ease;
 }
 
-#reset:hover { border-color: var(--blue); color: var(--blue); }
-#reset:active { transform: translateY(1px); }
-#reset:focus-visible { outline: 2px solid var(--blue); outline-offset: 2px; }
+#reset:hover,
+#feedback:hover { border-color: var(--blue); color: var(--blue); }
+#reset:active,
+#feedback:active { transform: translateY(1px); }
+#reset:focus-visible,
+#feedback:focus-visible { outline: 2px solid var(--blue); outline-offset: 2px; }
 
-/* Hidden means gone, not blank: the coffee link without a COFFEE_URL, and
-   the rate link on an unpacked copy that has no listing to review. */
-#coffee[hidden], #rate[hidden] { display: none; }
+/* The anchor is not a button and inherits none of its box: without this it
+   renders as inline text at the button's padding and sits off the baseline. */
+#feedback {
+  display: inline-flex;
+  align-items: center;
+  text-decoration: none;
+}
+
+/* Hidden means gone, not blank: the coffee link without a COFFEE_URL, the
+   feedback button without a FEEDBACK_URL, and the rate link on an unpacked
+   copy that has no listing to review. */
+#coffee[hidden], #rate[hidden], #feedback[hidden] { display: none; }
 
 /* ---- toast ----------------------------------------------------------- */
 
@@ -359,6 +386,6 @@ footer a:focus-visible { outline: 2px solid var(--blue); outline-offset: 3px; bo
 #toast[data-show] { opacity: 1; }
 
 @media (prefers-reduced-motion: reduce) {
-  #gated, .track, .track::after, #toast, #reset, .row { transition: none; }
-  #reset:active { transform: none; }
+  #gated, .track, .track::after, #toast, #reset, #feedback, .row { transition: none; }
+  #reset:active, #feedback:active { transform: none; }
 }
