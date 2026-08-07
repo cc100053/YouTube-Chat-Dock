@@ -51,9 +51,9 @@
      the report, and no button collects nothing.
      ------------------------------------------------------------------ */
   var FEEDBACK_URLS = {
-    en: '',
-    zh_TW: '',
-    ja: ''
+    en: 'https://tally.so/r/kd44aj',
+    zh_TW: 'https://tally.so/r/Me22XE',
+    ja: 'https://tally.so/r/ODZZak'
   };
 
   /* zh_CN is routed to the Traditional form, not to English. A Simplified
