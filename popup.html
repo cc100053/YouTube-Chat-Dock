@@ -81,7 +81,12 @@
          prominence a feature-request channel needs. -->
     <div class="acts">
       <button type="button" id="reset" data-i18n="btnReset"></button>
-      <a id="feedback" target="_blank" rel="noreferrer" data-i18n="btnFeedback"></a>
+      <!-- data-i18n sits on the inner span, not on the anchor: applyLanguage
+           assigns textContent to every [data-i18n] element, which would wipe
+           the emoji out on the first render. Same split as the nav links. -->
+      <a id="feedback" target="_blank" rel="noreferrer">
+        <span aria-hidden="true">📝</span><span data-i18n="btnFeedback"></span>
+      </a>
     </div>
     <nav>
       <a id="rate" target="_blank" rel="noreferrer">
