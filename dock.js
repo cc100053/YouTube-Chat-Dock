@@ -60,6 +60,7 @@
   const PANEL_TH = scoped(WATCH + '[theater]', SEL.panelTheater);
   const PANEL_PG = scoped(WATCH + ':not([fullscreen])', SEL.panelPage);
   const SLOT_TH = scoped(WATCH + '[theater]:not([fullscreen])', SEL.slotTheater);
+  const PRIMARY = scoped(WATCH + ':not([fullscreen]):not([theater])', SEL.primary);
 
   function mode() {
     if (inFullscreen()) return MODES.fs;
@@ -263,6 +264,7 @@
     for (const m of Object.values(MODES)) applyVar(m, clamp(readStored(m)));
     setVar('--ytchat-top', TOP_GAP + 'px');
     applyFlip(YTCHAT.isOn(lsGet(FLIP_KEY)));
+    syncCap();
   }
 
   function readWidth() {
@@ -321,14 +323,27 @@
     return null;
   }
 
-  /* Theater is the one mode whose panel is positioned by us rather than by
-     flex, so its box has to be measured off the slot YouTube reserves and
-     handed to CSS. data-ytchat-theater is set only once the numbers are real,
-     which is what keeps section 2c inert (and the chat unmoved) until then. */
+  /* Two separate questions, and conflating them was a bug.
+
+     data-ytchat-tdock — should this extension size theater at all? That is
+     the user's switch plus the health tripwire plus actually being in theater,
+     and nothing else. Section 2c's reservation resize hangs off it. It used to
+     hang off nothing, so the player was widened even when theater docking was
+     switched OFF in the popup, and even when the chat-moving half below had
+     stood itself down — measured on a chat replay, player 0..1455 against a
+     chat YouTube had pinned at 1244..1905, 211px of video underneath it.
+
+     data-ytchat-theater — did a legacy reserved slot actually measure usable?
+     Only the position:fixed overlay depends on this. On current YouTube the
+     answer is always no: the reservation is parked at the viewport's right
+     edge (measured x=1905 in a 1905px viewport on three pages), so the
+     visibility guard rejects it and the overlay never runs. Kept because it
+     costs nothing and is the fallback if YouTube reserves a visible slot
+     again. */
   function syncTheater() {
-    if (!enabled || !healthy || !theaterOn || !inTheater()) {
-      return setAttr('data-ytchat-theater', false);
-    }
+    const on = enabled && healthy && theaterOn && inTheater();
+    setAttr('data-ytchat-tdock', on);
+    if (!on) return setAttr('data-ytchat-theater', false);
     const slot = first(SLOT_TH);
     if (!slot) return setAttr('data-ytchat-theater', false);
     const r = slot.getBoundingClientRect();
@@ -359,6 +374,36 @@
     setVar('--ytchat-tl', Math.round(r.left) + 'px');
     setVar('--ytchat-th', Math.round(r.height) + 'px');
     setAttr('data-ytchat-theater', true);
+  }
+
+  /* Hand dock.css the ceiling the player cannot grow past, so section 1 can
+     stop narrowing the sidebar once narrowing it no longer widens the video.
+
+     This has to be measured rather than derived, and the near miss is worth
+     recording: YouTube publishes --ytd-watch-flexy-max-player-width, which
+     looks exactly like the number wanted and is not. It carries the VIDEO's
+     aspect ratio, written inline alongside --ytd-watch-flexy-width-ratio and
+     -height-ratio. Measured on a portrait live stream (ratios 1 and 1.7778) it
+     read calc((100vh - 116px)*(1/1.7778)) = 398.8px, while #primary's real
+     max-width on the same page was 1260.44px — the 16:9 figure, the same one
+     the 16:9 video next door produced. A CSS-only floor built on that var
+     would have measured correct on every ordinary video and collapsed the
+     column on portrait streams.
+
+     getComputedStyle rather than a rect, because #primary's *used* width is
+     whatever the current sidebar leaves it; only the max-width is the
+     invariant. It is viewport-derived, so this is called from the 400ms tick
+     and from restore() (which the resize handler runs) rather than from
+     reposition(), which also fires on every scroll event. A drag never needs
+     it: dragging the chat cannot change how tall the window is.
+
+     Anything unparseable — no watch page, max-width:none, a rename — writes
+     0px, and 0px makes the floor in dock.css collapse to YouTube's own sidebar
+     width. The failure mode is the stock recommended list, not a broken one. */
+  function syncCap() {
+    const p = first(PRIMARY);
+    const mw = p ? getComputedStyle(p).maxWidth : '';
+    setVar('--ytchat-cap', /^\d+(\.\d+)?px$/.test(mw) ? mw : '0px');
   }
 
   /* RTL locales mirror the layout and put chat on the LEFT, which flips both
@@ -684,6 +729,10 @@
        runs on every scroll event, and the probe's extra queries have no reason
        to run at that rate. */
     probeHealth();
+    /* The player's ceiling moves with the viewport height and with SPA
+       navigation, and neither has an event this file trusts — same reason
+       everything else here is polled. */
+    syncCap();
     // YouTube can replace <body> wholesale on some navigations.
     ensureMounted();
     reposition();

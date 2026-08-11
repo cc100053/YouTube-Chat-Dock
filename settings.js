@@ -96,8 +96,14 @@ YTCHAT.SEL = {
   // Page mode: the frame element inside #secondary.
   panelPage: ['ytd-live-chat-frame#chat', 'ytd-live-chat-frame', '#chat-container'],
 
-  // Theater: the same chat, reparented to a direct child of #columns.
-  panelTheater: ['#chat-container', 'ytd-live-chat-frame#chat', 'ytd-live-chat-frame'],
+  /* Theater. The frame comes first, not #chat-container, because YouTube now
+     pins the frame itself (position:fixed, right:0) and leaves the container
+     collapsed — measured width 0 on three theater pages, which made the
+     divider hide itself rather than sit on a zero-width box. The frame is the
+     right answer under the legacy layout too: section 2c gives it
+     width/height 100% of the container it is docking, so the two boxes are
+     identical there and only the frame is correct in both. */
+  panelTheater: ['ytd-live-chat-frame#chat', 'ytd-live-chat-frame', '#chat-container'],
 
   // True fullscreen: a different container entirely.
   panelFs: ['#panels-full-bleed-container', '#panels-container'],
@@ -105,6 +111,13 @@ YTCHAT.SEL = {
   // The empty reservation theater docking is positioned over. No frame
   // fallback is possible: in theater the chat is NOT in this element.
   slotTheater: ['#panels-full-bleed-container'],
+
+  /* The video column. Only its used max-width is read, and only to hand CSS
+     the ceiling the player cannot grow past — see syncCap() in dock.js. A
+     miss here is harmless: --ytchat-cap falls back to 0px, which collapses
+     the sidebar floor onto YouTube's own sidebar width and leaves the
+     recommended list at its stock size. */
+  primary: ['#primary.ytd-watch-flexy', '#primary'],
 };
 
 YTCHAT.ALL_KEYS = Object.keys(YTCHAT.DEF);
