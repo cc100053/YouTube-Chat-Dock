@@ -1,6 +1,6 @@
 {
   "extName": {
-    "message": "YouTube Chat Dock — 直播聊天侧边栏",
+    "message": "YouTube Chat Dock — 可调整宽度的直播聊天侧边栏",
     "description": "Store title and manifest name. 75-char ceiling. The brand token stays fixed; the suffix carries the words store search is matched against, localised per store."
   },
   "extNameShort": {

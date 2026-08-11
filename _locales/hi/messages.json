@@ -1,6 +1,6 @@
 {
   "extName": {
-    "message": "YouTube Chat Dock — लाइव चैट साइड पैनल",
+    "message": "YouTube Chat Dock — आकार बदलने योग्य लाइव चैट साइड पैनल",
     "description": "Store title and manifest name. 75-char ceiling. The brand token stays fixed; the suffix carries the words store search is matched against, localised per store."
   },
   "extNameShort": {

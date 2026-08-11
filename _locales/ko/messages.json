@@ -1,6 +1,6 @@
 {
   "extName": {
-    "message": "YouTube Chat Dock — 실시간 채팅 사이드 패널",
+    "message": "YouTube Chat Dock — 크기 조절 가능한 실시간 채팅 사이드 패널",
     "description": "Store title and manifest name. 75-char ceiling. The brand token stays fixed; the suffix carries the words store search is matched against, localised per store."
   },
   "extNameShort": {
