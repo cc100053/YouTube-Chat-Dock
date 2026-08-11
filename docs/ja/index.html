@@ -133,7 +133,7 @@ code{background:var(--card); border:1px solid var(--line); border-radius:5px; pa
     <a class="btn" href="https://chromewebstore.google.com/detail/youtube-chat-dock/bkmbhlkcjbkjapbamkidacajjfhoiiam">Chromeに追加（無料）</a>
     <a class="btn ghost" href="https://github.com/cc100053/YouTube-Chat-Dock">GitHubでソースを見る</a>
   </div>
-  <p class="meta">Chrome 88以降とChromium系ブラウザ · 権限はひとつ、インストール時の警告なし · データ収集なし · 12言語 · MITライセンス</p>
+  <p class="meta">Chrome 105以降とChromium系ブラウザ · 権限はひとつ、インストール時の警告なし · データ収集なし · 12言語 · MITライセンス</p>
 </header>
 
 <!--
@@ -182,13 +182,13 @@ code{background:var(--card); border:1px solid var(--line); border-radius:5px; pa
   <figcaption>残ったスペースに合わせてプレイヤーがリサイズされるので、動画が切れることはありません。</figcaption>
 </figure>
 
-<h2>シアターモードでチャットが動画の下に行くのはなぜ？</h2>
+<h2>シアターモードでチャットの幅を変えられないのはなぜ？</h2>
 
 <p class="answer">
-  シアターモードではYouTubeがプレイヤーを狭めて横に領域を確保し、そのうえでその領域を空のまま残し、チャットを動画の下に表示するためです。これはYouTube側の挙動であって、拡張機能の不具合ではありません。
+  YouTubeがチャットをプレイヤーの横に固定し、その幅を自動で決めてしまうからです。どこにも変更する設定はありません。この拡張機能はその幅をあなたのものにします。仕切りをドラッグすればプレイヤーも合わせてリサイズされ、両者が常に画面をぴったり分け合います。
 </p>
 
-<p>この拡張機能を有効にした状態と、すべて無効にした状態の両方で実測しましたが、レイアウトは同一でした。プレイヤーの横におよそ450pxの列が確保されたまま使われず、チャットはその下に置かれます。YouTube Chat Dockは、その確保済みの領域を本来入るはずだったチャットで埋め、さらにその確保幅そのものを変えられるようにします。だからプレイヤーの幅とチャットの幅が食い違いません。</p>
+<p>YouTubeの以前の挙動はこれとは違いました。プレイヤーを狭めて横に領域を確保し、その領域を空のまま残してチャットを動画の下に置いていた——「シアターモードでチャットが動画の下に行く」という声はここから来ています。当時も拡張機能の有無で実測して同一だったので、拡張機能が壊していたわけではありません。その後YouTube側が変更しました。1920&times;769でライブ配信2本とチャットリプレイ1本を実測したところ、チャットはプレイヤーの横に固定され、スクロールしてもその位置に留まり、関連動画がその下を流れていきます。この拡張機能は現在のレイアウトに従い、幅以外は何も変えません。</p>
 
 <h2>全画面でもライブチャットは使える？</h2>
 
@@ -247,7 +247,7 @@ code{background:var(--card); border:1px solid var(--line); border-radius:5px; pa
 <h2>Edge・Brave・Opera・Arcでも動く？</h2>
 
 <p class="answer">
-  はい。依存関係のないManifest V3拡張機能で、Chrome 88以降とChromium系ブラウザ（Edge、Brave、Opera、Vivaldi、Arc）で動作します。
+  はい。依存関係のないManifest V3拡張機能で、Chrome 105以降とChromium系ブラウザ（Edge、Brave、Opera、Vivaldi、Arc）で動作します。
 </p>
 
 <p>Chromeウェブストアで公開しており、Edgeをはじめ他のChromium系ブラウザからも直接インストールできます。Firefoxアドオンではありません。</p>
@@ -295,8 +295,8 @@ code{background:var(--card); border:1px solid var(--line); border-radius:5px; pa
       "description": "YouTubeのライブチャットとチャットのリプレイを、通常表示・シアターモード・本当の全画面で、動画の横に並ぶ幅可変のサイドパネルにするChrome拡張機能。",
       "applicationCategory": "BrowserApplication",
       "applicationSubCategory": "Chrome Extension",
-      "operatingSystem": "Chrome 88+, Microsoft Edge, Brave, Opera, Vivaldi, Arc",
-      "browserRequirements": "Requires Chrome 88 or any Chromium-based browser",
+      "operatingSystem": "Chrome 105+, Microsoft Edge, Brave, Opera, Vivaldi, Arc",
+      "browserRequirements": "Requires Chrome 105 or any Chromium-based browser",
       "softwareVersion": "1.7.0",
       "url": "https://cc100053.github.io/YouTube-Chat-Dock/ja/",
       "inLanguage": [
@@ -319,7 +319,7 @@ code{background:var(--card); border:1px solid var(--line); border-radius:5px; pa
         "ドラッグできる仕切り。通常表示・シアターモード・全画面がそれぞれ別の幅を記憶します",
         "マウスだけでなくキーボードでも幅を変えられます",
         "本当の全画面でも動作します。YouTube側ではチャットの幅も位置も変えられません",
-        "シアターモードでYouTubeが確保したまま空にしている領域を埋めます",
+        "シアターモードのチャット幅を変えられるようにし、プレイヤーもそれに合わせます",
         "アーカイブのチャットリプレイもライブチャットと同じように動きます",
         "チャットは左右どちらにも移動できます",
         "右から左に読む言語のレイアウトに対応",
@@ -349,10 +349,10 @@ code{background:var(--card); border:1px solid var(--line); border-radius:5px; pa
         },
         {
           "@type": "Question",
-          "name": "シアターモードでチャットが動画の下に行くのはなぜ？",
+          "name": "シアターモードでチャットの幅を変えられないのはなぜ？",
           "acceptedAnswer": {
             "@type": "Answer",
-            "text": "シアターモードではYouTubeがプレイヤーを狭めて横に領域を確保し、そのうえでその領域を空のまま残し、チャットを動画の下に表示するためです。これはYouTube側の挙動であって、拡張機能の不具合ではありません。"
+            "text": "YouTubeがチャットをプレイヤーの横に固定し、その幅を自動で決めてしまうからです。どこにも変更する設定はありません。この拡張機能はその幅をあなたのものにします。仕切りをドラッグすればプレイヤーも合わせてリサイズされ、両者が常に画面をぴったり分け合います。"
           }
         },
         {
@@ -400,7 +400,7 @@ code{background:var(--card); border:1px solid var(--line); border-radius:5px; pa
           "name": "Edge・Brave・Opera・Arcでも動く？",
           "acceptedAnswer": {
             "@type": "Answer",
-            "text": "はい。依存関係のないManifest V3拡張機能で、Chrome 88以降とChromium系ブラウザ（Edge、Brave、Opera、Vivaldi、Arc）で動作します。"
+            "text": "はい。依存関係のないManifest V3拡張機能で、Chrome 105以降とChromium系ブラウザ（Edge、Brave、Opera、Vivaldi、Arc）で動作します。"
           }
         },
         {

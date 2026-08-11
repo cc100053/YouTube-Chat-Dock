@@ -133,7 +133,7 @@ code{background:var(--card); border:1px solid var(--line); border-radius:5px; pa
     <a class="btn" href="https://chromewebstore.google.com/detail/youtube-chat-dock/bkmbhlkcjbkjapbamkidacajjfhoiiam">Add to Chrome — free</a>
     <a class="btn ghost" href="https://github.com/cc100053/YouTube-Chat-Dock">View the source on GitHub</a>
   </div>
-  <p class="meta">Chrome 88+ and any Chromium browser · one permission, no permission prompt · no data collected · 12 languages · MIT licensed</p>
+  <p class="meta">Chrome 105+ and any Chromium browser · one permission, no permission prompt · no data collected · 12 languages · MIT licensed</p>
 </header>
 
 <!--
@@ -182,13 +182,13 @@ code{background:var(--card); border:1px solid var(--line); border-radius:5px; pa
   <figcaption>The player is resized to fit the space left over, so the video is never cropped.</figcaption>
 </figure>
 
-<h2>Why does YouTube put chat below the video in theater mode?</h2>
+<h2>Why can’t I resize the chat in YouTube’s theater mode?</h2>
 
 <p class="answer">
-  Because YouTube narrows the player in theater mode to reserve a side slot, then leaves that slot empty and renders chat underneath the video instead. This is YouTube’s own behaviour, not a bug in any extension.
+  Because YouTube pins the chat beside the player at a width it picks for you, and there is no setting anywhere to change it. This extension makes that width yours: drag the divider and the player resizes to match, so the two always tile the window exactly.
 </p>
 
-<p>It was measured both with this extension enabled and disabled and the layout was identical: a roughly 450px column sits reserved and unused beside the player, and the chat is dropped below. YouTube Chat Dock fills that reserved slot with the chat it was reserved for, and lets you resize the reservation itself so the player and the chat stay in agreement.</p>
+<p>YouTube used to behave differently here. It narrowed the player to reserve a side column, then left that column empty and dropped chat below the video — which is where the complaint about chat going underneath the video in theater mode came from. That was measured identical with this extension enabled and disabled, so it was never damage an extension was doing. YouTube has since changed it: measured at 1920&times;769 on two live streams and a chat replay, the chat is pinned beside the player and stays there while you scroll, so the recommended videos scroll past underneath it. This extension follows the current layout and changes nothing about it except the width.</p>
 
 <h2>Does live chat work in fullscreen on YouTube?</h2>
 
@@ -247,7 +247,7 @@ code{background:var(--card); border:1px solid var(--line); border-radius:5px; pa
 <h2>Does it work in Edge, Brave, Opera or Arc?</h2>
 
 <p class="answer">
-  Yes. It is a Manifest V3 extension with no dependencies, and it runs on Chrome 88 and up and on any Chromium-based browser — Edge, Brave, Opera, Vivaldi, Arc.
+  Yes. It is a Manifest V3 extension with no dependencies, and it runs on Chrome 105 and up and on any Chromium-based browser — Edge, Brave, Opera, Vivaldi, Arc.
 </p>
 
 <p>It is published on the Chrome Web Store, which Edge and the other Chromium browsers can install from directly. It is not a Firefox add-on.</p>
@@ -295,8 +295,8 @@ code{background:var(--card); border:1px solid var(--line); border-radius:5px; pa
       "description": "A Chrome extension that turns YouTube's live chat and chat replay into a resizable side panel beside the video, in page view, theater mode and true fullscreen.",
       "applicationCategory": "BrowserApplication",
       "applicationSubCategory": "Chrome Extension",
-      "operatingSystem": "Chrome 88+, Microsoft Edge, Brave, Opera, Vivaldi, Arc",
-      "browserRequirements": "Requires Chrome 88 or any Chromium-based browser",
+      "operatingSystem": "Chrome 105+, Microsoft Edge, Brave, Opera, Vivaldi, Arc",
+      "browserRequirements": "Requires Chrome 105 or any Chromium-based browser",
       "softwareVersion": "1.7.0",
       "url": "https://cc100053.github.io/YouTube-Chat-Dock/",
       "inLanguage": [
@@ -319,7 +319,7 @@ code{background:var(--card); border:1px solid var(--line); border-radius:5px; pa
         "Draggable divider, with separate remembered widths for page view, theater mode and fullscreen",
         "Resizable with the keyboard as well as the pointer",
         "Works in true fullscreen, where YouTube gives you no control over the chat's width or position",
-        "Fills the empty side slot YouTube reserves in theater mode",
+        "Makes the theater-mode chat width adjustable, with the player resizing to match",
         "Chat replay on VODs behaves exactly like live chat",
         "Chat can be moved to either side",
         "Right-to-left layouts supported",
@@ -349,10 +349,10 @@ code{background:var(--card); border:1px solid var(--line); border-radius:5px; pa
         },
         {
           "@type": "Question",
-          "name": "Why does YouTube put chat below the video in theater mode?",
+          "name": "Why can’t I resize the chat in YouTube’s theater mode?",
           "acceptedAnswer": {
             "@type": "Answer",
-            "text": "Because YouTube narrows the player in theater mode to reserve a side slot, then leaves that slot empty and renders chat underneath the video instead. This is YouTube’s own behaviour, not a bug in any extension."
+            "text": "Because YouTube pins the chat beside the player at a width it picks for you, and there is no setting anywhere to change it. This extension makes that width yours: drag the divider and the player resizes to match, so the two always tile the window exactly."
           }
         },
         {
@@ -400,7 +400,7 @@ code{background:var(--card); border:1px solid var(--line); border-radius:5px; pa
           "name": "Does it work in Edge, Brave, Opera or Arc?",
           "acceptedAnswer": {
             "@type": "Answer",
-            "text": "Yes. It is a Manifest V3 extension with no dependencies, and it runs on Chrome 88 and up and on any Chromium-based browser — Edge, Brave, Opera, Vivaldi, Arc."
+            "text": "Yes. It is a Manifest V3 extension with no dependencies, and it runs on Chrome 105 and up and on any Chromium-based browser — Edge, Brave, Opera, Vivaldi, Arc."
           }
         },
         {

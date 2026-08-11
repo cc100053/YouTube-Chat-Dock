@@ -13,7 +13,7 @@ in page view, theater mode, and true fullscreen.
 [![Website](https://img.shields.io/badge/website-cc100053.github.io-3ea6ff)](https://cc100053.github.io/YouTube-Chat-Dock/)
 [![License](https://img.shields.io/github/license/cc100053/YouTube-Chat-Dock?color=blue)](LICENSE)
 ![Manifest V3](https://img.shields.io/badge/Manifest-V3-3ea6ff)
-![Chrome 88+](https://img.shields.io/badge/Chrome-88%2B-3ea6ff)
+![Chrome 105+](https://img.shields.io/badge/Chrome-105%2B-3ea6ff)
 ![Languages](https://img.shields.io/badge/languages-12-3ea6ff)
 ![Permissions](https://img.shields.io/badge/permissions-storage%20only-6dd491)
 [![Stars](https://img.shields.io/github/stars/cc100053/YouTube-Chat-Dock?style=social)](https://github.com/cc100053/YouTube-Chat-Dock/stargazers)
@@ -31,8 +31,8 @@ in page view, theater mode, and true fullscreen.
   make room for it.
 - **↔️ Drag the divider to resize.** Page view, theater and fullscreen each
   remember their own width. Double-click the divider to snap back.
-- **🎬 Works in theater mode.** YouTube narrows the player there to reserve a
-  side slot, then leaves the slot empty and drops chat underneath. This fills it.
+- **🎬 Works in theater mode.** YouTube pins chat beside the player there at a
+  width you cannot change. This makes that width yours, and the player follows.
 - **🖥️ Works in true fullscreen.** Chat stays docked, the video stays uncropped.
 - **⇄ Chat on either side.** Hover the divider and click the toggle. The choice
   sticks.
@@ -55,7 +55,7 @@ install first:
 4. Click **Load unpacked** and pick the folder
 5. Reload any open YouTube tab
 
-Chrome 88+ and any Chromium browser — Edge, Brave, Opera, Arc.
+Chrome 105+ and any Chromium browser — Edge, Brave, Opera, Arc.
 
 ## ⚙️ Settings
 
@@ -124,12 +124,18 @@ Yes — drag the divider between the video and the chat. Page view, theater and
 fullscreen each remember their own width, so going fullscreen doesn't undo your
 layout. Double-click the divider to snap back to the default.
 
-### Why does YouTube put chat below the video in theater mode?
+### Why can't I resize the chat in theater mode?
 
-Because YouTube narrows the player in theater mode to reserve a side slot, then
-leaves that slot empty and renders chat underneath instead. That's YouTube's own
-behaviour — measured identical with this extension on and off. This fills the
-slot with the chat it was reserved for, and resizes the reservation with it.
+Because YouTube pins it beside the player at a width it picks for you, and there
+is no setting anywhere to change it. This makes that width yours: drag the
+divider and the player resizes to match, so the two always tile the window.
+
+YouTube used to do something else here — narrow the player to reserve a side
+column, then leave it empty and drop chat below the video, which is where the
+"chat below the video in theater mode" complaint came from. That was measured
+identical with this extension on and off, so it was never damage an extension
+was doing. It has since changed: measured at 1920×769 on two live streams and a
+chat replay, chat is pinned beside the player and stays put while you scroll.
 
 ### Does live chat work in fullscreen on YouTube?
 
@@ -155,7 +161,7 @@ kind. See [Permissions and privacy](#-permissions-and-privacy) above.
 
 ### Does it work in Edge, Brave, Opera or Arc?
 
-Yes — Chrome 88+ and any Chromium browser. Install it from the Chrome Web Store,
+Yes — Chrome 105+ and any Chromium browser. Install it from the Chrome Web Store,
 which those browsers can all install from. It is not a Firefox add-on.
 
 ## ⚠️ Known limitations
@@ -183,10 +189,11 @@ No build step, no dependencies, no framework.
 Almost every non-obvious line exists because a plausible assumption was measured
 against YouTube's live DOM and turned out false. Three of them:
 
-- **Theater mode was never broken by this extension.** Measured with it on and
-  off, the two were identical: YouTube reserves a 450px slot beside the player,
-  leaves it empty, and renders chat below. It also reparents the chat container
-  between modes, so no single selector finds it in all three.
+- **Theater mode changed underneath the extension.** YouTube now pins the chat
+  itself — `position: fixed; right: 0`, sized from its own sidebar variable —
+  and the reservation it used to leave beside the player is parked off-screen at
+  x=1905 in a 1905px viewport. The old code resized that reservation without
+  moving the chat, so 211px of video ran under the chat panel.
 - **The `<video>` does not reflow.** YouTube writes its size as inline
   attributes from JS and never recomputes them when CSS resizes the player —
   measured: player `1157×651`, video still `1346×757`, visibly cropped.

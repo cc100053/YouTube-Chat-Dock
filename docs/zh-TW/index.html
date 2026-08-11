@@ -133,7 +133,7 @@ code{background:var(--card); border:1px solid var(--line); border-radius:5px; pa
     <a class="btn" href="https://chromewebstore.google.com/detail/youtube-chat-dock/bkmbhlkcjbkjapbamkidacajjfhoiiam">加到 Chrome（免費）</a>
     <a class="btn ghost" href="https://github.com/cc100053/YouTube-Chat-Dock">在 GitHub 看原始碼</a>
   </div>
-  <p class="meta">Chrome 88 以上與任何 Chromium 瀏覽器 · 只有一個權限，安裝時不會跳出任何提示 · 不收集資料 · 12 種語言 · MIT 授權</p>
+  <p class="meta">Chrome 105 以上與任何 Chromium 瀏覽器 · 只有一個權限，安裝時不會跳出任何提示 · 不收集資料 · 12 種語言 · MIT 授權</p>
 </header>
 
 <!--
@@ -182,13 +182,13 @@ code{background:var(--card); border:1px solid var(--line); border-radius:5px; pa
   <figcaption>播放器會配合剩下的空間縮放，所以影片不會被裁切。</figcaption>
 </figure>
 
-<h2>為什麼劇院模式下聊天室會跑到影片下面？</h2>
+<h2>為什麼劇院模式下沒辦法調整聊天室的寬度？</h2>
 
 <p class="answer">
-  因為劇院模式下 YouTube 會把播放器收窄、在旁邊預留一格空位，然後把那格空位留空，改把聊天室排到影片下方。這是 YouTube 自己的行為，不是任何擴充功能的問題。
+  因為 YouTube 會把聊天室固定在播放器旁邊，寬度由它決定，而且任何地方都沒有可以更改的設定。這個擴充功能把那個寬度交還給你：拖曳分隔線，播放器就會跟著縮放，兩者永遠剛好分掉整個視窗。
 </p>
 
-<p>這件事在擴充功能開啟與完全關閉的狀態下都量過，版面一模一樣：播放器旁邊有一格大約 450px 的欄位被預留下來卻空著，而聊天室被丟到下面。YouTube Chat Dock 把那格預留的位置填上它本來就該放的聊天室，而且讓你連那格預留寬度本身都能調整 —— 所以播放器的寬度和聊天室的寬度永遠一致。</p>
+<p>YouTube 以前的做法不一樣：它會把播放器收窄、在旁邊預留一格空位，然後把那格留空，改把聊天室排到影片下方 —— 「劇院模式聊天室跑到影片下面」的說法就是這樣來的。那個版面在擴充功能開啟與關閉時量起來完全一樣，所以從來就不是擴充功能造成的。後來 YouTube 改掉了：在 1920&times;769 下實測兩個直播與一個聊天重播，聊天室都固定在播放器旁邊，捲動時也留在原處，推薦影片會從它下面捲過去。這個擴充功能跟著 YouTube 目前的版面走，除了寬度以外什麼都不改。</p>
 
 <h2>全螢幕的時候還能看聊天室嗎？</h2>
 
@@ -247,7 +247,7 @@ code{background:var(--card); border:1px solid var(--line); border-radius:5px; pa
 <h2>Edge、Brave、Opera、Arc 可以用嗎？</h2>
 
 <p class="answer">
-  可以。這是一個沒有任何依賴的 Manifest V3 擴充功能，支援 Chrome 88 以上，以及任何以 Chromium 為基礎的瀏覽器 —— Edge、Brave、Opera、Vivaldi、Arc。
+  可以。這是一個沒有任何依賴的 Manifest V3 擴充功能，支援 Chrome 105 以上，以及任何以 Chromium 為基礎的瀏覽器 —— Edge、Brave、Opera、Vivaldi、Arc。
 </p>
 
 <p>它發布在 Chrome 線上應用程式商店，Edge 與其他 Chromium 瀏覽器都可以直接從那裡安裝。它不是 Firefox 附加元件。</p>
@@ -295,8 +295,8 @@ code{background:var(--card); border:1px solid var(--line); border-radius:5px; pa
       "description": "一個 Chrome 擴充功能，把 YouTube 的直播聊天室與聊天重播變成影片旁邊可調整寬度的側邊欄，在一般播放頁、劇院模式與真正的全螢幕都有效。",
       "applicationCategory": "BrowserApplication",
       "applicationSubCategory": "Chrome Extension",
-      "operatingSystem": "Chrome 88+, Microsoft Edge, Brave, Opera, Vivaldi, Arc",
-      "browserRequirements": "Requires Chrome 88 or any Chromium-based browser",
+      "operatingSystem": "Chrome 105+, Microsoft Edge, Brave, Opera, Vivaldi, Arc",
+      "browserRequirements": "Requires Chrome 105 or any Chromium-based browser",
       "softwareVersion": "1.7.0",
       "url": "https://cc100053.github.io/YouTube-Chat-Dock/zh-TW/",
       "inLanguage": [
@@ -319,7 +319,7 @@ code{background:var(--card); border:1px solid var(--line); border-radius:5px; pa
         "可拖曳的分隔線，一般播放頁、劇院模式與全螢幕各自記住自己的寬度",
         "除了滑鼠，也可以用鍵盤調整寬度",
         "在真正的全螢幕下有效，而 YouTube 本身不讓你改聊天室的寬度或位置",
-        "填補劇院模式下 YouTube 預留卻留空的側邊位置",
+        "讓劇院模式的聊天室寬度可以調整，播放器跟著縮放",
         "影片重溫的聊天重播行為與直播聊天室完全相同",
         "聊天室可以移到左右任一側",
         "支援由右至左的版面",
@@ -349,10 +349,10 @@ code{background:var(--card); border:1px solid var(--line); border-radius:5px; pa
         },
         {
           "@type": "Question",
-          "name": "為什麼劇院模式下聊天室會跑到影片下面？",
+          "name": "為什麼劇院模式下沒辦法調整聊天室的寬度？",
           "acceptedAnswer": {
             "@type": "Answer",
-            "text": "因為劇院模式下 YouTube 會把播放器收窄、在旁邊預留一格空位，然後把那格空位留空，改把聊天室排到影片下方。這是 YouTube 自己的行為，不是任何擴充功能的問題。"
+            "text": "因為 YouTube 會把聊天室固定在播放器旁邊，寬度由它決定，而且任何地方都沒有可以更改的設定。這個擴充功能把那個寬度交還給你：拖曳分隔線，播放器就會跟著縮放，兩者永遠剛好分掉整個視窗。"
           }
         },
         {
@@ -400,7 +400,7 @@ code{background:var(--card); border:1px solid var(--line); border-radius:5px; pa
           "name": "Edge、Brave、Opera、Arc 可以用嗎？",
           "acceptedAnswer": {
             "@type": "Answer",
-            "text": "可以。這是一個沒有任何依賴的 Manifest V3 擴充功能，支援 Chrome 88 以上，以及任何以 Chromium 為基礎的瀏覽器 —— Edge、Brave、Opera、Vivaldi、Arc。"
+            "text": "可以。這是一個沒有任何依賴的 Manifest V3 擴充功能，支援 Chrome 105 以上，以及任何以 Chromium 為基礎的瀏覽器 —— Edge、Brave、Opera、Vivaldi、Arc。"
           }
         },
         {
