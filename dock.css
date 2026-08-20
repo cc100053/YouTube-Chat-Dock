@@ -402,6 +402,10 @@ yt-live-chat-app yt-live-chat-text-message-renderer {
 
 /* -------------------------------------------------------------
    5. Drag divider
+
+   The element remains a transparent, full-height hit target so resizing is
+   still easy to start anywhere along the edge. The original short line stays
+   hidden until the edge is hovered, focused, or actively used.
    ------------------------------------------------------------- */
 #ytchat-resizer {
   position: fixed;
@@ -421,27 +425,29 @@ yt-live-chat-app yt-live-chat-text-message-renderer {
   width: 2px;
   height: 44px;
   border-radius: 2px;
-  background: rgba(255, 255, 255, .28);
-  transition: background .12s ease, height .12s ease;
+  background: #3ea6ff;
+  opacity: 0;
+  transition: opacity .12s ease, height .12s ease;
+  pointer-events: none;
 }
 
 #ytchat-resizer:hover::before,
 #ytchat-resizer:focus-visible::before,
 #ytchat-resizer.dragging::before,
 #ytchat-resizer.keying::before {
-  background: #3ea6ff;
+  opacity: 1;
   height: 90px;
 }
 
 /* The handle is 10px wide and mostly transparent, so a focus ring drawn
-   outside it would float in the middle of the video. Inset it onto the bar. */
+   outside it would float in the middle of the video. Inset it onto the line. */
 #ytchat-resizer:focus-visible {
   outline: 2px solid #3ea6ff;
   outline-offset: -1px;
 }
 
 #ytchat-resizer.dragging {
-  background: rgba(62, 166, 255, .12);
+  background: transparent;
 }
 
 #ytchat-resizer .ytchat-readout {
@@ -460,9 +466,7 @@ yt-live-chat-app yt-live-chat-text-message-renderer {
 }
 
 /* .keying is the keyboard equivalent of .dragging for the readout only: a
-   resize with no number is a resize you cannot aim. It deliberately does not
-   tint the bar or hide the flip button the way .dragging does, because there
-   is no pointer to keep clear of. */
+   resize with no number is a resize you cannot aim. */
 #ytchat-resizer.dragging .ytchat-readout,
 #ytchat-resizer.keying .ytchat-readout {
   opacity: 1;
@@ -482,10 +486,10 @@ yt-live-chat-app yt-live-chat-text-message-renderer {
    it never sits under the cursor mid-resize. */
 #ytchat-flip-btn {
   position: absolute;
-  /* Below the chat header, not beside it: at top:8px this landed 24px from
-     YouTube's own "close chat" ✕ (measured, panel top 68 → button 76..100),
-     which is a misclick waiting to happen. */
-  top: 48px;
+  /* Sit directly above the 90px active line, centered on it, with an 8px
+     breathing gap. This keeps the control associated with the divider without
+     putting it beside or on top of the line. */
+  top: calc(50% - 77px);
   left: 50%;
   transform: translateX(-50%);
   width: 24px;
