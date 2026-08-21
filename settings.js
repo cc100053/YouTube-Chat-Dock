@@ -118,6 +118,15 @@ YTCHAT.SEL = {
      the sidebar floor onto YouTube's own sidebar width and leaves the
      recommended list at its stock size. */
   primary: ['#primary.ytd-watch-flexy', '#primary'],
+
+  /* The video box, read only to find the middle of the gutter the divider
+     sits in. #movie_player is used rather than #primary or
+     #player-full-bleed-container because it is the one element that exists,
+     and carries the real painted edge of the video, in all three modes.
+     A miss, or a gutter outside the sane range, falls the divider back onto
+     the panel edge it used before v1.9.1 — the old position, never a wild
+     one. */
+  player: ['#movie_player', '#player-container', '#player'],
 };
 
 YTCHAT.ALL_KEYS = Object.keys(YTCHAT.DEF);

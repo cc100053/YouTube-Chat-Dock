@@ -422,11 +422,21 @@ yt-live-chat-app yt-live-chat-text-message-renderer {
 
 #ytchat-resizer::before {
   content: '';
-  width: 2px;
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 4px;
   height: 44px;
-  border-radius: 2px;
+  border-radius: 3px;
   background: #3ea6ff;
+  /* Widened from 2px to 4px: at 2px the line read as a hairline and was easy
+     to miss. The halo is here because the line sits over video of any
+     colour — the dark shadow separates it from a bright frame, the blue one
+     keeps it from looking like a stray border on a dark one. */
+  box-shadow: 0 0 3px rgba(0, 0, 0, .55), 0 0 8px rgba(62, 166, 255, .55);
   opacity: 0;
+  transform: translate(-50%, -50%);
+  transform-origin: center;
   transition: opacity .12s ease, height .12s ease;
   pointer-events: none;
 }
@@ -437,6 +447,84 @@ yt-live-chat-app yt-live-chat-text-message-renderer {
 #ytchat-resizer.keying::before {
   opacity: 1;
   height: 90px;
+}
+
+/* Running light. ::before is the short line and stays put; ::after fires two
+   beams from the divider's midpoint, one up and one down, each running the
+   length of the edge and then gone. One pass per hover — leaving :hover
+   removes the animation, which is what arms the restart on re-entry. It
+   deliberately does NOT run during a drag: a beam relaunching every second
+   while you are reading the px readout is motion competing with the number.
+
+   CORNER_INSET is why the box is not the full height. YouTube's chat panel is
+   rounded, so a beam that ran to the true top and bottom of the edge would
+   paint square ends standing outside the panel's curve. Following the curve
+   would need an SVG path kept in sync with a radius YouTube can restyle at
+   any time; insetting the box by the radius costs two properties and cannot
+   fall out of sync, so the beam simply stops where the straight edge stops.
+
+   Two copies of the same gradient are stacked as two background layers so one
+   element can run both directions at once: background-position takes a
+   per-layer list, and the two entries animate to opposite ends.
+
+   The beam is sized in px, not in a percentage of the box, because the box is
+   as tall as the chat panel — a percentage would make the beam grow with the
+   viewport and read as the whole edge lighting up rather than something
+   travelling along it.
+
+   background-position, not transform: a length puts the layer's top edge that
+   far from the box top, so -BEAM parks it fully clear above and
+   calc(100% + BEAM) fully clear below, while 50% centres it whatever the
+   panel's height is. Transform would drag the glow out past the divider and
+   across the video instead of ending where the edge ends. */
+#ytchat-resizer::after {
+  content: '';
+  position: absolute;
+  top: 12px;
+  left: 50%;
+  height: calc(100% - 24px);
+  width: 4px;
+  border-radius: 3px;
+  transform: translateX(-50%);
+  background-image:
+    linear-gradient(
+      to bottom,
+      rgba(62, 166, 255, 0) 0%,
+      rgba(120, 190, 255, .55) 34%,
+      #eaf5ff 50%,
+      rgba(120, 190, 255, .55) 66%,
+      rgba(62, 166, 255, 0) 100%
+    ),
+    linear-gradient(
+      to bottom,
+      rgba(62, 166, 255, 0) 0%,
+      rgba(120, 190, 255, .55) 34%,
+      #eaf5ff 50%,
+      rgba(120, 190, 255, .55) 66%,
+      rgba(62, 166, 255, 0) 100%
+    );
+  background-repeat: no-repeat, no-repeat;
+  background-size: 100% 96px, 100% 96px;
+  background-position: 0 50%, 0 50%;
+  filter: drop-shadow(0 0 3px #3ea6ff) drop-shadow(0 0 8px rgba(62, 166, 255, .7));
+  opacity: 0;
+  pointer-events: none;
+}
+
+#ytchat-resizer:hover::after {
+  animation: ytchat-resizer-run 1.1s cubic-bezier(.2, .65, .3, 1) 1 both;
+}
+
+@keyframes ytchat-resizer-run {
+  0% {
+    opacity: 1;
+    background-position: 0 50%, 0 50%;
+  }
+  100% {
+    /* First layer clears the top of the straight edge, second the bottom. */
+    opacity: 1;
+    background-position: 0 -96px, 0 calc(100% + 96px);
+  }
 }
 
 /* The handle is 10px wide and mostly transparent, so a focus ring drawn
@@ -542,9 +630,14 @@ yt-live-chat-app yt-live-chat-text-message-renderer {
 @media (prefers-reduced-motion: reduce) {
   #ytchat-resizer,
   #ytchat-resizer::before,
+  #ytchat-resizer::after,
   #ytchat-resizer .ytchat-readout,
   #ytchat-flip-btn {
     transition: none;
+  }
+  #ytchat-resizer::before,
+  #ytchat-resizer::after {
+    animation: none;
   }
 }
 
@@ -554,6 +647,11 @@ yt-live-chat-app yt-live-chat-text-message-renderer {
 @media (forced-colors: active) {
   #ytchat-resizer::before {
     background: CanvasText;
+    box-shadow: none;
+  }
+  #ytchat-resizer::after {
+    background-image: none;
+    filter: none;
   }
   #ytchat-flip-btn {
     background: Canvas;
