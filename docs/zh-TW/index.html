@@ -208,6 +208,14 @@ code{background:var(--card); border:1px solid var(--line); border-radius:5px; pa
   適用。影片重溫的聊天重播，停靠與調整寬度的行為跟直播中的聊天室完全一樣，不需要另外設定。
 </p>
 
+<h2>為什麼切到全螢幕之後聊天重播會變成一片空白？</h2>
+
+<p class="answer">
+  因為聊天重播卡住了：訊息不再送進來，而且不會自己恢復。這是 YouTube 自己的問題，完全不裝任何擴充功能也會發生。YouTube Chat Dock 會在全螢幕切換之後偵測到卡住的重播，並在保留你原本選的模式下自動把它重新啟動。
+</p>
+
+<p>實測卡住的重播：訊息清單裡只剩一則 YouTube 自己的提示，而面板尺寸正常、完全可見，影片也照常播放，從外面看根本不像壞掉。重新載入聊天框架<em>沒有</em>用，因為那個框架握著一個已經失效的 token；在聊天室標題列重新選一次模式才有用，因為 YouTube 會去拿一個新的 token 重建清單。這個擴充功能重選的是「現在已經選著」那一個，所以熱門聊天重播仍然是熱門聊天重播。你也可以在設定面板把它關掉。</p>
+
 <h2>可以把聊天室移到左邊嗎？</h2>
 
 <p class="answer">
@@ -219,13 +227,13 @@ code{background:var(--card); border:1px solid var(--line); border-radius:5px; pa
 <h2>有哪些設定？</h2>
 
 <p class="answer">
-  啟用開關、語言選擇、左右切換、三個寬度滑桿，還有一鍵回復預設值，全部在工具列的設定面板裡。不過你其實不必打開它：分隔線就能做到滑桿能做的事，也可以用方向鍵調整。
+  啟用開關、聊天重播修復、語言選擇、左右切換、三個寬度滑桿，還有一鍵回復預設值，全部在工具列的設定面板裡。不過你其實不必打開它：分隔線就能做到滑桿能做的事，也可以用方向鍵調整。
 </p>
 
 <div class="scroller">
 <table>
   <tr><th>設定</th><th>作用</th></tr>
-  <tr><td>在 YouTube 啟用</td><td>不必解除安裝就能關掉側邊欄</td></tr><tr><td>語言</td><td>12 種任選，與瀏覽器的語言無關</td></tr><tr><td>聊天室移到另一側</td><td>與分隔線上的 &#8646; 按鈕相同</td></tr><tr><td>三個寬度滑桿</td><td>一般播放頁、劇院模式與全螢幕，拖動時即時預覽</td></tr><tr><td>回復預設值</td><td>全部還原</td></tr>
+  <tr><td>在 YouTube 啟用</td><td>不必解除安裝就能關掉側邊欄</td></tr><tr><td>修復空白的聊天重播</td><td>聊天重播在全螢幕卡住時自動重新啟動</td></tr><tr><td>語言</td><td>12 種任選，與瀏覽器的語言無關</td></tr><tr><td>聊天室移到另一側</td><td>與分隔線上的 &#8646; 按鈕相同</td></tr><tr><td>三個寬度滑桿</td><td>一般播放頁、劇院模式與全螢幕，拖動時即時預覽</td></tr><tr><td>回復預設值</td><td>全部還原</td></tr>
 </table>
 </div>
 
@@ -297,7 +305,7 @@ code{background:var(--card); border:1px solid var(--line); border-radius:5px; pa
       "applicationSubCategory": "Chrome Extension",
       "operatingSystem": "Chrome 105+, Microsoft Edge, Brave, Opera, Vivaldi, Arc",
       "browserRequirements": "Requires Chrome 105 or any Chromium-based browser",
-      "softwareVersion": "1.7.0",
+      "softwareVersion": "1.10.0",
       "url": "https://cc100053.github.io/YouTube-Chat-Dock/zh-TW/",
       "inLanguage": [
         "en",
@@ -373,6 +381,14 @@ code{background:var(--card); border:1px solid var(--line); border-radius:5px; pa
         },
         {
           "@type": "Question",
+          "name": "為什麼切到全螢幕之後聊天重播會變成一片空白？",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "因為聊天重播卡住了：訊息不再送進來，而且不會自己恢復。這是 YouTube 自己的問題，完全不裝任何擴充功能也會發生。YouTube Chat Dock 會在全螢幕切換之後偵測到卡住的重播，並在保留你原本選的模式下自動把它重新啟動。"
+          }
+        },
+        {
+          "@type": "Question",
           "name": "可以把聊天室移到左邊嗎？",
           "acceptedAnswer": {
             "@type": "Answer",
@@ -384,7 +400,7 @@ code{background:var(--card); border:1px solid var(--line); border-radius:5px; pa
           "name": "有哪些設定？",
           "acceptedAnswer": {
             "@type": "Answer",
-            "text": "啟用開關、語言選擇、左右切換、三個寬度滑桿，還有一鍵回復預設值，全部在工具列的設定面板裡。不過你其實不必打開它：分隔線就能做到滑桿能做的事，也可以用方向鍵調整。"
+            "text": "啟用開關、聊天重播修復、語言選擇、左右切換、三個寬度滑桿，還有一鍵回復預設值，全部在工具列的設定面板裡。不過你其實不必打開它：分隔線就能做到滑桿能做的事，也可以用方向鍵調整。"
           }
         },
         {

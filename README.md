@@ -37,6 +37,9 @@ in page view, theater mode, and true fullscreen.
 - **⇄ Chat on either side.** Hover the divider and click the toggle. The choice
   sticks.
 - **▶️ Chat replay too.** Replay on VODs behaves exactly like live chat.
+- **🩹 Fixes YouTube's blank chat replay.** Going fullscreen sometimes stalls
+  chat replay for good — YouTube's own bug, with no extension installed. This
+  spots it and restarts it, keeping the chat mode you had selected.
 - **📏 Narrow to 120px** without messages getting clipped.
 - **🌍 Right-to-left layouts** dock chat on the correct side, and the divider
   flips with them.
@@ -68,6 +71,7 @@ Click the toolbar icon.
 | Setting | What it does |
 |---|---|
 | **Enable on YouTube** | Turn the panel off without uninstalling |
+| **Fix blank chat replay** | Restarts YouTube's chat replay when it stalls in fullscreen |
 | **Language** | Any of the 12, independently of your browser's language |
 | **Chat on the other side** | Same as the divider's ⇄ toggle |
 | **Three width sliders** | Page view, theater, fullscreen. They preview live as you drag, exactly like the divider does |
@@ -148,6 +152,14 @@ it covers nothing and the video is never cropped.
 Yes. Chat replay on a VOD is docked and resized exactly like live chat on an
 active stream, with no separate setting.
 
+### Why does YouTube's chat replay go blank in fullscreen?
+
+Because the replay stalls: messages stop arriving and never resume. It is
+YouTube's own bug — it reproduces with no extension installed at all. The
+extension spots a stalled replay after a fullscreen switch and restarts it,
+keeping whichever chat mode you had selected. There is a switch for it in the
+popup.
+
 ### Can I move YouTube chat to the left side?
 
 Yes — hover the divider and click the ⇄ toggle, or flip the switch in the popup.
@@ -187,7 +199,7 @@ No build step, no dependencies, no framework.
 | `popup.html/.css/.js` | The settings UI |
 
 Almost every non-obvious line exists because a plausible assumption was measured
-against YouTube's live DOM and turned out false. Three of them:
+against YouTube's live DOM and turned out false. Four of them:
 
 - **Theater mode changed underneath the extension.** YouTube now pins the chat
   itself — `position: fixed; right: 0`, sized from its own sidebar variable —
@@ -197,6 +209,10 @@ against YouTube's live DOM and turned out false. Three of them:
 - **The `<video>` does not reflow.** YouTube writes its size as inline
   attributes from JS and never recomputes them when CSS resizes the player —
   measured: player `1157×651`, video still `1346×757`, visibly cropped.
+- **Reloading the chat iframe does not fix a stalled replay.** A stalled frame
+  holds a dead continuation token, so reloading the same URL replays the same
+  dead token — measured 1 message before and 1 after, over 15 seconds. Picking
+  a mode in the chat header rebuilds the list from a fresh token: 1 → 138.
 - **RTL is not detectable from `<html dir>`.** With `hl=ar` YouTube leaves
   `documentElement` at `ltr` and puts `rtl` on `<body>` instead. The side is
   decided geometrically.

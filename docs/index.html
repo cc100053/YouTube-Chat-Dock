@@ -208,6 +208,14 @@ code{background:var(--card); border:1px solid var(--line); border-radius:5px; pa
   Yes. Chat replay on a VOD is docked and resized exactly like live chat on an active stream, with no separate setting.
 </p>
 
+<h2>Why does YouTube’s chat replay go blank in fullscreen?</h2>
+
+<p class="answer">
+  Because the replay stalls: messages stop arriving and never resume, and the only cures used to be reloading the page or re-picking the chat mode by hand. It is YouTube’s own bug — it happens with no extension installed at all. YouTube Chat Dock spots a stalled replay after a fullscreen switch and restarts it for you, keeping whichever chat mode you had selected.
+</p>
+
+<p>Measured on a stalled replay: the message list holds a single item — YouTube’s own “Live chat replay is on” notice — while the panel is the right size, fully visible, and the video plays normally, so nothing looks broken from the outside. Reloading the chat frame does <em>not</em> fix it, because that frame is holding a dead token. Picking a mode in the chat header does, because YouTube fetches a fresh one and rebuilds the list. The extension re-picks the mode that is <em>already</em> selected, so Top chat replay stays Top chat replay, and it can be switched off in the popup.</p>
+
 <h2>Can I move YouTube chat to the left side?</h2>
 
 <p class="answer">
@@ -219,13 +227,13 @@ code{background:var(--card); border:1px solid var(--line); border-radius:5px; pa
 <h2>What settings does it have?</h2>
 
 <p class="answer">
-  An on/off switch, a language picker, a side toggle, three width sliders and a reset — all in the toolbar popup. You never have to open it, though: the divider does everything the sliders do, and it can be resized with the arrow keys too.
+  An on/off switch, a chat-replay fix, a language picker, a side toggle, three width sliders and a reset — all in the toolbar popup. You never have to open it, though: the divider does everything the sliders do, and it can be resized with the arrow keys too.
 </p>
 
 <div class="scroller">
 <table>
   <tr><th>Setting</th><th>What it does</th></tr>
-  <tr><td>Enable on YouTube</td><td>Turn the panel off without uninstalling</td></tr><tr><td>Language</td><td>Any of the 12, independently of your browser’s language</td></tr><tr><td>Chat on the other side</td><td>Same as the divider’s &#8646; toggle</td></tr><tr><td>Three width sliders</td><td>Page view, theater and fullscreen, previewing live as you drag</td></tr><tr><td>Reset to defaults</td><td>Puts everything back</td></tr>
+  <tr><td>Enable on YouTube</td><td>Turn the panel off without uninstalling</td></tr><tr><td>Fix blank chat replay</td><td>Restarts YouTube’s chat replay when it stalls in fullscreen</td></tr><tr><td>Language</td><td>Any of the 12, independently of your browser’s language</td></tr><tr><td>Chat on the other side</td><td>Same as the divider’s &#8646; toggle</td></tr><tr><td>Three width sliders</td><td>Page view, theater and fullscreen, previewing live as you drag</td></tr><tr><td>Reset to defaults</td><td>Puts everything back</td></tr>
 </table>
 </div>
 
@@ -297,7 +305,7 @@ code{background:var(--card); border:1px solid var(--line); border-radius:5px; pa
       "applicationSubCategory": "Chrome Extension",
       "operatingSystem": "Chrome 105+, Microsoft Edge, Brave, Opera, Vivaldi, Arc",
       "browserRequirements": "Requires Chrome 105 or any Chromium-based browser",
-      "softwareVersion": "1.7.0",
+      "softwareVersion": "1.10.0",
       "url": "https://cc100053.github.io/YouTube-Chat-Dock/",
       "inLanguage": [
         "en",
@@ -373,6 +381,14 @@ code{background:var(--card); border:1px solid var(--line); border-radius:5px; pa
         },
         {
           "@type": "Question",
+          "name": "Why does YouTube’s chat replay go blank in fullscreen?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "Because the replay stalls: messages stop arriving and never resume, and the only cures used to be reloading the page or re-picking the chat mode by hand. It is YouTube’s own bug — it happens with no extension installed at all. YouTube Chat Dock spots a stalled replay after a fullscreen switch and restarts it for you, keeping whichever chat mode you had selected."
+          }
+        },
+        {
+          "@type": "Question",
           "name": "Can I move YouTube chat to the left side?",
           "acceptedAnswer": {
             "@type": "Answer",
@@ -384,7 +400,7 @@ code{background:var(--card); border:1px solid var(--line); border-radius:5px; pa
           "name": "What settings does it have?",
           "acceptedAnswer": {
             "@type": "Answer",
-            "text": "An on/off switch, a language picker, a side toggle, three width sliders and a reset — all in the toolbar popup. You never have to open it, though: the divider does everything the sliders do, and it can be resized with the arrow keys too."
+            "text": "An on/off switch, a chat-replay fix, a language picker, a side toggle, three width sliders and a reset — all in the toolbar popup. You never have to open it, though: the divider does everything the sliders do, and it can be resized with the arrow keys too."
           }
         },
         {

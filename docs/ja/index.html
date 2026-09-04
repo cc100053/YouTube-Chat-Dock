@@ -208,6 +208,14 @@ code{background:var(--card); border:1px solid var(--line); border-radius:5px; pa
   はい。アーカイブのチャットリプレイも、配信中のライブチャットとまったく同じようにドッキングされ、リサイズできます。個別の設定は不要です。
 </p>
 
+<h2>全画面にするとチャットリプレイが真っ白になるのはなぜ？</h2>
+
+<p class="answer">
+  チャットリプレイが止まってしまうからです。メッセージが届かなくなり、そのまま二度と再開しません。これはYouTube側の不具合で、拡張機能を何も入れていなくても起きます。YouTube Chat Dockは全画面の切り替えのあとで止まったリプレイを検知し、選んでいたモードを保ったまま自動で再開させます。
+</p>
+
+<p>止まったリプレイを実測すると、メッセージ一覧にはYouTube自身のお知らせが1件あるだけでした。パネルの大きさも表示も正常で、動画も普通に再生されているので、外から見て壊れているようには見えません。チャットのフレームを再読み込みしても<em>直りません</em>。フレームが無効になったトークンを握ったままだからです。チャットのヘッダーでモードを選び直すと直るのは、YouTubeが新しいトークンを取得して一覧を作り直すからです。この拡張機能は「すでに選ばれているモード」を選び直すので、上位のチャットのリプレイはそのままです。設定パネルでオフにもできます。</p>
+
 <h2>チャットを左側に移せる？</h2>
 
 <p class="answer">
@@ -219,13 +227,13 @@ code{background:var(--card); border:1px solid var(--line); border-radius:5px; pa
 <h2>設定にはどんな項目がある？</h2>
 
 <p class="answer">
-  有効化スイッチ、言語選択、左右の切り替え、3つの幅スライダー、そしてリセット。すべてツールバーの設定パネルにあります。ただし開く必要はありません。仕切りだけでスライダーと同じことができ、矢印キーでも幅を変えられます。
+  有効化スイッチ、チャットリプレイの修復、言語選択、左右の切り替え、3つの幅スライダー、そしてリセット。すべてツールバーの設定パネルにあります。ただし開く必要はありません。仕切りだけでスライダーと同じことができ、矢印キーでも幅を変えられます。
 </p>
 
 <div class="scroller">
 <table>
   <tr><th>項目</th><th>動作</th></tr>
-  <tr><td>YouTubeで有効にする</td><td>アンインストールせずにパネルをオフにします</td></tr><tr><td>言語</td><td>ブラウザの言語とは無関係に、12言語から選べます</td></tr><tr><td>チャットを反対側に</td><td>仕切りの &#8646; ボタンと同じです</td></tr><tr><td>3つの幅スライダー</td><td>通常表示・シアターモード・全画面。ドラッグ中もその場で反映されます</td></tr><tr><td>既定値に戻す</td><td>すべて元に戻します</td></tr>
+  <tr><td>YouTubeで有効にする</td><td>アンインストールせずにパネルをオフにします</td></tr><tr><td>チャットリプレイの停止を修復</td><td>全画面で止まったチャットリプレイを自動で再開します</td></tr><tr><td>言語</td><td>ブラウザの言語とは無関係に、12言語から選べます</td></tr><tr><td>チャットを反対側に</td><td>仕切りの &#8646; ボタンと同じです</td></tr><tr><td>3つの幅スライダー</td><td>通常表示・シアターモード・全画面。ドラッグ中もその場で反映されます</td></tr><tr><td>既定値に戻す</td><td>すべて元に戻します</td></tr>
 </table>
 </div>
 
@@ -297,7 +305,7 @@ code{background:var(--card); border:1px solid var(--line); border-radius:5px; pa
       "applicationSubCategory": "Chrome Extension",
       "operatingSystem": "Chrome 105+, Microsoft Edge, Brave, Opera, Vivaldi, Arc",
       "browserRequirements": "Requires Chrome 105 or any Chromium-based browser",
-      "softwareVersion": "1.7.0",
+      "softwareVersion": "1.10.0",
       "url": "https://cc100053.github.io/YouTube-Chat-Dock/ja/",
       "inLanguage": [
         "en",
@@ -373,6 +381,14 @@ code{background:var(--card); border:1px solid var(--line); border-radius:5px; pa
         },
         {
           "@type": "Question",
+          "name": "全画面にするとチャットリプレイが真っ白になるのはなぜ？",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "チャットリプレイが止まってしまうからです。メッセージが届かなくなり、そのまま二度と再開しません。これはYouTube側の不具合で、拡張機能を何も入れていなくても起きます。YouTube Chat Dockは全画面の切り替えのあとで止まったリプレイを検知し、選んでいたモードを保ったまま自動で再開させます。"
+          }
+        },
+        {
+          "@type": "Question",
           "name": "チャットを左側に移せる？",
           "acceptedAnswer": {
             "@type": "Answer",
@@ -384,7 +400,7 @@ code{background:var(--card); border:1px solid var(--line); border-radius:5px; pa
           "name": "設定にはどんな項目がある？",
           "acceptedAnswer": {
             "@type": "Answer",
-            "text": "有効化スイッチ、言語選択、左右の切り替え、3つの幅スライダー、そしてリセット。すべてツールバーの設定パネルにあります。ただし開く必要はありません。仕切りだけでスライダーと同じことができ、矢印キーでも幅を変えられます。"
+            "text": "有効化スイッチ、チャットリプレイの修復、言語選択、左右の切り替え、3つの幅スライダー、そしてリセット。すべてツールバーの設定パネルにあります。ただし開く必要はありません。仕切りだけでスライダーと同じことができ、矢印キーでも幅を変えられます。"
           }
         },
         {
