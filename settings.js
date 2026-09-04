@@ -32,6 +32,7 @@ var YTCHAT = {
     tw: 'ytchat-tw',
     theater: 'ytchat-theater',
     lang: 'ytchat-lang',
+    chatfix: 'ytchat-chatfix',
   },
 
   DEF: {
@@ -49,6 +50,9 @@ var YTCHAT = {
        resolved at write time so that changing the browser language keeps
        working for anyone who never touched the picker. */
     'ytchat-lang': 'auto',
+    /* On by default: it only ever fires on a chat replay that has already
+       stalled, and the stall is YouTube's, not this extension's. */
+    'ytchat-chatfix': '1',
   },
 };
 
@@ -92,6 +96,29 @@ YTCHAT.SEL = {
      contentWindow.location.pathname reads exactly "/live_chat", and the
      document is same-origin, so dock.js can reach it. */
   framePath: '/live_chat',
+
+  /* The replay variant of the same path. Chat replay is the only mode the
+     stall was measured in, and the nudge is scoped to it: on a *live* chat a
+     nearly empty message list is an ordinary quiet stream, not a fault. */
+  framePathReplay: '/live_chat_replay',
+
+  /* Inside the chat iframe, not on the watch page — read through the frame's
+     contentDocument, which is same-origin. All three are scoped under
+     yt-live-chat-app for the same reason the CSS is: bare #items matched 9
+     unrelated elements on the watch page, and this file's selectors get
+     reused by eye.
+
+       chatItems     the message list. Measured on a stalled replay: exactly
+                     one child, YouTube's own "Live chat replay is on" notice,
+                     against 73-250 on a healthy one.
+       chatLabel     the header's current-mode text ("Top chat replay"). Read
+                     so the nudge can re-pick the mode already selected and
+                     never silently switch the user from Top to Live.
+       chatMenuItem  the two mode rows. Clicking one is the ONLY thing that
+                     was measured to clear the stall - see dock.js. */
+  chatItems: 'yt-live-chat-app #items',
+  chatLabel: 'yt-live-chat-app #label-text',
+  chatMenuItem: 'yt-live-chat-app tp-yt-paper-item',
 
   // Page mode: the frame element inside #secondary.
   panelPage: ['ytd-live-chat-frame#chat', 'ytd-live-chat-frame', '#chat-container'],

@@ -113,6 +113,7 @@
      and calling addEventListener on it threw during init, which aborted the
      whole popup and rendered it blank. */
   var enabled = $('enabled');
+  var chatfix = $('chatfix');
   var flip = $('flip');
   var pageWidth = $('pageWidth');
   var twWidth = $('twWidth');
@@ -218,6 +219,7 @@
 
   function render(s) {
     enabled.checked = YTCHAT.isOn(s[YTCHAT.K.enabled]);
+    chatfix.checked = YTCHAT.isOn(s[YTCHAT.K.chatfix]);
     flip.checked = YTCHAT.isOn(s[YTCHAT.K.flip]);
 
     var w = function (k) {
@@ -285,6 +287,10 @@
     if (enabled.checked) gated.removeAttribute('data-off');
     else gated.setAttribute('data-off', '');
     set(YTCHAT.K.enabled, enabled.checked ? '1' : '0');
+  });
+
+  chatfix.addEventListener('change', function () {
+    set(YTCHAT.K.chatfix, chatfix.checked ? '1' : '0');
   });
 
   flip.addEventListener('change', function () {

@@ -34,6 +34,17 @@
         <span class="track" aria-hidden="true"></span>
       </label>
 
+      <!-- Not inside #gated: this works around a YouTube bug, not one of
+           ours, so it stays reachable with the docking switched off. -->
+      <label class="row switch">
+        <span class="labels">
+          <span class="title" data-i18n="optChatFix"></span>
+          <span class="hint" data-i18n="optChatFixHint"></span>
+        </span>
+        <input type="checkbox" id="chatfix">
+        <span class="track" aria-hidden="true"></span>
+      </label>
+
       <label class="row select">
         <span class="labels">
           <span class="title" data-i18n="optLanguage"></span>

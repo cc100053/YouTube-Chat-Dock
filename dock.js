@@ -177,6 +177,7 @@
   let theaterOn = true;
   let lang = 'en';
   let healthy = true;
+  let chatFixOn = true;
 
   function applyFlip(on) {
     flipped = on;
@@ -260,6 +261,7 @@
     applyEnabled(YTCHAT.isOn(lsGet(YTCHAT.K.enabled)));
     dividerOn = YTCHAT.isOn(lsGet(YTCHAT.K.divider));
     theaterOn = YTCHAT.isOn(lsGet(YTCHAT.K.theater));
+    chatFixOn = YTCHAT.isOn(lsGet(YTCHAT.K.chatfix));
     lang = ytchatResolveLang(lsGet(YTCHAT.K.lang), uiLanguage());
     relabel();
     for (const m of Object.values(MODES)) applyVar(m, clamp(readStored(m)));
@@ -738,6 +740,72 @@
     } catch (e) { /* orphaned context */ }
   }
 
+  /* ---- YouTube's own chat-replay stall ---------------------------------
+
+     Not this extension's bug, and it reproduces with the extension switched
+     off. Entering fullscreen sometimes leaves chat replay blank: no new
+     messages ever arrive again, for the rest of the page's life.
+
+     Measured on a stalled replay (1905px viewport, video playing normally at
+     t=183s of 3426s):
+
+       - #items has exactly ONE child, and it is YouTube's own
+         "Live chat replay is on..." notice. Zero real messages.
+       - the iframe and yt-live-chat-app both measure 396x735, visible,
+         opacity 1, and the scroller's scrollHeight equals its clientHeight.
+
+     So the paint is fine and the DATA is gone. Everything below was then
+     tried against that live page, waiting between each and re-counting:
+
+       leaving fullscreen                             1 -> 1
+       display:none/block + a resize event            1 -> 1
+       iframe.contentWindow.location.reload()         1 -> 1  (over 15s)
+       video.currentTime += 0.5                       1 -> 1
+       picking a mode in the chat header's menu       1 -> 138
+
+     The reload result is the important one, and it is why this function does
+     not do the obvious thing. A stalled frame is holding a DEAD continuation
+     token; reloading the same URL just replays the same dead token. Confirmed
+     from the other direction too: history.back() onto the previous chat URL
+     reproduced the blank list exactly, and hand-building
+     /live_chat_replay?continuation=<token> from the frame's own data served
+     "Something went wrong".
+
+     Only the menu works, because YouTube fetches a fresh token to rebuild the
+     list. Clicking the mode that is ALREADY selected rebuilds it just the
+     same - measured 211 -> 73 children with a new firstElementChild, the
+     header still reading "Top chat replay", and the menu never opening. That
+     is what this does: the user's mode is not changed, and nothing here
+     depends on a name YouTube would not also break its own chat by renaming,
+     beyond the three selectors in settings.js.
+
+     Deliberately NOT gated on `enabled`: the stall is YouTube's, and someone
+     who switched the docking off still wants their chat to work. It has its
+     own switch in the popup for that reason. */
+  const CHATFIX_DELAY = 1500;
+
+  function nudgeChatReplay() {
+    if (!chatFixOn) return;
+    const f = chatFrame();
+    if (!f) return;
+    const w = f.contentWindow;
+    if (w.location.pathname.indexOf(SEL.framePathReplay) !== 0) return;
+    const d = f.contentDocument;
+    const list = d.querySelector(SEL.chatItems);
+    // One child is the stall's signature; anything more is a working replay.
+    if (!list || list.childElementCount > 1) return;
+    /* Re-pick the mode the header is already showing. Without this the only
+       way to rebuild would be to pick the OTHER one, which silently moves a
+       Top-chat viewer onto unfiltered chat. No label, no nudge. */
+    const label = d.querySelector(SEL.chatLabel);
+    const want = label && label.textContent.trim();
+    if (!want) return;
+    const items = d.querySelectorAll(SEL.chatMenuItem);
+    for (let i = 0; i < items.length; i++) {
+      if (items[i].textContent.trim().indexOf(want) === 0) return void items[i].click();
+    }
+  }
+
   /* One throw must not kill the loop or spam the console every 400ms. */
   let errorsLogged = 0;
   function safe(fn) {
@@ -778,7 +846,15 @@
      event is reliable, so poll cheaply (one querySelector + one rect). */
   addEventListener('resize', safe(() => { restore(); reposition(); }), { passive: true });
   addEventListener('scroll', safeReposition, { passive: true });
-  addEventListener('fullscreenchange', () => setTimeout(safeReposition, 120));
+  /* Both directions of the transition get a check: the stall was measured
+     entering fullscreen, but leaving it does not clear one, so a frame that
+     is still blank on the way out deserves the same nudge. The 1500ms is
+     slack for YouTube's own relayout, and the check is free when chat is
+     healthy - one querySelector and a childElementCount. */
+  addEventListener('fullscreenchange', () => {
+    setTimeout(safeReposition, 120);
+    setTimeout(safe(nudgeChatReplay), CHATFIX_DELAY);
+  });
   addEventListener('yt-navigate-finish', safe(() => {
     // A stale cache would silently stop applying a width, and that failure is
     // invisible — so drop it on navigation rather than trust it across one.
