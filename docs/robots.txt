@@ -1,0 +1,4 @@
+User-agent: *
+Allow: /
+
+Sitemap: https://cc100053.github.io/YouTube-Chat-Dock/sitemap.xml

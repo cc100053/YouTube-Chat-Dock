@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9"
+        xmlns:xhtml="http://www.w3.org/1999/xhtml">
+  <url>
+    <loc>https://cc100053.github.io/YouTube-Chat-Dock/</loc>
+    <xhtml:link rel="alternate" hreflang="en" href="https://cc100053.github.io/YouTube-Chat-Dock/"/>
+    <xhtml:link rel="alternate" hreflang="ja" href="https://cc100053.github.io/YouTube-Chat-Dock/ja/"/>
+    <xhtml:link rel="alternate" hreflang="zh-Hant" href="https://cc100053.github.io/YouTube-Chat-Dock/zh-TW/"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://cc100053.github.io/YouTube-Chat-Dock/"/>
+  </url>
+  <url>
+    <loc>https://cc100053.github.io/YouTube-Chat-Dock/ja/</loc>
+    <xhtml:link rel="alternate" hreflang="en" href="https://cc100053.github.io/YouTube-Chat-Dock/"/>
+    <xhtml:link rel="alternate" hreflang="ja" href="https://cc100053.github.io/YouTube-Chat-Dock/ja/"/>
+    <xhtml:link rel="alternate" hreflang="zh-Hant" href="https://cc100053.github.io/YouTube-Chat-Dock/zh-TW/"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://cc100053.github.io/YouTube-Chat-Dock/"/>
+  </url>
+  <url>
+    <loc>https://cc100053.github.io/YouTube-Chat-Dock/zh-TW/</loc>
+    <xhtml:link rel="alternate" hreflang="en" href="https://cc100053.github.io/YouTube-Chat-Dock/"/>
+    <xhtml:link rel="alternate" hreflang="ja" href="https://cc100053.github.io/YouTube-Chat-Dock/ja/"/>
+    <xhtml:link rel="alternate" hreflang="zh-Hant" href="https://cc100053.github.io/YouTube-Chat-Dock/zh-TW/"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://cc100053.github.io/YouTube-Chat-Dock/"/>
+  </url>
+</urlset>
