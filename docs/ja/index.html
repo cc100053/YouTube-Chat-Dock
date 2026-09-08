@@ -233,7 +233,7 @@ code{background:var(--card); border:1px solid var(--line); border-radius:5px; pa
 <div class="scroller">
 <table>
   <tr><th>項目</th><th>動作</th></tr>
-  <tr><td>YouTubeで有効にする</td><td>アンインストールせずにパネルをオフにします</td></tr><tr><td>チャットリプレイの停止を修復</td><td>全画面で止まったチャットリプレイを自動で再開します</td></tr><tr><td>言語</td><td>ブラウザの言語とは無関係に、12言語から選べます</td></tr><tr><td>チャットを反対側に</td><td>仕切りの &#8646; ボタンと同じです</td></tr><tr><td>3つの幅スライダー</td><td>通常表示・シアターモード・全画面。ドラッグ中もその場で反映されます</td></tr><tr><td>既定値に戻す</td><td>すべて元に戻します</td></tr>
+  <tr><td>YouTubeで有効にする</td><td>アンインストールせずにパネルをオフにします</td></tr><tr><td>チャットリプレイの停止を修復</td><td>全画面で止まったチャットリプレイを自動で再開します</td></tr><tr><td>言語</td><td>ブラウザの言語とは無関係に、12言語から選べます</td></tr><tr><td>チャットを反対側に</td><td>仕切りの &#8646; ボタンと同じです</td></tr><tr><td>3つの幅スライダー</td><td>通常表示・シアターモード・全画面。ドラッグ中もその場で反映されます</td></tr><tr><td>既定値に戻す</td><td>すべて元に戻します</td></tr><tr><td>ホバーでチャットを一時停止</td><td>マウスが重なっているあいだメッセージ一覧を固定します</td></tr>
 </table>
 </div>
 
@@ -284,6 +284,12 @@ code{background:var(--card); border:1px solid var(--line); border-radius:5px; pa
 
 <div class="grid"><div class="card"><h3>ウェブストアから</h3><p><a href="https://chromewebstore.google.com/detail/youtube-chat-dock/bkmbhlkcjbkjapbamkidacajjfhoiiam">Chromeに追加</a>して、YouTubeのタブを再読み込みするだけ。Chromeは何の許可も求めません。</p></div><div class="card"><h3>ソースから</h3><p>リポジトリをクローンし、<code>chrome://extensions/</code>を開いてデベロッパーモードをオンにし、「パッケージ化されていない拡張機能を読み込む」でフォルダを選びます。ビルド不要、依存関係もありません。</p></div></div>
 
+<h2>メッセージを読むあいだ、チャットのスクロールを止められる？</h2>
+
+<p class="answer">
+  はい。メッセージ一覧にマウスを重ねるとその場で固定されるので、速いチャットでも読んだりリンクを押したりするあいだ止まっています。新しいメッセージはその下に届き続け、マウスを離すとライブに戻ります。マウス専用です。タッチ画面にはホバーがないので、その場合はYouTube自身のスクロールアップによる一時停止が働きます。設定パネルにオン・オフのスイッチがあります。
+</p>
+
 <footer>
   <p><a href="https://chromewebstore.google.com/detail/youtube-chat-dock/bkmbhlkcjbkjapbamkidacajjfhoiiam">Chromeウェブストア</a> <span aria-hidden="true">&middot;</span> <a href="https://github.com/cc100053/YouTube-Chat-Dock">GitHub</a> <span aria-hidden="true">&middot;</span> <a href="https://github.com/cc100053/YouTube-Chat-Dock/blob/main/store/PRIVACY.md">プライバシー</a> <span aria-hidden="true">&middot;</span> <a href="https://github.com/cc100053/YouTube-Chat-Dock/issues">問題を報告</a></p>
   <nav class="langs" aria-label="言語"><a href="https://cc100053.github.io/YouTube-Chat-Dock/" hreflang="en">English</a> <span aria-hidden="true">·</span> <strong aria-current="true">日本語</strong> <span aria-hidden="true">·</span> <a href="https://cc100053.github.io/YouTube-Chat-Dock/zh-TW/" hreflang="zh-TW">繁體中文</a></nav>
@@ -305,7 +311,7 @@ code{background:var(--card); border:1px solid var(--line); border-radius:5px; pa
       "applicationSubCategory": "Chrome Extension",
       "operatingSystem": "Chrome 105+, Microsoft Edge, Brave, Opera, Vivaldi, Arc",
       "browserRequirements": "Requires Chrome 105 or any Chromium-based browser",
-      "softwareVersion": "1.10.0",
+      "softwareVersion": "2.0.0",
       "url": "https://cc100053.github.io/YouTube-Chat-Dock/ja/",
       "inLanguage": [
         "en",
@@ -331,7 +337,8 @@ code{background:var(--card); border:1px solid var(--line); border-radius:5px; pa
         "アーカイブのチャットリプレイもライブチャットと同じように動きます",
         "チャットは左右どちらにも移動できます",
         "右から左に読む言語のレイアウトに対応",
-        "ブラウザの言語とは独立した12言語のUI"
+        "ブラウザの言語とは独立した12言語のUI",
+        "マウスが重なっているあいだチャットが止まるので、速いチャットも読めます"
       ]
     },
     {
@@ -441,6 +448,14 @@ code{background:var(--card); border:1px solid var(--line); border-radius:5px; pa
           "acceptedAnswer": {
             "@type": "Answer",
             "text": "Chromeウェブストアからワンクリックで追加し、開いているYouTubeのタブを再読み込みするだけです。サイドパネルにするための設定は必要ありません。"
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "メッセージを読むあいだ、チャットのスクロールを止められる？",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "はい。メッセージ一覧にマウスを重ねるとその場で固定されるので、速いチャットでも読んだりリンクを押したりするあいだ止まっています。新しいメッセージはその下に届き続け、マウスを離すとライブに戻ります。マウス専用です。タッチ画面にはホバーがないので、その場合はYouTube自身のスクロールアップによる一時停止が働きます。設定パネルにオン・オフのスイッチがあります。"
           }
         }
       ]

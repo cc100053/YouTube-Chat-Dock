@@ -22,7 +22,6 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<meta name="google-site-verification" content="X-KrR5b2eGuzlJ2QcIurhjjBLHPYHLdLk2P5m0q5zqM" />
 <title>YouTube Chat Dock — Live Chat Side Panel for YouTube</title>
 <meta name="description" content="Free Chrome extension that docks YouTube live chat and chat replay as a resizable side panel beside the video — in page view, theater mode and true fullscreen.">
 <link rel="canonical" href="https://cc100053.github.io/YouTube-Chat-Dock/">
@@ -234,7 +233,7 @@ code{background:var(--card); border:1px solid var(--line); border-radius:5px; pa
 <div class="scroller">
 <table>
   <tr><th>Setting</th><th>What it does</th></tr>
-  <tr><td>Enable on YouTube</td><td>Turn the panel off without uninstalling</td></tr><tr><td>Fix blank chat replay</td><td>Restarts YouTube’s chat replay when it stalls in fullscreen</td></tr><tr><td>Language</td><td>Any of the 12, independently of your browser’s language</td></tr><tr><td>Chat on the other side</td><td>Same as the divider’s &#8646; toggle</td></tr><tr><td>Three width sliders</td><td>Page view, theater and fullscreen, previewing live as you drag</td></tr><tr><td>Reset to defaults</td><td>Puts everything back</td></tr>
+  <tr><td>Enable on YouTube</td><td>Turn the panel off without uninstalling</td></tr><tr><td>Fix blank chat replay</td><td>Restarts YouTube’s chat replay when it stalls in fullscreen</td></tr><tr><td>Language</td><td>Any of the 12, independently of your browser’s language</td></tr><tr><td>Chat on the other side</td><td>Same as the divider’s &#8646; toggle</td></tr><tr><td>Three width sliders</td><td>Page view, theater and fullscreen, previewing live as you drag</td></tr><tr><td>Reset to defaults</td><td>Puts everything back</td></tr><tr><td>Pause chat on hover</td><td>Freezes the message list while the mouse is over it</td></tr>
 </table>
 </div>
 
@@ -285,6 +284,12 @@ code{background:var(--card); border:1px solid var(--line); border-radius:5px; pa
 
 <div class="grid"><div class="card"><h3>From the Web Store</h3><p><a href="https://chromewebstore.google.com/detail/youtube-chat-dock/bkmbhlkcjbkjapbamkidacajjfhoiiam">Add to Chrome</a>, then reload your YouTube tab. Chrome asks you to approve nothing.</p></div><div class="card"><h3>From source</h3><p>Clone the repo, open <code>chrome://extensions/</code>, turn on Developer mode, click Load unpacked and pick the folder. No build step, no dependencies.</p></div></div>
 
+<h2>Can I stop the chat scrolling while I read a message?</h2>
+
+<p class="answer">
+  Yes. Hover the mouse over the message list and it freezes in place, so a fast chat holds still while you read or click a link. New messages keep arriving underneath; move the mouse away and it jumps back to live. It is mouse-only — on a touchscreen there is no hover, so YouTube’s own scroll-up pause still applies. There is a switch for it in the toolbar popup.
+</p>
+
 <footer>
   <p><a href="https://chromewebstore.google.com/detail/youtube-chat-dock/bkmbhlkcjbkjapbamkidacajjfhoiiam">Chrome Web Store</a> <span aria-hidden="true">&middot;</span> <a href="https://github.com/cc100053/YouTube-Chat-Dock">GitHub</a> <span aria-hidden="true">&middot;</span> <a href="https://github.com/cc100053/YouTube-Chat-Dock/blob/main/store/PRIVACY.md">Privacy</a> <span aria-hidden="true">&middot;</span> <a href="https://github.com/cc100053/YouTube-Chat-Dock/issues">Report an issue</a></p>
   <nav class="langs" aria-label="Language"><strong aria-current="true">English</strong> <span aria-hidden="true">·</span> <a href="https://cc100053.github.io/YouTube-Chat-Dock/ja/" hreflang="ja">日本語</a> <span aria-hidden="true">·</span> <a href="https://cc100053.github.io/YouTube-Chat-Dock/zh-TW/" hreflang="zh-TW">繁體中文</a></nav>
@@ -306,7 +311,7 @@ code{background:var(--card); border:1px solid var(--line); border-radius:5px; pa
       "applicationSubCategory": "Chrome Extension",
       "operatingSystem": "Chrome 105+, Microsoft Edge, Brave, Opera, Vivaldi, Arc",
       "browserRequirements": "Requires Chrome 105 or any Chromium-based browser",
-      "softwareVersion": "1.10.0",
+      "softwareVersion": "2.0.0",
       "url": "https://cc100053.github.io/YouTube-Chat-Dock/",
       "inLanguage": [
         "en",
@@ -332,7 +337,8 @@ code{background:var(--card); border:1px solid var(--line); border-radius:5px; pa
         "Chat replay on VODs behaves exactly like live chat",
         "Chat can be moved to either side",
         "Right-to-left layouts supported",
-        "12 interface languages, independent of the browser language"
+        "12 interface languages, independent of the browser language",
+        "Chat freezes while the mouse is over it, so a fast chat can be read"
       ]
     },
     {
@@ -442,6 +448,14 @@ code{background:var(--card); border:1px solid var(--line); border-radius:5px; pa
           "acceptedAnswer": {
             "@type": "Answer",
             "text": "Install it from the Chrome Web Store in one click, then reload any open YouTube tab. There is nothing to configure to get the side panel."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "Can I stop the chat scrolling while I read a message?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "Yes. Hover the mouse over the message list and it freezes in place, so a fast chat holds still while you read or click a link. New messages keep arriving underneath; move the mouse away and it jumps back to live. It is mouse-only — on a touchscreen there is no hover, so YouTube’s own scroll-up pause still applies. There is a switch for it in the toolbar popup."
           }
         }
       ]

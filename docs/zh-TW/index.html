@@ -233,7 +233,7 @@ code{background:var(--card); border:1px solid var(--line); border-radius:5px; pa
 <div class="scroller">
 <table>
   <tr><th>設定</th><th>作用</th></tr>
-  <tr><td>在 YouTube 啟用</td><td>不必解除安裝就能關掉側邊欄</td></tr><tr><td>修復空白的聊天重播</td><td>聊天重播在全螢幕卡住時自動重新啟動</td></tr><tr><td>語言</td><td>12 種任選，與瀏覽器的語言無關</td></tr><tr><td>聊天室移到另一側</td><td>與分隔線上的 &#8646; 按鈕相同</td></tr><tr><td>三個寬度滑桿</td><td>一般播放頁、劇院模式與全螢幕，拖動時即時預覽</td></tr><tr><td>回復預設值</td><td>全部還原</td></tr>
+  <tr><td>在 YouTube 啟用</td><td>不必解除安裝就能關掉側邊欄</td></tr><tr><td>修復空白的聊天重播</td><td>聊天重播在全螢幕卡住時自動重新啟動</td></tr><tr><td>語言</td><td>12 種任選，與瀏覽器的語言無關</td></tr><tr><td>聊天室移到另一側</td><td>與分隔線上的 &#8646; 按鈕相同</td></tr><tr><td>三個寬度滑桿</td><td>一般播放頁、劇院模式與全螢幕，拖動時即時預覽</td></tr><tr><td>回復預設值</td><td>全部還原</td></tr><tr><td>滑鼠停留時暫停聊天室</td><td>滑鼠移到訊息清單上時把它固定住</td></tr>
 </table>
 </div>
 
@@ -284,6 +284,12 @@ code{background:var(--card); border:1px solid var(--line); border-radius:5px; pa
 
 <div class="grid"><div class="card"><h3>從商店安裝</h3><p><a href="https://chromewebstore.google.com/detail/youtube-chat-dock/bkmbhlkcjbkjapbamkidacajjfhoiiam">加到 Chrome</a>，然後重新載入 YouTube 分頁。Chrome 不會要你同意任何東西。</p></div><div class="card"><h3>從原始碼安裝</h3><p>複製這個 repo，開啟 <code>chrome://extensions/</code>，打開開發人員模式，按「載入未封裝項目」並選擇該資料夾。不需要建置，也沒有任何依賴。</p></div></div>
 
+<h2>看訊息的時候可以讓聊天室不要一直捲動嗎？</h2>
+
+<p class="answer">
+  可以。把滑鼠移到訊息清單上，它就會停在原地，所以就算聊天很快，你在讀訊息或點連結的時候它也不動。新訊息會繼續在下面進來；把滑鼠移開就跳回即時。這是滑鼠專用的 —— 觸控螢幕沒有滑鼠停留，所以那時是靠 YouTube 自己的往上捲動暫停。工具列的設定面板裡有一個開關。
+</p>
+
 <footer>
   <p><a href="https://chromewebstore.google.com/detail/youtube-chat-dock/bkmbhlkcjbkjapbamkidacajjfhoiiam">Chrome 線上應用程式商店</a> <span aria-hidden="true">&middot;</span> <a href="https://github.com/cc100053/YouTube-Chat-Dock">GitHub</a> <span aria-hidden="true">&middot;</span> <a href="https://github.com/cc100053/YouTube-Chat-Dock/blob/main/store/PRIVACY.md">隱私權</a> <span aria-hidden="true">&middot;</span> <a href="https://github.com/cc100053/YouTube-Chat-Dock/issues">回報問題</a></p>
   <nav class="langs" aria-label="語言"><a href="https://cc100053.github.io/YouTube-Chat-Dock/" hreflang="en">English</a> <span aria-hidden="true">·</span> <a href="https://cc100053.github.io/YouTube-Chat-Dock/ja/" hreflang="ja">日本語</a> <span aria-hidden="true">·</span> <strong aria-current="true">繁體中文</strong></nav>
@@ -305,7 +311,7 @@ code{background:var(--card); border:1px solid var(--line); border-radius:5px; pa
       "applicationSubCategory": "Chrome Extension",
       "operatingSystem": "Chrome 105+, Microsoft Edge, Brave, Opera, Vivaldi, Arc",
       "browserRequirements": "Requires Chrome 105 or any Chromium-based browser",
-      "softwareVersion": "1.10.0",
+      "softwareVersion": "2.0.0",
       "url": "https://cc100053.github.io/YouTube-Chat-Dock/zh-TW/",
       "inLanguage": [
         "en",
@@ -331,7 +337,8 @@ code{background:var(--card); border:1px solid var(--line); border-radius:5px; pa
         "影片重溫的聊天重播行為與直播聊天室完全相同",
         "聊天室可以移到左右任一側",
         "支援由右至左的版面",
-        "12 種介面語言，與瀏覽器語言無關"
+        "12 種介面語言，與瀏覽器語言無關",
+        "滑鼠停在訊息上時聊天室會凍結，讓你讀得完很快的聊天"
       ]
     },
     {
@@ -441,6 +448,14 @@ code{background:var(--card); border:1px solid var(--line); border-radius:5px; pa
           "acceptedAnswer": {
             "@type": "Answer",
             "text": "在 Chrome 線上應用程式商店按一下安裝，然後重新載入已經開著的 YouTube 分頁就好。不需要任何設定就會變成側邊欄。"
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "看訊息的時候可以讓聊天室不要一直捲動嗎？",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "可以。把滑鼠移到訊息清單上，它就會停在原地，所以就算聊天很快，你在讀訊息或點連結的時候它也不動。新訊息會繼續在下面進來；把滑鼠移開就跳回即時。這是滑鼠專用的 —— 觸控螢幕沒有滑鼠停留，所以那時是靠 YouTube 自己的往上捲動暫停。工具列的設定面板裡有一個開關。"
           }
         }
       ]
