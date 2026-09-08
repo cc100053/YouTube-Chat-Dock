@@ -68,83 +68,110 @@
 
   /* ---- the freeze itself ----------------------------------------------
 
-     The obvious implementations were measured on a busy live chat (Kapamilya
-     Online Live, ~4 messages per 10s, 1920x769) and both are wrong.
+     Hold a ROW still, not a scroll offset. That choice is the whole fix, and
+     the two versions before it were both wrong in the same way.
 
      overflow:hidden is wrong twice over: the user must still be able to
      scroll back through what they stopped to read, and a list YouTube still
      believes is on the tail never renders #show-more, so there would be no
      way back to live either.
 
-     Nudging the scroller a little way off the bottom, so YouTube's own
-     at-bottom test detaches follow, is the approach this shipped with first
-     and it does not work at the size it needs to be. Measured, each offset
-     applied at the tail and then watched for 9s:
+     Nudging the scroller off the bottom so YouTube's own at-bottom test lets
+     go does not work at a usable size. Measured on a busy live chat, each
+     offset applied at the tail and watched for 9s: 40, 60, 80 and 100px were
+     all followed straight back to gap 0; only 120px and 400px held. YouTube's
+     tolerance is therefore around 110px, about four messages, and a nudge big
+     enough to clear it is a four-message jump at the exact moment you stopped
+     to read one.
 
-       offset  40px   YouTube followed anyway, back to gap 0
-       offset  60px   followed
-       offset  80px   followed
-       offset 100px   followed
-       offset 120px   FROZE, gap held at 120
-       offset 400px   FROZE, gap held at 400
+     Then this held s.scrollTop at the value it had when the hold started,
+     which measured perfectly on a quiet list and fails on the two cases
+     actually reported — heavy influx, and hovering in and out repeatedly:
 
-     So YouTube's tolerance sits between 100 and 120px — about four messages
-     — and a nudge big enough to clear it is a visible jump of four messages
-     at the exact moment you stopped to read one. The cure is worse than the
-     symptom, and tuning to sit just past a threshold this extension cannot
-     see was never going to hold.
+       - The list is VIRTUALISED. #items is position:absolute inside
+         #item-offset, whose height YouTube writes inline and recomputes, and
+         under heavy influx it also trims old rows off the top. Both renumber
+         scrollTop without the content moving, so the old loop's "it went up,
+         something else moved it, adopt the new value" branch ratcheted the
+         baseline on every trim, and the freeze walked down the list with the
+         chat. The more traffic, the more trims, the worse it got.
 
-     Nor is there a zero-jump way to fake the gap: #items is position:absolute
-     with a transform inside #item-offset, whose height YouTube writes inline
-     and recomputes — measured, padding-bottom on #items moved scrollHeight by
-     exactly 0.
+       - #show-more.click(), which release() uses to jump back to the tail,
+         starts YouTube's own smooth scroll (scrollPixelsRemaining_ /
+         scrollTimeRemainingMs_ on the list renderer). Re-entering while that
+         animation is still in flight made hold() sample scrollTop mid-flight,
+         and from there two rAF loops wrote scrollTop every frame, one pulling
+         to the tail and one pulling back.
 
-     What is left is to let YouTube scroll and put it back, which costs no
-     jump at all and needs no number from YouTube. The gap then accumulates on
-     its own as messages arrive, and once it passes that ~110px tolerance
-     YouTube stops following by itself and this loop goes quiet — so it also
-     ends with YouTube genuinely off-bottom, which is what makes the native
-     #show-more chip appear rather than being suppressed. */
-  let frozenTop = 0;
+     A row is immune to all of it. "Keep the message under the cursor exactly
+     where it is" stays true through appends, trims, offset-height rewrites
+     and anyone else's scroll animation, because it is measured against the
+     rendered box rather than against a number YouTube is free to renumber. */
   let raf = 0;
-  /* Resolved at hold() and re-resolved only when it dies, rather than queried
-     every frame: the list renderer is replaced whole when chat switches Top
-     <-> Live or live <-> replay, and isConnected is what notices that without
-     paying for a querySelector 60 times a second. */
-  let held$ = null;
+  let held$ = null;      // the scroller, resolved at hold()
+  let anchor = null;     // the row being held still
+  let anchorTop = 0;     // its top, relative to the scroller's top edge
+
+  const offsetOf = (el, s) =>
+    el.getBoundingClientRect().top - s.getBoundingClientRect().top;
+
+  /* The topmost row still showing. Deliberately not elementFromPoint: the
+     pointer may be over a gap, a menu, or nothing at all, and the anchor has
+     to exist whether or not anything is under the cursor. */
+  function pickAnchor(s) {
+    const items = document.querySelector(SEL.chatItems);
+    anchor = null;
+    if (!items) return;
+    const top = s.getBoundingClientRect().top;
+    const kids = items.children;
+    for (let i = 0; i < kids.length; i++) {
+      if (kids[i].getBoundingClientRect().bottom > top + 1) { anchor = kids[i]; break; }
+    }
+    if (!anchor && kids.length) anchor = kids[kids.length - 1];
+    if (anchor) anchorTop = offsetOf(anchor, s);
+  }
 
   function loop() {
     raf = held ? requestAnimationFrame(loop) : 0;
     if (!held$ || !held$.isConnected) {
       held$ = scroller();
+      anchor = null;
       if (!held$) return;
-      frozenTop = held$.scrollTop;   // new list, new baseline
-      return;
     }
     const s = held$;
-    const st = s.scrollTop;
+    /* Re-picked when the row we were holding is trimmed away, which under
+       heavy influx happens to every row eventually. */
+    if (!anchor || !anchor.isConnected) return pickAnchor(s);
+
+    const drift = offsetOf(anchor, s) - anchorTop;
+    if (!drift) return;
+
     if (Date.now() - lastUserAt < USER_MS) {
-      // The user's own scrolling. Follow it, and re-baseline onto where they
-      // put the list, so the freeze holds their position and not the old one.
-      if (st === frozenTop) return;
-      frozenTop = st;
+      // The user's own scrolling. Re-anchor onto where they put the list.
+      pickAnchor(s);
       if (atBottom(s)) { userScrolled = false; parked = false; startedParked = false; }
       else userScrolled = true;
-    } else if (st > frozenTop) {
-      // Only ever undo DOWNWARD movement: that is YouTube following the tail.
-      s.scrollTop = frozenTop;
-    } else if (st < frozenTop) {
-      frozenTop = st;   // something else moved it up; don't fight it
+      return;
     }
+    /* Somebody else moved it: YouTube following the tail, a trim, or a scroll
+       animation still in flight. Put the row back. Adding the drift rather
+       than restoring a remembered scrollTop is what makes this correct when
+       the offset container has been renumbered underneath. */
+    s.scrollTop += drift;
+    /* Clamped at the ends, or fought by an animation mid-frame, the row does
+       not land exactly. Take the remainder as the new truth instead of
+       re-fighting it forever on the next frame. */
+    const left = offsetOf(anchor, s) - anchorTop;
+    if (left) anchorTop += left;
   }
 
   /* A rAF loop rather than a scroll listener, and the reason is worth
-     recording: this runs only between hold() and release(), so it costs one
-     property read per frame while the mouse is actually parked on the
-     messages and nothing at all the rest of the time. A scroll listener would
-     be cheaper still, but it makes the whole feature depend on YouTube's
-     follow producing scroll events on #item-scroller, which is one more
-     assumption about their internals than this needs. */
+     recording: this runs only between hold() and release(), so it costs two
+     rects per frame while the mouse is actually parked on the messages and
+     nothing at all the rest of the time. A scroll listener would be cheaper
+     still, but it makes the whole feature depend on YouTube's follow
+     producing scroll events on #item-scroller — measured on a live chat, it
+     does not always. */
   function startLoop() { if (!raf) raf = requestAnimationFrame(loop); }
 
   function toTail() {
@@ -178,7 +205,7 @@
     userScrolled = false;
     ring(true);
     held$ = scroller();
-    frozenTop = held$ ? held$.scrollTop : 0;
+    if (held$) pickAnchor(held$);
     startLoop();
   }
 
@@ -186,6 +213,7 @@
     leaveT = 0;
     held = false;
     if (raf) { cancelAnimationFrame(raf); raf = 0; }
+    anchor = null;
     ring(false);
     if (userScrolled || startedParked) { parked = true; return; }
     parked = false;
@@ -219,6 +247,7 @@
     clearTimeout(enterT); clearTimeout(leaveT);
     enterT = leaveT = 0;
     if (raf) { cancelAnimationFrame(raf); raf = 0; }
+    anchor = null;
     zone = held = parked = startedParked = userScrolled = false;
     ring(false);
   }
@@ -236,28 +265,61 @@
     };
   }
 
-  const inZone = (n) => !!(n && n.closest && n.closest(SEL.chatList));
+  /* ---- where the pointer is -------------------------------------------
 
-  /* pointerover/pointerout rather than pointerenter/leave, and on the
-     document rather than on the list: the list renderer is replaced whole
-     when chat switches live <-> replay or Top <-> Live, so anything bound to
-     it dies silently. These two bubble, so one pair of listeners survives
-     every rebuild with no re-binding and no observer.
+     Tracked as a COORDINATE and re-tested against the list's box, rather than
+     inferred from which element an event happened to land on.
 
-     Mouse only. Touch already has a pause gesture — scrolling up — and a
-     sticky freeze from a tap would be a trap on a device with no hover. */
-  document.addEventListener('pointerover', safe((e) => {
+     The event-only version desynced, and hovering in and out repeatedly is
+     what exposed it: `zone` is a boolean built from a stream of pointerover /
+     pointerout events, and any event that is missed, arrives out of order, or
+     arrives for a row YouTube is in the middle of recycling leaves it stuck
+     at the wrong value with nothing to correct it. A coordinate tested
+     against a rect cannot desync — worst case it is one heartbeat stale.
+
+     Measured on a live chat with the cursor held still: 103 pointerover
+     events in 10 seconds, every one of them on a different recycled row. That
+     is the churn this has to be indifferent to. */
+  let ptrX = -1;
+  let ptrY = -1;
+  let ptrIn = false;
+
+  function inZoneNow() {
+    if (!ptrIn) return false;
+    const l = document.querySelector(SEL.chatList);
+    if (!l) return false;
+    const r = l.getBoundingClientRect();
+    if (r.width < 1 || r.height < 1) return false;
+    return ptrX >= r.left && ptrX < r.right && ptrY >= r.top && ptrY < r.bottom;
+  }
+
+  const track = safe((e) => {
     if (e.pointerType !== 'mouse') return;
-    setZone(inZone(e.target));
-  }), true);
+    ptrX = e.clientX; ptrY = e.clientY; ptrIn = true;
+    setZone(inZoneNow());
+  });
 
-  /* A null relatedTarget is the pointer leaving the document entirely — into
-     the parent page, the video, or off the window. Every in-document
-     transition is already covered by pointerover above. */
+  document.addEventListener('pointerover', track, true);
+  document.addEventListener('pointermove', track, { capture: true, passive: true });
+
+  /* A null relatedTarget means the pointer left this document — EXCEPT when
+     the row it was over was simply removed, which on a fast chat happens
+     several times a second. isConnected tells the two apart: a recycled row
+     is already detached by the time this fires, a real exit is not. Without
+     that test every trim under the cursor read as "the mouse left". */
   document.addEventListener('pointerout', safe((e) => {
     if (e.pointerType !== 'mouse' || e.relatedTarget) return;
+    if (e.target && e.target.isConnected === false) return;
+    ptrIn = false;
     setZone(false);
   }), true);
+
+  /* The heartbeat that makes the above self-correcting. Everything can be
+     missed — events, a relayout, a list rebuilt while the pointer sat still —
+     and this re-asks the question from geometry regardless. One querySelector
+     and one rect, at a quarter of the rate dock.js already polls the watch
+     page. */
+  setInterval(safe(() => { if (ptrIn) setZone(inZoneNow()); }), 250);
 
   const markUser = () => { lastUserAt = Date.now(); };
   document.addEventListener('pointerdown', markUser, { capture: true, passive: true });
