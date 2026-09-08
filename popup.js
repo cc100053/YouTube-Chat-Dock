@@ -114,6 +114,7 @@
      whole popup and rendered it blank. */
   var enabled = $('enabled');
   var chatfix = $('chatfix');
+  var hoverpause = $('hoverpause');
   var flip = $('flip');
   var pageWidth = $('pageWidth');
   var twWidth = $('twWidth');
@@ -220,6 +221,7 @@
   function render(s) {
     enabled.checked = YTCHAT.isOn(s[YTCHAT.K.enabled]);
     chatfix.checked = YTCHAT.isOn(s[YTCHAT.K.chatfix]);
+    hoverpause.checked = YTCHAT.isOn(s[YTCHAT.K.hoverpause]);
     flip.checked = YTCHAT.isOn(s[YTCHAT.K.flip]);
 
     var w = function (k) {
@@ -291,6 +293,10 @@
 
   chatfix.addEventListener('change', function () {
     set(YTCHAT.K.chatfix, chatfix.checked ? '1' : '0');
+  });
+
+  hoverpause.addEventListener('change', function () {
+    set(YTCHAT.K.hoverpause, hoverpause.checked ? '1' : '0');
   });
 
   flip.addEventListener('change', function () {

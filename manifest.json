@@ -29,7 +29,8 @@
       "js": [
         "settings.js",
         "i18n.js",
-        "dock.js"
+        "dock.js",
+        "hover.js"
       ],
       "run_at": "document_start",
       "all_frames": true

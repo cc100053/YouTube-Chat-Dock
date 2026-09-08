@@ -33,6 +33,7 @@ var YTCHAT = {
     theater: 'ytchat-theater',
     lang: 'ytchat-lang',
     chatfix: 'ytchat-chatfix',
+    hoverpause: 'ytchat-hoverpause',
   },
 
   DEF: {
@@ -53,6 +54,10 @@ var YTCHAT = {
     /* On by default: it only ever fires on a chat replay that has already
        stalled, and the stall is YouTube's, not this extension's. */
     'ytchat-chatfix': '1',
+    /* On by default, and independent of the docking switch for the same
+       reason chatfix is: freezing the list while you read it is chat
+       behaviour, not layout, and it is useful on YouTube's stock sidebar. */
+    'ytchat-hoverpause': '1',
   },
 };
 
@@ -119,6 +124,24 @@ YTCHAT.SEL = {
   chatItems: 'yt-live-chat-app #items',
   chatLabel: 'yt-live-chat-app #label-text',
   chatMenuItem: 'yt-live-chat-app tp-yt-paper-item',
+
+  /* Hover-pause, read from INSIDE the chat document by hover.js — so these
+     are the one group here that is not reached through a frame.
+
+     chatList is the hover hot zone, and the choice of element is the whole
+     policy: the header (mode switch, viewer count) and the input block are
+     siblings of the list renderer, not descendants, so scoping the zone to
+     this one element excludes both without naming either.
+
+       chatScroller  the box that actually scrolls. Freezing is done by
+                     moving it off the bottom so YouTube's own follow
+                     detaches — nothing here overrides scrolling.
+       chatShowMore  YouTube's native "back to live" chip. Used, never
+                     cloned: it is the documented way out of a parked list,
+                     and clicking it is also the most reliable jump to tail. */
+  chatList: 'yt-live-chat-item-list-renderer',
+  chatScroller: 'yt-live-chat-item-list-renderer #item-scroller',
+  chatShowMore: 'yt-live-chat-item-list-renderer #show-more',
 
   // Page mode: the frame element inside #secondary.
   panelPage: ['ytd-live-chat-frame#chat', 'ytd-live-chat-frame', '#chat-container'],

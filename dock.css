@@ -401,6 +401,64 @@ yt-live-chat-app yt-live-chat-text-message-renderer {
 }
 
 /* -------------------------------------------------------------
+   4b. Hover-pause ring
+
+   Drawn only while hover.js is actually holding the list frozen.
+   It is a pseudo-element on the chat document's own <html>, which
+   is what makes it cover the WHOLE panel — header, list and input
+   — rather than just the messages, and why it needs no element of
+   ours in the page at all.
+
+   Quieter than the divider on purpose. Same hue (#3ea6ff), but a
+   1px inset stroke and a faint inner glow instead of the divider's
+   solid line and halo: this one can sit lit for minutes while
+   someone reads, and the divider's treatment at that duration
+   reads as an error state. For the same reason the divider's
+   running beam is NOT reused here — one pass on hover is a cue, a
+   beam relaunching for five minutes is a distraction.
+
+   It fades in and snaps out: the rule only exists while the
+   attribute is set, so there is nothing left to transition on the
+   way out. Rendering the pseudo-element unconditionally would fix
+   that and would also hang a fixed-position box off every YouTube
+   page this stylesheet touches, which is a worse trade for 180ms.
+
+   Ungated by data-ytchat-off, like the rest of section 4: dock.js
+   is top-frame-only so the attribute can never land in here, and
+   hover-pause is deliberately independent of the docking switch.
+   ------------------------------------------------------------- */
+:root[data-ytchat-hold]::after {
+  content: '';
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  z-index: 2147483000;
+  box-shadow: inset 0 0 0 1px rgba(62, 166, 255, .55),
+              inset 0 0 14px rgba(62, 166, 255, .18);
+  animation: ytchat-hold-in .18s ease both;
+}
+
+@keyframes ytchat-hold-in {
+  from { opacity: 0; }
+  to   { opacity: 1; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  :root[data-ytchat-hold]::after { animation: none; }
+}
+
+/* Forced colours drops the glow entirely — a coloured shadow is either
+   overridden or invisible there. A plain system-coloured outline is the
+   only thing that survives and still says "held". */
+@media (forced-colors: active) {
+  :root[data-ytchat-hold]::after {
+    box-shadow: none;
+    outline: 2px solid Highlight;
+    outline-offset: -2px;
+  }
+}
+
+/* -------------------------------------------------------------
    5. Drag divider
 
    The element remains a transparent, full-height hit target so resizing is

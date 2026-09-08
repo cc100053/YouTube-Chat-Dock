@@ -40,6 +40,10 @@ in page view, theater mode, and true fullscreen.
 - **🩹 Fixes YouTube's blank chat replay.** Going fullscreen sometimes stalls
   chat replay for good — YouTube's own bug, with no extension installed. This
   spots it and restarts it, keeping the chat mode you had selected.
+- **⏸️ Pause chat on hover.** Put the mouse over the messages and the list
+  stops scrolling so you can read one; move away and it follows live again.
+  Scroll up and it keeps your place until you come back to the bottom.
+  Desktop mouse only — on touch, YouTube's own scroll-up pause still applies.
 - **📏 Narrow to 120px** without messages getting clipped.
 - **🌍 Right-to-left layouts** dock chat on the correct side, and the divider
   flips with them.
@@ -72,6 +76,7 @@ Click the toolbar icon.
 |---|---|
 | **Enable on YouTube** | Turn the panel off without uninstalling |
 | **Fix blank chat replay** | Restarts YouTube's chat replay when it stalls in fullscreen |
+| **Pause chat on hover** | Freezes the message list while the mouse is over it |
 | **Language** | Any of the 12, independently of your browser's language |
 | **Chat on the other side** | Same as the divider's ⇄ toggle |
 | **Three width sliders** | Page view, theater, fullscreen. They preview live as you drag, exactly like the divider does |
@@ -159,6 +164,15 @@ YouTube's own bug — it reproduces with no extension installed at all. The
 extension spots a stalled replay after a fullscreen switch and restarts it,
 keeping whichever chat mode you had selected. There is a switch for it in the
 popup.
+
+### Can I stop the chat scrolling while I read a message?
+
+Yes — hover the message list and it freezes in place. New messages keep
+arriving underneath; move the mouse away and it jumps back to live. If you
+scrolled up into history it stays there instead, until you scroll back to the
+bottom or click YouTube's own "Chat paused" button. It is mouse-only: on a
+touchscreen there is no hover, so YouTube's native scroll-up pause is still
+the way. There is a switch for it in the popup.
 
 ### Can I move YouTube chat to the left side?
 
