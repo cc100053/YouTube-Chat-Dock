@@ -193,7 +193,17 @@
   }
 
   function setZone(v) {
-    if (v === zone) return;
+    if (v === zone) {
+      /* Same answer as last time, but the enter timer can have been cancelled
+         out from under us while `zone` stayed true — and then nothing would
+         ever re-arm it, because every later pointerover takes this early
+         return. Measured on a chat replay: one blur on the chat window inside
+         the 180ms enter delay left hover-pause dead for as long as the
+         pointer stayed on the list, and only moving it off the messages and
+         back on revived it. Re-arm instead of sitting latched. */
+      if (v && !held && !enterT) enterT = setTimeout(hold, ENTER_MS);
+      return;
+    }
     zone = v;
     if (v) {
       // Re-entering during the leave delay cancels the resume outright.
@@ -278,9 +288,18 @@
   }), true);
 
   /* Losing focus is not the pointer leaving, and resuming on it would scroll
-     the list out from under someone who alt-tabbed away mid-read. Cancel the
-     pending timers and keep whatever state we are in. */
-  const freeze = safe(() => { clearTimeout(leaveT); clearTimeout(enterT); leaveT = enterT = 0; });
+     the list out from under someone who alt-tabbed away mid-read. So this
+     cancels the pending RESUME and nothing else.
+
+     It used to clear the enter timer too, which was never needed for that and
+     was a real bug: the chat iframe's window takes blur routinely as focus
+     moves around the watch page, so a blur landing inside the 180ms enter
+     delay threw away the pending hold — and `zone` was still true, so no
+     later pointerover could re-arm it. Measured on a live chat replay: hover
+     did nothing at all until the pointer left the message list and came back.
+     That is the intermittent "the ring shows up but chat keeps scrolling for
+     several seconds" this shipped with. */
+  const freeze = safe(() => { clearTimeout(leaveT); leaveT = 0; });
   addEventListener('blur', freeze);
   document.addEventListener('visibilitychange', () => { if (document.hidden) freeze(); });
 
