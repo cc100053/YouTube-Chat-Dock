@@ -120,7 +120,7 @@
      every case measured. Keeping the override cost a measured 7.5px shift off
      stock on every watch page, because YouTube's own layout leaves 15px of
      slack that justify-content:center splits and space-between did not. */
-  :root:not([data-ytchat-off]) ytd-watch-flexy:not([fullscreen]):not([theater]) #secondary.ytd-watch-flexy:has(ytd-live-chat-frame) {
+  :root:not([data-ytchat-off]) ytd-watch-flexy:not([fullscreen]):not([theater]):not([using-fixed-panel]) #secondary.ytd-watch-flexy:has(ytd-live-chat-frame) {
     --ytchat-gut: var(--ytd-watch-flexy-horizontal-page-margin, 16px);
     --ytchat-floor: min(
       var(--ytd-watch-flexy-sidebar-width, 0px),
@@ -161,6 +161,36 @@
      at KEEP_FOR_VIDEO, which is the only floor that knows about the chat. */
   :root:not([data-ytchat-off]) ytd-watch-flexy:not([fullscreen]):not([theater]) #primary.ytd-watch-flexy:has(~ #secondary ytd-live-chat-frame),
   :root:not([data-ytchat-off]) ytd-watch-flexy:not([fullscreen]):not([theater]) #primary.ytd-watch-flexy:has(~ #secondary ytd-live-chat-frame) #player-container-outer {
+    min-width: 0 !important;
+  }
+
+  /* The full Oct 2026 layout (ytd-watch-flexy[using-fixed-panel], with
+     split-scroll) is a different machine, and the column rules above must
+     stay off it — hence :not([using-fixed-panel]) on them. #secondary is a
+     full-viewport position:fixed layer there (measured 0..1600 in a 1600px
+     viewport) with the chat column pinned to its right edge, and the
+     player's room comes from #columns::after = sidebar width + the 64px rail
+     (486px). The recommended list is not in #secondary at all — it moved to
+     a grid under the player — so the reason this file stopped overriding
+     --ytd-watch-flexy-sidebar-width (section 1's floor) does not apply, and
+     overriding it is what moves the reservation and the chat together.
+     Measured at 1600px, chat 700: reservation 764, player 16..804, chat
+     821..1521, rail 1536. Without it, resizing #secondary dragged the fixed
+     layer itself: chat 1011..1451 over a player ending at 1082. */
+  :root:not([data-ytchat-off]) ytd-watch-flexy[using-fixed-panel]:not([fullscreen]):not([theater]):has(ytd-live-chat-frame) {
+    --ytd-watch-flexy-sidebar-width: var(--ytchat-w) !important;
+  }
+
+  /* Same player floor as above, in this layout's own form: the fixed layer
+     holds #secondary-split-scroll-spacer, a flex sibling standing in for the
+     player with the same 789px min-width, and #secondary-inner shrinks to
+     what it leaves — measured 698.67px at 1600 wide with the chat driven to
+     1056, so the chat ran 20px under the rail. clamp() in dock.js is the
+     floor that knows about the chat. #secondary-inner's own 320px min-width
+     goes too: below it the column stopped following the reservation, and
+     the player ran under a chat narrower than 320. */
+  :root:not([data-ytchat-off]) ytd-watch-flexy[using-fixed-panel]:not([fullscreen]):not([theater]) #secondary:has(ytd-live-chat-frame) #secondary-split-scroll-spacer,
+  :root:not([data-ytchat-off]) ytd-watch-flexy[using-fixed-panel]:not([fullscreen]):not([theater]) #secondary-inner:has(ytd-live-chat-frame) {
     min-width: 0 !important;
   }
 }
@@ -224,7 +254,7 @@
    worst case there is a cosmetic 0/32 gutter, not a break.
    ------------------------------------------------------------- */
 @media (min-width: 1000px) {
-  :root[data-ytchat-flip]:not([data-ytchat-off]) ytd-watch-flexy:not([fullscreen]):not([theater]) #secondary.ytd-watch-flexy:has(ytd-live-chat-frame) {
+  :root[data-ytchat-flip]:not([data-ytchat-off]) ytd-watch-flexy:not([fullscreen]):not([theater]):not([using-fixed-panel]) #secondary.ytd-watch-flexy:has(ytd-live-chat-frame) {
     order: -1 !important;
     padding-left: var(--ytd-watch-flexy-horizontal-page-margin) !important;
     padding-right: 0 !important;
@@ -731,3 +761,4 @@ yt-live-chat-app yt-live-chat-text-message-renderer {
     forced-color-adjust: none;
   }
 }
+

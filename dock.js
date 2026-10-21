@@ -74,11 +74,14 @@
      current viewport every time, not just against the static MAX. */
   function clamp(px) {
     /* YouTube's side rail (Description / Live chat buttons, Oct 2026 layout)
-       reserves its own column as #columns::after — measured 64px with the
-       rail, "auto" without — so the video's share has to come out of what is
-       left after it, or the max drag leaves the player at 351px, not 480. */
-    const cols = document.querySelector('ytd-watch-flexy #columns');
-    const rail = cols ? parseFloat(getComputedStyle(cols, '::after').width) || 0 : 0;
+       takes the window edge, so the video's share has to come out of what is
+       left after it, or the max drag leaves the player at 351px, not 480.
+       Measured from the rail's own box, edge to window edge (64px at 1600):
+       #columns::after looked like the number, but under using-fixed-panel it
+       is rail + sidebar, so it would move with the very width being clamped. */
+    const rb = document.getElementById('fixed-side-menu');
+    const r = rb ? rb.getBoundingClientRect() : null;
+    const rail = r && r.width ? Math.min(window.innerWidth - r.left, r.right) : 0;
     const ceiling = Math.max(MIN, Math.min(MAX, window.innerWidth - KEEP_FOR_VIDEO - rail));
     return Math.round(Math.min(ceiling, Math.max(MIN, px)));
   }
