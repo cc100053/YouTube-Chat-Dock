@@ -73,7 +73,13 @@
      1280px laptop — that would leave the player a sliver. Clamp against the
      current viewport every time, not just against the static MAX. */
   function clamp(px) {
-    const ceiling = Math.max(MIN, Math.min(MAX, window.innerWidth - KEEP_FOR_VIDEO));
+    /* YouTube's side rail (Description / Live chat buttons, Oct 2026 layout)
+       reserves its own column as #columns::after — measured 64px with the
+       rail, "auto" without — so the video's share has to come out of what is
+       left after it, or the max drag leaves the player at 351px, not 480. */
+    const cols = document.querySelector('ytd-watch-flexy #columns');
+    const rail = cols ? parseFloat(getComputedStyle(cols, '::after').width) || 0 : 0;
+    const ceiling = Math.max(MIN, Math.min(MAX, window.innerWidth - KEEP_FOR_VIDEO - rail));
     return Math.round(Math.min(ceiling, Math.max(MIN, px)));
   }
 
@@ -347,6 +353,16 @@
     const on = enabled && healthy && theaterOn && inTheater();
     setAttr('data-ytchat-tdock', on);
     if (!on) return setAttr('data-ytchat-theater', false);
+    /* YouTube already pins the chat itself, so there is no slot to fill. This
+       used to fall out of the visibility check below, but the Oct 2026 side
+       rail layout puts the reservation ON screen (measured 1023..1405 in a
+       1405px viewport) while still pinning the frame, and the overlay then
+       cut the chat to the player's height — 570px instead of 683. Once the
+       overlay is on it makes the frame static, so this cannot oscillate. */
+    const frame = first(PANEL_TH);
+    if (frame && getComputedStyle(frame).position === 'fixed') {
+      return setAttr('data-ytchat-theater', false);
+    }
     const slot = first(SLOT_TH);
     if (!slot) return setAttr('data-ytchat-theater', false);
     const r = slot.getBoundingClientRect();

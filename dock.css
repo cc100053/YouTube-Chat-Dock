@@ -150,6 +150,19 @@
     margin-block: 0 12px !important;
     margin-inline: auto 0 !important;
   }
+
+  /* YouTube floors the player at a 480px-tall 16:9 box, as min-width on both
+     #primary and #player-container-outer — 853px, or 789px with the Oct 2026
+     side rail. A chat wider than what that floor leaves overflowed the row:
+     measured at 1422px wide, chat 700, the video started at x=-82 and the chat
+     ran under the rail's Description / Live chat buttons. With both released
+     the player gives way instead — chat 700: video 16..609, chat 625..1325,
+     rail 1341, no horizontal scroll. dock.js's clamp still keeps the player
+     at KEEP_FOR_VIDEO, which is the only floor that knows about the chat. */
+  :root:not([data-ytchat-off]) ytd-watch-flexy:not([fullscreen]):not([theater]) #primary.ytd-watch-flexy:has(~ #secondary ytd-live-chat-frame),
+  :root:not([data-ytchat-off]) ytd-watch-flexy:not([fullscreen]):not([theater]) #primary.ytd-watch-flexy:has(~ #secondary ytd-live-chat-frame) #player-container-outer {
+    min-width: 0 !important;
+  }
 }
 
 /* -------------------------------------------------------------
