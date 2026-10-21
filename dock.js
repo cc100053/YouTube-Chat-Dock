@@ -61,7 +61,6 @@
   const PANEL_PG = scoped(WATCH + ':not([fullscreen])', SEL.panelPage);
   const SLOT_TH = scoped(WATCH + '[theater]:not([fullscreen])', SEL.slotTheater);
   const PRIMARY = scoped(WATCH + ':not([fullscreen]):not([theater])', SEL.primary);
-  const PLAYER = SEL.player;
 
   function mode() {
     if (inFullscreen()) return MODES.fs;
@@ -441,37 +440,15 @@
     return (rect.left + rect.right) / 2 < window.innerWidth / 2;
   }
 
-  /* Where the 10px handle's left goes, so the 2px line lands in the middle of
-     the *visible* gutter rather than on the panel's own edge.
-
-     The panel edge is not the middle of the seam: YouTube leaves margin on
-     the video side of the gap, so a line centred on the edge reads as sitting
-     slightly toward the video. Measure the player's facing edge instead and
-     split the distance.
-
-     GUTTER_MAX rejects anything that is not a gutter — a stale or reparented
-     player rect can put the two boxes hundreds of pixels apart, or overlap
-     them — and falls back to the panel edge, which is where the handle sat
-     before this. */
-  const GUTTER_MAX = 48;
-
-  function gutterCentre(rect) {
-    const p = first(PLAYER);
-    if (!p) return null;
-    const pr = p.getBoundingClientRect();
-    if (pr.width < 1 || pr.height < 1) return null;
-    // Panel on the left (RTL): the video is to its right, and vice versa.
-    const gap = panelOnLeft(rect) ? pr.left - rect.right : rect.left - pr.right;
-    if (!(gap >= 0 && gap <= GUTTER_MAX)) return null;
-    return (panelOnLeft(rect) ? rect.right : pr.right) + gap / 2;
-  }
-
-  /* The edge facing the video — the one the divider grabs. */
+  /* The edge facing the video — the one the divider grabs. The line is
+     centred on the chat's own edge, which is where theater and fullscreen
+     already put it (the player and chat tile there, no gap). Page mode used
+     to centre it in the gutter instead, which left it floating 8px off the
+     chat in the classic layout and up to 23px off in the side-rail one —
+     a different feel from the other two modes for the same control. */
   function innerEdge(rect) {
-    const c = gutterCentre(rect);
-    // Round so the 2px line lands on whole pixels instead of straddling two.
-    if (c !== null) return Math.round(c) - 5;
-    return (panelOnLeft(rect) ? rect.right : rect.left) - 5;
+    // Round so the line lands on whole pixels instead of straddling two.
+    return Math.round(panelOnLeft(rect) ? rect.right : rect.left) - 5;
   }
 
   /* Strings come from the table in i18n.js, not chrome.i18n, because
