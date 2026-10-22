@@ -1,42 +1,51 @@
 # Privacy Policy — YouTube Chat Dock
 
-Last updated: 3 August 2026 (v1.4.0)
+Last updated: 22 October 2026 (v2.0.2)
 
 ## Short version
 
-YouTube Chat Dock collects nothing and sends nothing. It stores your own
-settings, on your own device, and nothing else.
+YouTube Chat Dock has no automatic data collection, analytics or telemetry.
+Settings stay on your device. If you choose to open the external feedback form,
+its URL includes the extension version and selected interface language; any
+feedback you submit is handled separately as described below.
 
 ## What is collected
 
-Nothing. The extension does not collect, record, or transmit any personal
+During normal operation, the extension does not collect, record, or transmit any personal
 information, browsing history, video identifiers, chat content, account
 details, or usage analytics.
 
 ## What is stored, and where
 
-Five values, and only these five:
+The ten preferences defined in `settings.js`:
 
-- the chat panel width you last set in page view,
-- the width you last set in fullscreen,
-- whether you flipped the panel to the other side,
-- whether the extension is switched on,
-- whether the drag divider is shown.
+- chat width in page view (`ytchat-w`),
+- chat width in fullscreen (`ytchat-fsw`),
+- chat width in theater mode (`ytchat-tw`),
+- whether the panel side is flipped (`ytchat-flip`),
+- whether docking is enabled (`ytchat-enabled`),
+- whether the drag divider is shown (`ytchat-divider`),
+- whether theater docking is enabled (`ytchat-theater`),
+- interface language preference (`ytchat-lang`),
+- whether blank chat-replay recovery is enabled (`ytchat-chatfix`),
+- whether pause-on-hover is enabled (`ytchat-hoverpause`).
 
-They are held in two places on your own device, for two different reasons.
-`localStorage` for `youtube.com` is read synchronously before the page paints,
-which is what stops the layout flickering on load. `chrome.storage.local` holds
-the same five values so the settings popup — which is a separate extension page
-and cannot reach youtube.com's storage — can change them.
+They are held in two places on your device. YouTube's `localStorage` is read
+synchronously before the page paints to apply the saved layout immediately.
+`chrome.storage.local` lets the separate settings popup communicate preferences
+to the content scripts. Page changes write to both stores; the extension store
+is mirrored back into YouTube's local storage.
 
-Neither store leaves your computer. `chrome.storage.local` is local storage,
+Neither store is synced to a cloud account. `chrome.storage.local` is local storage,
 not synced storage: nothing is written to your Google account. Clearing site
-data for youtube.com resets the first copy; removing the extension removes the
-second.
+data for youtube.com removes the first copy, which the extension store can
+restore on the next load. Use Reset to defaults in the popup for a deliberate
+reset. Removing the extension removes its extension store; it does not itself
+clear the YouTube-origin copy.
 
 ## Network activity
 
-The extension makes no network requests of any kind. It contains no analytics
+The extension makes no automatic network requests during normal operation. It contains no analytics
 SDK, no telemetry, no remote configuration, no error reporting, and no
 third-party libraries. It has no background service worker, so no code runs
 when you are not on a YouTube page.
@@ -52,18 +61,34 @@ because `storage` is not a permission Chrome warns about.
 The extension acts on `https://www.youtube.com/*` and nowhere else, via the
 manifest's `content_scripts.matches`, which requires no permission grant.
 
+## Optional external links and feedback
+
+The popup contains links to an external feedback form (Tally), donations
+(Ko-fi), the Chrome Web Store review page and GitHub. The extension does not
+open these automatically. Clicking one opens the external website, whose own
+privacy policy and normal network handling apply.
+
+The feedback URL includes `v` (the installed extension version) and `lang`
+(the selected interface language). Opening it therefore sends those two
+values to the form provider. It does not attach video identifiers, chat
+messages or browsing history. If you submit the form, the feedback text and
+any optional email address you enter are sent to the form provider and made
+available to the developer. Submitting feedback is optional.
+
 ## Data sharing and sale
 
-No data is collected, so none is shared, sold, transferred, or used for
-advertising, credit assessment, or any other purpose.
+The extension does not sell user data or automatically transfer browsing,
+chat or account information to third parties. Optional feedback is handled
+as described above.
 
 ## Children's privacy
 
-The extension collects no data from anyone, including children.
+The extension has no automatic data collection from anyone, including children.
+Optional external forms remain subject to the provider’s policies.
 
 ## Changes
 
-If a future version ever collects or transmits data, this policy will be
+If a future version changes data handling, this policy will be
 updated before that version is published, and the change will be visible in
 the extension's public commit history.
 

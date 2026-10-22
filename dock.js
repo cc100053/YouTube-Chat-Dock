@@ -2,7 +2,8 @@
    YouTube Chat Dock — drag divider
 
    Runs in the top frame only. The chat iframe needs styling
-   (dock.css, injected there by the manifest) but no script.
+   (dock.css, injected there by the manifest); hover.js handles
+   pause-on-hover inside the chat document separately.
    ============================================================= */
 (function () {
   'use strict';

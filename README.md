@@ -35,7 +35,8 @@ in page view, theater mode, and true fullscreen.
   width you cannot change. This makes that width yours, and the player follows.
 - **🖥️ Works in true fullscreen.** Chat stays docked, the video stays uncropped.
 - **⇄ Chat on either side.** Hover the divider and click the toggle. The choice
-  sticks.
+  sticks. Version 2.0.2 fixes switching sides in YouTube's new fixed side-rail
+  page layout, including RTL.
 - **▶️ Chat replay too.** Replay on VODs behaves exactly like live chat.
 - **🩹 Fixes YouTube's blank chat replay.** Going fullscreen sometimes stalls
   chat replay for good — YouTube's own bug, with no extension installed. This
@@ -85,18 +86,26 @@ Click the toolbar icon.
 You never have to open it, though — drag the divider, double-click to reset,
 hover it and click ⇄ to switch sides.
 
+The enable switch controls docking and the divider. Pause-on-hover and chat
+replay recovery have their own switches and can remain active when docking is off.
+
 ## 🔒 Permissions and privacy
 
 One permission, `storage`, and Chrome shows **no permission prompt** on install.
 It exists for exactly one reason: the settings popup is a separate page and
 cannot otherwise reach the tab it is configuring.
 
-- ❌ No data collected, transmitted, or sold
-- ❌ No network requests — no analytics, no telemetry, no remote config
+- ❌ No automatic data collection or sale
+- ❌ No automatic extension network requests — no analytics, telemetry or remote config
 - ❌ No background service worker; nothing runs when you are not on YouTube
 - ❌ No account, no sign-in, no cloud sync
 - ❌ No host permissions — it acts on `youtube.com` and nowhere else
-- ✅ Your settings live in your own browser and never leave the device
+- ✅ Your settings are stored locally, without cloud sync
+
+Opening the optional external feedback form sends the extension version and
+selected interface language in its URL. Feedback text and an optional email
+address are submitted only if you choose to send the form. External feedback,
+donation, review and source links open websites with their own privacy policies.
 
 Full policy: [store/PRIVACY.md](store/PRIVACY.md)
 
@@ -177,13 +186,14 @@ the way. There is a switch for it in the popup.
 ### Can I move YouTube chat to the left side?
 
 Yes — hover the divider and click the ⇄ toggle, or flip the switch in the popup.
-The choice persists. In right-to-left languages it mirrors with the layout
-rather than inverting, so "the other side" always means what it looks like.
+The choice persists. Version 2.0.2 fixes switching sides in YouTube's new fixed
+side-rail page layout, including RTL.
 
 ### Does it collect any data?
 
-No. It collects nothing, transmits nothing, and makes no network requests of any
-kind. See [Permissions and privacy](#-permissions-and-privacy) above.
+It has no automatic data collection, analytics or telemetry. The optional
+external feedback link includes your extension version and selected interface
+language. See [Permissions and privacy](#-permissions-and-privacy) above.
 
 ### Does it work in Edge, Brave, Opera or Arc?
 
@@ -192,14 +202,11 @@ which those browsers can all install from. It is not a Firefox add-on.
 
 ## ⚠️ Known limitations
 
-- **Below a 1000px window**, YouTube switches to a single-column layout with
-  chat under the video. The extension deliberately does not apply there, rather
-  than fight YouTube's own responsive layout.
-- **Clearing site data for youtube.com resets your widths.** They are kept in
-  `localStorage` so they can be applied *before* the page paints, which is what
-  stops the layout flickering on every load.
-- **The side flip is unverified in true fullscreen and under RTL.** Its failure
-  mode is benign: chat simply stays put.
+- **The divider is hidden below 1000 CSS pixels of viewport width.** Page and
+  theater sizing rules use the same breakpoint. Pause-on-hover is independent.
+- **Clearing site data is not a complete settings reset.** YouTube's
+  `localStorage` supplies the first-paint copy, but `chrome.storage.local` can
+  restore it. Use **Reset to defaults** in the popup to reset settings.
 
 ## 🛠️ Under the hood
 
@@ -209,6 +216,7 @@ No build step, no dependencies, no framework.
 |---|---|
 | `dock.css` | All the layout — page, theater, fullscreen, the video fix, chat-iframe fixes, divider |
 | `dock.js` | Drag logic and the storage mirror. Top frame only |
+| `hover.js` | Pause-on-hover inside live chat, chat replay and pop-out chat documents |
 | `settings.js` · `i18n.js` | Keys and defaults; UI strings. Shared by the page and the popup |
 | `popup.html/.css/.js` | The settings UI |
 
