@@ -266,6 +266,35 @@
   :root[data-ytchat-flip]:not([data-ytchat-off]) ytd-watch-flexy:not([fullscreen]):not([theater]) ytd-live-chat-frame#chat {
     margin-inline: 0 auto !important;
   }
+
+  /* The full side-rail layout (using-fixed-panel) has no column to reorder:
+     the player's room is #columns::after = chat + rail + gutter in one box,
+     and the chat lives in the fixed #secondary layer. The rule above is
+     excluded from it, so the toggle did nothing there — the 2026-10-22 canary
+     failed rail/interactions and rtl/rail-flip on exactly that. Flipping
+     means splitting the reservation: ::after moves to the row's start and
+     keeps only chat + gutter, #primary keeps the rail's share as its end
+     margin, and #secondary-inner moves to the start of the fixed layer. The
+     rail itself stays where YouTube put it. Measured at 1600px, chat 440:
+     LTR chat 16..456, player 472..1520, rail 1536..1584; RTL chat
+     1144..1584, player 80..1128, rail 16..64. Player 1048 wide in both, as
+     unflipped, and no horizontal scroll. */
+  :root[data-ytchat-flip]:not([data-ytchat-off]) ytd-watch-flexy[using-fixed-panel]:not([fullscreen]):not([theater]):has(ytd-live-chat-frame) #columns::after {
+    order: -1 !important;
+    width: var(--ytd-watch-flexy-sidebar-width) !important;
+    min-width: 0 !important;
+    padding: 0 !important;
+    padding-inline-start: var(--ytd-watch-flexy-horizontal-page-margin) !important;
+  }
+
+  :root[data-ytchat-flip]:not([data-ytchat-off]) ytd-watch-flexy[using-fixed-panel]:not([fullscreen]):not([theater]) #primary.ytd-watch-flexy:has(~ #secondary ytd-live-chat-frame) {
+    margin-inline-end: var(--ytd-watch-flexy-fixed-side-menu-width) !important;
+  }
+
+  :root[data-ytchat-flip]:not([data-ytchat-off]) ytd-watch-flexy[using-fixed-panel]:not([fullscreen]):not([theater]) #secondary-inner:has(ytd-live-chat-frame) {
+    order: -1 !important;
+    margin-inline-start: var(--ytd-watch-flexy-horizontal-page-margin) !important;
+  }
 }
 
 :root[data-ytchat-flip]:not([data-ytchat-off]) ytd-watch-flexy[fullscreen] #panels-full-bleed-container {
