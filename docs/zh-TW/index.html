@@ -4,12 +4,9 @@
   Edit the strings in that script and re-run it, or the next run silently
   reverts whatever you changed here.
 
-  The page exists for search and for answer engines, which is why it is shaped
-  this way: the store listing cannot rank for long-tail how-to queries, and a
-  README ranks for little beyond the brand name. Every H2 is a question someone
-  actually types, and each answer opens with a direct sentence rather than a
-  preamble — that first sentence is what gets lifted into a snippet or an LLM
-  answer.
+  Each FAQ opens with a direct answer, with product requirements and known
+  limitations in visible text. Structured data describes that same content;
+  it does not guarantee indexing, rich results or inclusion in AI answers.
 
   The FAQPage JSON-LD below is emitted from the same strings as the visible
   answers, so the two cannot disagree. store/package.sh still compares them.
@@ -22,6 +19,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
+
 <title>YouTube Chat Dock — YouTube 直播聊天室側邊欄</title>
 <meta name="description" content="免費 Chrome 擴充功能，把 YouTube 的直播聊天室與聊天重播變成可調整寬度的側邊欄，並排在影片旁邊。一般播放頁、劇院模式與真正的全螢幕都有效。">
 <link rel="canonical" href="https://cc100053.github.io/YouTube-Chat-Dock/zh-TW/">
@@ -104,6 +102,8 @@ li{margin:6px 0}
 .card p{margin:0; color:var(--muted); font-size:.95rem}
 
 table{width:100%; border-collapse:collapse; margin:14px 0; font-size:.95rem}
+caption{text-align:start; font-size:1.2rem; font-weight:600; color:var(--fg)}
+.facts th{width:24%}
 th,td{text-align:start; padding:9px 10px; border-bottom:1px solid var(--line); vertical-align:top}
 th{color:var(--muted); font-weight:600}
 .scroller{overflow-x:auto}
@@ -133,8 +133,15 @@ code{background:var(--card); border:1px solid var(--line); border-radius:5px; pa
     <a class="btn" href="https://chromewebstore.google.com/detail/youtube-chat-dock/bkmbhlkcjbkjapbamkidacajjfhoiiam">加到 Chrome（免費）</a>
     <a class="btn ghost" href="https://github.com/cc100053/YouTube-Chat-Dock">在 GitHub 看原始碼</a>
   </div>
-  <p class="meta">Chrome 105 以上與任何 Chromium 瀏覽器 · 只有一個權限，安裝時不會跳出任何提示 · 不收集資料 · 12 種語言 · MIT 授權</p>
+  <p class="meta">桌面版 Chrome 105 以上與相容的 Chromium 瀏覽器 · 僅 storage 權限 · 無自動資料收集 · 12 種介面語言 · MIT 授權</p>
 </header>
+
+<main>
+<table class="facts">
+  <caption>YouTube Chat Dock 產品摘要</caption>
+  <tbody><tr><th scope="row">擴充功能版本</th><td>2.0.2</td></tr><tr><th scope="row">價格與授權</th><td>免費、開放原始碼，採 MIT 授權</td></tr><tr><th scope="row">適用內容</th><td>YouTube 既有直播聊天室與聊天重播；不會替沒有聊天室的影片建立聊天</td></tr><tr><th scope="row">顯示模式</th><td>一般播放頁、劇院模式與真正全螢幕，各自保存寬度</td></tr><tr><th scope="row">視窗要求</th><td>使用分隔線需至少 1000 CSS 像素可視寬度；聊天室最窄 120 CSS 像素，上限依可用空間而定</td></tr></tbody>
+</table>
+<nav aria-label="本頁導覽"><ul><li><a href="#faq-2">YouTube 的直播聊天室可以調整寬度嗎？</a></li><li><a href="#faq-4">全螢幕的時候還能看聊天室嗎？</a></li><li><a href="#faq-9">YouTube Chat Dock 會收集資料嗎？</a></li><li><a href="#faq-12">有什麼限制？</a></li><li><a href="#faq-13">怎樣安裝？</a></li></ul></nav>
 
 <!--
   MP4, not a GIF, and that is measured rather than preferred. The clip is
@@ -142,31 +149,38 @@ code{background:var(--card); border:1px solid var(--line); border-radius:5px; pa
   pixel changes every frame and GIF's inter-frame compression has nothing to
   work with: the same 2.8 seconds measured 4.3MB as a 480px GIF that looked
   rough, against 2.0MB as a 1280px MP4 that does not.
-  autoplay+muted+loop+playsinline behaves like a GIF anyway, and is the
-  combination iOS Safari requires to play inline at all.
+  Playback controls let readers start and pause the clip without autoplay.
 -->
 <figure>
   <video class="shot" src="../assets/demo.mp4" poster="../assets/demo-poster.jpg"
          width="1280" height="732"
-         autoplay loop muted playsinline preload="metadata"
+         controls loop muted playsinline preload="none"
          aria-label="螢幕錄影：YouTube 在真正的全螢幕下，直播聊天室以側邊欄的形式停靠在影片旁邊。先把面板切換到另一側，再拖曳分隔線把寬度從 528px 調到 184px，影片跟著縮放而且沒有被裁切。">
   </video>
   <figcaption>直播、真正的全螢幕。先把聊天室切到另一側，再把分隔線從 528px 拖到 184px —— 播放器跟著縮放，影片從頭到尾沒有被裁切。</figcaption>
 </figure>
+<p>此為已錄製的示範；使用條件與限制請參閱常見問題。</p>
 
 <figure>
-  <img class="shot" src="../assets/zh-TW/screenshot-1-side-panel.png" width="1280" height="800"
+  <img class="shot" loading="lazy" decoding="async" src="../assets/zh-TW/screenshot-1-side-panel.png" width="1280" height="800"
        alt="YouTube 直播聊天室以可調整寬度的直欄停靠在影片右側，中間有一條可拖曳的分隔線">
   <figcaption>聊天室是播放器旁邊真正的一欄，中間有可拖曳的分隔線。</figcaption>
 </figure>
 
+<div id="faq">
+<section id="faq-1">
+
 <h2>怎樣讓 YouTube 直播聊天室排在影片旁邊？</h2>
 
 <p class="answer">
-  裝一個能把它停靠住的擴充功能。YouTube 本身完全沒有給你控制權：三種顯示模式裡，都找不到任何可以調整聊天室寬度或移動位置的設定。
+  從 Chrome 線上應用程式商店安裝 YouTube Chat Dock，重新載入 YouTube，再開啟有直播聊天室或聊天重播的影片。在至少 1000 CSS 像素寬的桌面可視區域中，拖曳分隔線即可調整影片旁既有聊天室的寬度。
 </p>
 
 <p>YouTube Chat Dock 只是把頁面上原本就有的聊天室重新排版，所以它仍然是 YouTube 自己的聊天室，Super Chat、表情符號、管理工具、會員徽章全部照常運作。沒有任何東西被重寫，也沒有任何東西經過中轉。改變的只有聊天室放在哪裡、以及有多寬。</p>
+
+</section>
+
+<section id="faq-2">
 
 <h2>YouTube 的直播聊天室可以調整寬度嗎？</h2>
 
@@ -174,60 +188,84 @@ code{background:var(--card); border:1px solid var(--line); border-radius:5px; pa
   可以，拖曳影片與聊天室之間的分隔線就行。一般播放頁、劇院模式與全螢幕各自記住自己的寬度，所以切到全螢幕不會弄亂你的版面。
 </p>
 
-<ul><li>拖曳分隔線，寬度最窄可到 120px。</li><li>雙擊分隔線即可回復預設寬度。</li><li>也可以聚焦分隔線後用方向鍵調整，Shift 是大幅度，Home 與 End 直接到最小與最大。</li><li>把滑鼠移到分隔線上按 &#8646;，聊天室會移到另一側，選擇會被記住。</li><li>或者用工具列設定面板的滑桿，拖動時畫面會即時跟著變。</li></ul>
+<ul><li>拖曳分隔線，寬度最窄可到 120 CSS 像素，上限依可用視窗空間而定。</li><li>雙擊分隔線即可回復預設寬度。</li><li>也可以聚焦分隔線後用方向鍵調整，Shift 是大幅度，Home 與 End 直接到最小與最大。</li><li>把滑鼠移到分隔線上按左右切換，或使用工具列設定面板，即可換邊；選擇會保存。</li><li>或者用工具列設定面板的滑桿，拖動時畫面會即時跟著變。</li></ul>
 
 <figure>
-  <img class="shot" src="../assets/zh-TW/screenshot-2-drag-to-resize.png" width="1280" height="800"
+  <img class="shot" loading="lazy" decoding="async" src="../assets/zh-TW/screenshot-2-drag-to-resize.png" width="1280" height="800"
        alt="拖曳分隔線、影片配合剩下的空間縮放的示意圖">
   <figcaption>播放器會配合剩下的空間縮放，所以影片不會被裁切。</figcaption>
 </figure>
 
+</section>
+
+<section id="faq-3">
+
 <h2>為什麼劇院模式下沒辦法調整聊天室的寬度？</h2>
 
 <p class="answer">
-  因為 YouTube 會把聊天室固定在播放器旁邊，寬度由它決定，而且任何地方都沒有可以更改的設定。這個擴充功能把那個寬度交還給你：拖曳分隔線，播放器就會跟著縮放，兩者永遠剛好分掉整個視窗。
+  YouTube 原生劇院模式的聊天室寬度由 YouTube 決定。YouTube Chat Dock 加入可拖曳的分隔線，讓你調整聊天室寬度，播放器也會配合縮放。使用分隔線需要至少 1000 CSS 像素的可視寬度。
 </p>
 
 <p>YouTube 以前的做法不一樣：它會把播放器收窄、在旁邊預留一格空位，然後把那格留空，改把聊天室排到影片下方 —— 「劇院模式聊天室跑到影片下面」的說法就是這樣來的。那個版面在擴充功能開啟與關閉時量起來完全一樣，所以從來就不是擴充功能造成的。後來 YouTube 改掉了：在 1920&times;769 下實測兩個直播與一個聊天重播，聊天室都固定在播放器旁邊，捲動時也留在原處，推薦影片會從它下面捲過去。這個擴充功能跟著 YouTube 目前的版面走，除了寬度以外什麼都不改。</p>
 
+</section>
+
+<section id="faq-4">
+
 <h2>全螢幕的時候還能看聊天室嗎？</h2>
 
 <p class="answer">
-  看得到，但不是照你的意思：寬度改不了，位置也選不了。裝了這個擴充功能之後，聊天室會用自己記住的寬度停靠在影片旁邊，不遮住任何東西，影片也不會被裁切。
+  YouTube Chat Dock 可在真正全螢幕下，將既有 YouTube 直播聊天室與聊天重播排在影片旁邊。拖曳分隔線可調整聊天室寬度，播放器會配合縮放而不裁切影片。全螢幕會獨立記住自己的寬度。
 </p>
 
+<p>完整教學：<a href="https://cc100053.github.io/YouTube-Chat-Dock/zh-TW/guides/youtube-live-chat-fullscreen/">YouTube 直播全螢幕時，如何讓聊天室留在影片旁邊</a></p>
+
 <figure>
-  <img class="shot" src="../assets/zh-TW/screenshot-3-fullscreen.png" width="1280" height="800"
+  <img class="shot" loading="lazy" decoding="async" src="../assets/zh-TW/screenshot-3-fullscreen.png" width="1280" height="800"
        alt="真正的全螢幕下聊天室停靠在影片旁邊、影片沒有被裁切的示意圖">
   <figcaption>真正的全螢幕，聊天室依然停靠在旁邊。</figcaption>
 </figure>
 
+</section>
+
+<section id="faq-5">
+
 <h2>舊直播的聊天重播也適用嗎？</h2>
 
 <p class="answer">
-  適用。影片重溫的聊天重播，停靠與調整寬度的行為跟直播中的聊天室完全一樣，不需要另外設定。
+  適用。YouTube Chat Dock 可在本身提供聊天重播的過往直播中，並排及調整聊天室寬度；不會還原已停用或不存在的聊天重播。
 </p>
+
+</section>
+
+<section id="faq-6">
 
 <h2>為什麼切到全螢幕之後聊天重播會變成一片空白？</h2>
 
 <p class="answer">
-  因為聊天重播卡住了：訊息不再送進來，而且不會自己恢復。這是 YouTube 自己的問題，完全不裝任何擴充功能也會發生。YouTube Chat Dock 會在全螢幕切換之後偵測到卡住的重播，並在保留你原本選的模式下自動把它重新啟動。
+  YouTube 的聊天重播可能在切換全螢幕後停滯，造成空白，即使沒有安裝擴充功能也可能發生。YouTube Chat Dock 偵測這類特定停滯後，會重新選取目前聊天模式以嘗試恢復；它不是所有空白聊天室或網路問題的通用修復。
 </p>
 
 <p>實測卡住的重播：訊息清單裡只剩一則 YouTube 自己的提示，而面板尺寸正常、完全可見，影片也照常播放，從外面看根本不像壞掉。重新載入聊天框架<em>沒有</em>用，因為那個框架握著一個已經失效的 token；在聊天室標題列重新選一次模式才有用，因為 YouTube 會去拿一個新的 token 重建清單。這個擴充功能重選的是「現在已經選著」那一個，所以熱門聊天重播仍然是熱門聊天重播。你也可以在設定面板把它關掉。</p>
 
+</section>
+
+<section id="faq-7">
+
 <h2>可以把聊天室移到左邊嗎？</h2>
 
 <p class="answer">
-  可以。把滑鼠移到分隔線上按 &amp;#8646; 按鈕，或在工具列的設定面板切換。這個選擇會一直記住，換影片也不會變。
+  可以。把滑鼠移到分隔線上按左右切換，或使用工具列設定面板；選擇會保存。YouTube Chat Dock 2.0.2 已修復 YouTube 新固定側欄一般頁面版型的換邊問題，包含由右至左的版面。
 </p>
 
-<p>在阿拉伯文這類由右至左的介面語言下，這個切換會跟著整個版面一起鏡像，而不是反過來，所以「另一側」永遠就是你看到的那一側。</p>
+</section>
+
+<section id="faq-8">
 
 <h2>有哪些設定？</h2>
 
 <p class="answer">
-  啟用開關、聊天重播修復、語言選擇、左右切換、三個寬度滑桿，還有一鍵回復預設值，全部在工具列的設定面板裡。不過你其實不必打開它：分隔線就能做到滑桿能做的事，也可以用方向鍵調整。
+  設定面板提供 docking 開關、聊天重播修復、滑鼠停留暫停、語言、左右切換、三個寬度滑桿及重設。docking 開關控制版面與分隔線；滑鼠停留暫停及重播修復各有獨立開關。
 </p>
 
 <div class="scroller">
@@ -238,27 +276,39 @@ code{background:var(--card); border:1px solid var(--line); border-radius:5px; pa
 </div>
 
 <figure>
-  <img class="shot" src="../assets/zh-TW/screenshot-5-settings.png" width="1280" height="800"
+  <img class="shot" loading="lazy" decoding="async" src="../assets/zh-TW/screenshot-5-settings.png" width="1280" height="800"
        alt="設定面板，包含啟用開關、語言選擇、左右切換與三個寬度滑桿">
 </figure>
+
+</section>
+
+<section id="faq-9">
 
 <h2>YouTube Chat Dock 會收集資料嗎？</h2>
 
 <p class="answer">
-  不會。不收集、不傳送，而且根本不發出任何網路連線 —— 沒有分析、沒有追蹤、沒有遠端設定。你的設定只存在自己的瀏覽器裡，永遠不會離開這台裝置。
+  擴充功能沒有自動資料收集、分析、遙測或遠端設定；設定保存在本機。若你主動開啟外部意見回饋表單，網址會包含擴充功能版本及所選介面語言；是否提交回饋由你決定。
 </p>
 
-<ul class="privacy"><li class="no">不收集、不傳送、不販售任何資料 —— 不做匿名化，也不做彙整</li><li class="no">沒有任何網路連線，沒有分析，沒有追蹤</li><li class="no">沒有背景執行的 service worker；不在 YouTube 時完全不會執行</li><li class="no">不需要帳號、不需要登入、沒有雲端同步</li><li class="no">沒有 host 權限 —— 只能在 <code>youtube.com</code> 上運作，其他地方一概不行</li><li class="yes">只有一個 <code>storage</code> 權限，而 Chrome 安裝時不會為它跳出任何提示</li></ul>
+<ul class="privacy"><li class="no">沒有自動資料收集或販售；自願提交的回饋另外處理</li><li class="no">擴充功能沒有自動連線、分析或遙測</li><li class="no">沒有背景執行的 service worker；不在 YouTube 時完全不會執行</li><li class="no">不需要帳號、不需要登入、沒有雲端同步</li><li class="no">沒有 host 權限 —— 只能在 <code>youtube.com</code> 上運作，其他地方一概不行</li><li class="yes">只有一個 <code>storage</code> 權限，而 Chrome 安裝時不會為它跳出任何提示</li></ul>
 
-<p>那唯一的 <code>storage</code> 權限存在的理由只有一個：設定面板是獨立的擴充功能頁面，否則沒有辦法把你的選擇傳到它正在設定的那個分頁。完整政策：<a href="https://github.com/cc100053/YouTube-Chat-Dock/blob/main/store/PRIVACY.md">store/PRIVACY.md</a>。整個擴充功能就是一份樣式表加一支小腳本，MIT 授權，大約十分鐘可以從頭讀到尾。</p>
+<p>那唯一的 <code>storage</code> 權限存在的理由只有一個：設定面板是獨立的擴充功能頁面，否則沒有辦法把你的選擇傳到它正在設定的那個分頁。完整政策：<a href="https://github.com/cc100053/YouTube-Chat-Dock/blob/main/store/PRIVACY.md">store/PRIVACY.md</a>。擴充功能由一份樣式表、四支內容腳本及工具列設定面板組成，採 MIT 授權，沒有執行時相依套件。</p>
+
+</section>
+
+<section id="faq-10">
 
 <h2>Edge、Brave、Opera、Arc 可以用嗎？</h2>
 
 <p class="answer">
-  可以。這是一個沒有任何依賴的 Manifest V3 擴充功能，支援 Chrome 105 以上，以及任何以 Chromium 為基礎的瀏覽器 —— Edge、Brave、Opera、Vivaldi、Arc。
+  YouTube Chat Dock 以桌面版 Chrome 105 以上及相容的 Chromium 瀏覽器為目標，包括 Edge、Brave、Opera、Vivaldi、Arc；未逐一獨立驗證各瀏覽器現行版本。它不是 Firefox 附加元件。
 </p>
 
 <p>它發布在 Chrome 線上應用程式商店，Edge 與其他 Chromium 瀏覽器都可以直接從那裡安裝。它不是 Firefox 附加元件。</p>
+
+</section>
+
+<section id="faq-11">
 
 <h2>支援哪些語言？</h2>
 
@@ -266,23 +316,35 @@ code{background:var(--card); border:1px solid var(--line); border-radius:5px; pa
   12 種：English、繁體中文、简体中文、日本語、한국어、Español、Português、Français、Deutsch、Русский、العربية、हिन्दी。
 </p>
 
-<p>語言選擇與瀏覽器的語言互不相干，所以 Chrome 可以是一種語言，這個擴充功能是另一種。由右至左的版面是正確處理的，不是碰巧鏡像。</p>
+<p>介面語言可獨立於瀏覽器語言選擇，並支援由右至左版面。</p>
+
+</section>
+
+<section id="faq-12">
 
 <h2>有什麼限制？</h2>
 
 <p class="answer">
-  有兩點值得知道。瀏覽器視窗寬度低於 1000px 時它會刻意不生效；另外，清除 youtube.com 的網站資料會讓你存的寬度回復預設。
+  使用分隔線需要至少 1000 CSS 像素的可視寬度。清除 YouTube 網站資料只會移除首次繪製用的設定副本，擴充功能儲存區仍可還原設定；要重設請使用設定面板的回復預設值。
 </p>
 
-<ul><li><strong>視窗寬度低於 1000px 時。</strong>YouTube 在那裡會切換成單欄版面，把聊天室排到影片下方。這個擴充功能選擇不介入，而不是去跟 YouTube 自己的響應式版面對抗。</li><li><strong>清除網站資料會重設寬度。</strong>寬度存在 <code>localStorage</code>，這樣才能在頁面繪製<em>之前</em>就套用，也正是這一點讓版面不會每次載入都閃一下。</li></ul>
+<ul><li><strong>可視寬度低於 1000 CSS 像素。</strong>分隔線會隱藏；一般頁面與劇院模式的寬度規則亦需要至少此寬度。滑鼠停留暫停是獨立功能。</li><li><strong>本機設定。</strong>YouTube 的 localStorage 提供首次繪製值；清除網站資料後 chrome.storage.local 仍可還原設定。要重設請使用設定面板的回復預設值。</li></ul>
+
+</section>
+
+<section id="faq-13">
 
 <h2>怎樣安裝？</h2>
 
 <p class="answer">
-  在 Chrome 線上應用程式商店按一下安裝，然後重新載入已經開著的 YouTube 分頁就好。不需要任何設定就會變成側邊欄。
+  從 Chrome 線上應用程式商店安裝 YouTube Chat Dock，重新載入已開啟的 YouTube 分頁，再開啟有直播聊天室或聊天重播的影片。展開聊天室後即可拖曳分隔線；桌面可視寬度需至少 1000 CSS 像素。
 </p>
 
 <div class="grid"><div class="card"><h3>從商店安裝</h3><p><a href="https://chromewebstore.google.com/detail/youtube-chat-dock/bkmbhlkcjbkjapbamkidacajjfhoiiam">加到 Chrome</a>，然後重新載入 YouTube 分頁。Chrome 不會要你同意任何東西。</p></div><div class="card"><h3>從原始碼安裝</h3><p>複製這個 repo，開啟 <code>chrome://extensions/</code>，打開開發人員模式，按「載入未封裝項目」並選擇該資料夾。不需要建置，也沒有任何依賴。</p></div></div>
+
+</section>
+
+<section id="faq-14">
 
 <h2>看訊息的時候可以讓聊天室不要一直捲動嗎？</h2>
 
@@ -290,9 +352,15 @@ code{background:var(--card); border:1px solid var(--line); border-radius:5px; pa
   可以。把滑鼠移到訊息清單上，它就會停在原地，所以就算聊天很快，你在讀訊息或點連結的時候它也不動。新訊息會繼續在下面進來；把滑鼠移開就跳回即時。這是滑鼠專用的 —— 觸控螢幕沒有滑鼠停留，所以那時是靠 YouTube 自己的往上捲動暫停。工具列的設定面板裡有一個開關。
 </p>
 
+</section>
+</div>
+</main>
+
 <footer>
   <p><a href="https://chromewebstore.google.com/detail/youtube-chat-dock/bkmbhlkcjbkjapbamkidacajjfhoiiam">Chrome 線上應用程式商店</a> <span aria-hidden="true">&middot;</span> <a href="https://github.com/cc100053/YouTube-Chat-Dock">GitHub</a> <span aria-hidden="true">&middot;</span> <a href="https://github.com/cc100053/YouTube-Chat-Dock/blob/main/store/PRIVACY.md">隱私權</a> <span aria-hidden="true">&middot;</span> <a href="https://github.com/cc100053/YouTube-Chat-Dock/issues">回報問題</a></p>
   <nav class="langs" aria-label="語言"><a href="https://cc100053.github.io/YouTube-Chat-Dock/" hreflang="en">English</a> <span aria-hidden="true">·</span> <a href="https://cc100053.github.io/YouTube-Chat-Dock/ja/" hreflang="ja">日本語</a> <span aria-hidden="true">·</span> <strong aria-current="true">繁體中文</strong></nav>
+  <p>內容核對日期: <time datetime="2026-10-22">2026-10-22</time> · 擴充功能版本: 2.0.2<br>
+  專案維護者: <a href="https://github.com/cc100053" rel="author">cc100053</a></p>
   <p>MIT 授權。與 YouTube 及 Google 沒有任何從屬、認可或贊助關係。</p>
 </footer>
 
@@ -304,20 +372,33 @@ code{background:var(--card); border:1px solid var(--line); border-radius:5px; pa
   "@graph": [
     {
       "@type": "SoftwareApplication",
-      "@id": "https://cc100053.github.io/YouTube-Chat-Dock/zh-TW/#app",
+      "@id": "https://cc100053.github.io/YouTube-Chat-Dock/#app",
       "name": "YouTube Chat Dock",
       "description": "一個 Chrome 擴充功能，把 YouTube 的直播聊天室與聊天重播變成影片旁邊可調整寬度的側邊欄，在一般播放頁、劇院模式與真正的全螢幕都有效。",
       "applicationCategory": "BrowserApplication",
       "applicationSubCategory": "Chrome Extension",
-      "operatingSystem": "Chrome 105+, Microsoft Edge, Brave, Opera, Vivaldi, Arc",
-      "browserRequirements": "Requires Chrome 105 or any Chromium-based browser",
-      "softwareVersion": "2.0.0",
+      "softwareRequirements": "Requires desktop Chrome 105+ or a compatible Chromium browser",
+      "softwareVersion": "2.0.2",
       "url": "https://cc100053.github.io/YouTube-Chat-Dock/zh-TW/",
       "inLanguage": [
         "en",
+        "zh-Hant",
+        "zh-Hans",
         "ja",
-        "zh-Hant"
+        "ko",
+        "es",
+        "pt-BR",
+        "fr",
+        "de",
+        "ru",
+        "ar",
+        "hi"
       ],
+      "author": {
+        "@type": "Person",
+        "name": "cc100053",
+        "url": "https://github.com/cc100053"
+      },
       "downloadUrl": "https://chromewebstore.google.com/detail/youtube-chat-dock/bkmbhlkcjbkjapbamkidacajjfhoiiam",
       "installUrl": "https://chromewebstore.google.com/detail/youtube-chat-dock/bkmbhlkcjbkjapbamkidacajjfhoiiam",
       "screenshot": "https://cc100053.github.io/YouTube-Chat-Dock/assets/zh-TW/screenshot-1-side-panel.png",
@@ -335,7 +416,7 @@ code{background:var(--card); border:1px solid var(--line); border-radius:5px; pa
         "在真正的全螢幕下有效，而 YouTube 本身不讓你改聊天室的寬度或位置",
         "讓劇院模式的聊天室寬度可以調整，播放器跟著縮放",
         "影片重溫的聊天重播行為與直播聊天室完全相同",
-        "聊天室可以移到左右任一側",
+        "可將聊天室移到另一側，包含固定側欄一般頁面版型",
         "支援由右至左的版面",
         "12 種介面語言，與瀏覽器語言無關",
         "滑鼠停在訊息上時聊天室會凍結，讓你讀得完很快的聊天"
@@ -344,18 +425,26 @@ code{background:var(--card); border:1px solid var(--line); border-radius:5px; pa
     {
       "@type": "FAQPage",
       "@id": "https://cc100053.github.io/YouTube-Chat-Dock/zh-TW/#faq",
+      "url": "https://cc100053.github.io/YouTube-Chat-Dock/zh-TW/",
+      "name": "YouTube Chat Dock — YouTube 直播聊天室側邊欄",
       "inLanguage": "zh-Hant",
+      "lastReviewed": "2026-10-22",
+      "about": {
+        "@id": "https://cc100053.github.io/YouTube-Chat-Dock/#app"
+      },
       "mainEntity": [
         {
           "@type": "Question",
+          "@id": "https://cc100053.github.io/YouTube-Chat-Dock/zh-TW/#faq-1",
           "name": "怎樣讓 YouTube 直播聊天室排在影片旁邊？",
           "acceptedAnswer": {
             "@type": "Answer",
-            "text": "裝一個能把它停靠住的擴充功能。YouTube 本身完全沒有給你控制權：三種顯示模式裡，都找不到任何可以調整聊天室寬度或移動位置的設定。"
+            "text": "從 Chrome 線上應用程式商店安裝 YouTube Chat Dock，重新載入 YouTube，再開啟有直播聊天室或聊天重播的影片。在至少 1000 CSS 像素寬的桌面可視區域中，拖曳分隔線即可調整影片旁既有聊天室的寬度。"
           }
         },
         {
           "@type": "Question",
+          "@id": "https://cc100053.github.io/YouTube-Chat-Dock/zh-TW/#faq-2",
           "name": "YouTube 的直播聊天室可以調整寬度嗎？",
           "acceptedAnswer": {
             "@type": "Answer",
@@ -364,70 +453,79 @@ code{background:var(--card); border:1px solid var(--line); border-radius:5px; pa
         },
         {
           "@type": "Question",
+          "@id": "https://cc100053.github.io/YouTube-Chat-Dock/zh-TW/#faq-3",
           "name": "為什麼劇院模式下沒辦法調整聊天室的寬度？",
           "acceptedAnswer": {
             "@type": "Answer",
-            "text": "因為 YouTube 會把聊天室固定在播放器旁邊，寬度由它決定，而且任何地方都沒有可以更改的設定。這個擴充功能把那個寬度交還給你：拖曳分隔線，播放器就會跟著縮放，兩者永遠剛好分掉整個視窗。"
+            "text": "YouTube 原生劇院模式的聊天室寬度由 YouTube 決定。YouTube Chat Dock 加入可拖曳的分隔線，讓你調整聊天室寬度，播放器也會配合縮放。使用分隔線需要至少 1000 CSS 像素的可視寬度。"
           }
         },
         {
           "@type": "Question",
+          "@id": "https://cc100053.github.io/YouTube-Chat-Dock/zh-TW/#faq-4",
           "name": "全螢幕的時候還能看聊天室嗎？",
           "acceptedAnswer": {
             "@type": "Answer",
-            "text": "看得到，但不是照你的意思：寬度改不了，位置也選不了。裝了這個擴充功能之後，聊天室會用自己記住的寬度停靠在影片旁邊，不遮住任何東西，影片也不會被裁切。"
+            "text": "YouTube Chat Dock 可在真正全螢幕下，將既有 YouTube 直播聊天室與聊天重播排在影片旁邊。拖曳分隔線可調整聊天室寬度，播放器會配合縮放而不裁切影片。全螢幕會獨立記住自己的寬度。"
           }
         },
         {
           "@type": "Question",
+          "@id": "https://cc100053.github.io/YouTube-Chat-Dock/zh-TW/#faq-5",
           "name": "舊直播的聊天重播也適用嗎？",
           "acceptedAnswer": {
             "@type": "Answer",
-            "text": "適用。影片重溫的聊天重播，停靠與調整寬度的行為跟直播中的聊天室完全一樣，不需要另外設定。"
+            "text": "適用。YouTube Chat Dock 可在本身提供聊天重播的過往直播中，並排及調整聊天室寬度；不會還原已停用或不存在的聊天重播。"
           }
         },
         {
           "@type": "Question",
+          "@id": "https://cc100053.github.io/YouTube-Chat-Dock/zh-TW/#faq-6",
           "name": "為什麼切到全螢幕之後聊天重播會變成一片空白？",
           "acceptedAnswer": {
             "@type": "Answer",
-            "text": "因為聊天重播卡住了：訊息不再送進來，而且不會自己恢復。這是 YouTube 自己的問題，完全不裝任何擴充功能也會發生。YouTube Chat Dock 會在全螢幕切換之後偵測到卡住的重播，並在保留你原本選的模式下自動把它重新啟動。"
+            "text": "YouTube 的聊天重播可能在切換全螢幕後停滯，造成空白，即使沒有安裝擴充功能也可能發生。YouTube Chat Dock 偵測這類特定停滯後，會重新選取目前聊天模式以嘗試恢復；它不是所有空白聊天室或網路問題的通用修復。"
           }
         },
         {
           "@type": "Question",
+          "@id": "https://cc100053.github.io/YouTube-Chat-Dock/zh-TW/#faq-7",
           "name": "可以把聊天室移到左邊嗎？",
           "acceptedAnswer": {
             "@type": "Answer",
-            "text": "可以。把滑鼠移到分隔線上按 &#8646; 按鈕，或在工具列的設定面板切換。這個選擇會一直記住，換影片也不會變。"
+            "text": "可以。把滑鼠移到分隔線上按左右切換，或使用工具列設定面板；選擇會保存。YouTube Chat Dock 2.0.2 已修復 YouTube 新固定側欄一般頁面版型的換邊問題，包含由右至左的版面。"
           }
         },
         {
           "@type": "Question",
+          "@id": "https://cc100053.github.io/YouTube-Chat-Dock/zh-TW/#faq-8",
           "name": "有哪些設定？",
           "acceptedAnswer": {
             "@type": "Answer",
-            "text": "啟用開關、聊天重播修復、語言選擇、左右切換、三個寬度滑桿，還有一鍵回復預設值，全部在工具列的設定面板裡。不過你其實不必打開它：分隔線就能做到滑桿能做的事，也可以用方向鍵調整。"
+            "text": "設定面板提供 docking 開關、聊天重播修復、滑鼠停留暫停、語言、左右切換、三個寬度滑桿及重設。docking 開關控制版面與分隔線；滑鼠停留暫停及重播修復各有獨立開關。"
           }
         },
         {
           "@type": "Question",
+          "@id": "https://cc100053.github.io/YouTube-Chat-Dock/zh-TW/#faq-9",
           "name": "YouTube Chat Dock 會收集資料嗎？",
           "acceptedAnswer": {
             "@type": "Answer",
-            "text": "不會。不收集、不傳送，而且根本不發出任何網路連線 —— 沒有分析、沒有追蹤、沒有遠端設定。你的設定只存在自己的瀏覽器裡，永遠不會離開這台裝置。"
+            "text": "擴充功能沒有自動資料收集、分析、遙測或遠端設定；設定保存在本機。若你主動開啟外部意見回饋表單，網址會包含擴充功能版本及所選介面語言；是否提交回饋由你決定。"
           }
         },
         {
           "@type": "Question",
+          "@id": "https://cc100053.github.io/YouTube-Chat-Dock/zh-TW/#faq-10",
           "name": "Edge、Brave、Opera、Arc 可以用嗎？",
           "acceptedAnswer": {
             "@type": "Answer",
-            "text": "可以。這是一個沒有任何依賴的 Manifest V3 擴充功能，支援 Chrome 105 以上，以及任何以 Chromium 為基礎的瀏覽器 —— Edge、Brave、Opera、Vivaldi、Arc。"
+            "text": "YouTube Chat Dock 以桌面版 Chrome 105 以上及相容的 Chromium 瀏覽器為目標，包括 Edge、Brave、Opera、Vivaldi、Arc；未逐一獨立驗證各瀏覽器現行版本。它不是 Firefox 附加元件。"
           }
         },
         {
           "@type": "Question",
+          "@id": "https://cc100053.github.io/YouTube-Chat-Dock/zh-TW/#faq-11",
           "name": "支援哪些語言？",
           "acceptedAnswer": {
             "@type": "Answer",
@@ -436,22 +534,25 @@ code{background:var(--card); border:1px solid var(--line); border-radius:5px; pa
         },
         {
           "@type": "Question",
+          "@id": "https://cc100053.github.io/YouTube-Chat-Dock/zh-TW/#faq-12",
           "name": "有什麼限制？",
           "acceptedAnswer": {
             "@type": "Answer",
-            "text": "有兩點值得知道。瀏覽器視窗寬度低於 1000px 時它會刻意不生效；另外，清除 youtube.com 的網站資料會讓你存的寬度回復預設。"
+            "text": "使用分隔線需要至少 1000 CSS 像素的可視寬度。清除 YouTube 網站資料只會移除首次繪製用的設定副本，擴充功能儲存區仍可還原設定；要重設請使用設定面板的回復預設值。"
           }
         },
         {
           "@type": "Question",
+          "@id": "https://cc100053.github.io/YouTube-Chat-Dock/zh-TW/#faq-13",
           "name": "怎樣安裝？",
           "acceptedAnswer": {
             "@type": "Answer",
-            "text": "在 Chrome 線上應用程式商店按一下安裝，然後重新載入已經開著的 YouTube 分頁就好。不需要任何設定就會變成側邊欄。"
+            "text": "從 Chrome 線上應用程式商店安裝 YouTube Chat Dock，重新載入已開啟的 YouTube 分頁，再開啟有直播聊天室或聊天重播的影片。展開聊天室後即可拖曳分隔線；桌面可視寬度需至少 1000 CSS 像素。"
           }
         },
         {
           "@type": "Question",
+          "@id": "https://cc100053.github.io/YouTube-Chat-Dock/zh-TW/#faq-14",
           "name": "看訊息的時候可以讓聊天室不要一直捲動嗎？",
           "acceptedAnswer": {
             "@type": "Answer",

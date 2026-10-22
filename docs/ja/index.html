@@ -4,12 +4,9 @@
   Edit the strings in that script and re-run it, or the next run silently
   reverts whatever you changed here.
 
-  The page exists for search and for answer engines, which is why it is shaped
-  this way: the store listing cannot rank for long-tail how-to queries, and a
-  README ranks for little beyond the brand name. Every H2 is a question someone
-  actually types, and each answer opens with a direct sentence rather than a
-  preamble — that first sentence is what gets lifted into a snippet or an LLM
-  answer.
+  Each FAQ opens with a direct answer, with product requirements and known
+  limitations in visible text. Structured data describes that same content;
+  it does not guarantee indexing, rich results or inclusion in AI answers.
 
   The FAQPage JSON-LD below is emitted from the same strings as the visible
   answers, so the two cannot disagree. store/package.sh still compares them.
@@ -22,6 +19,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
+
 <title>YouTube Chat Dock — YouTubeのライブチャットをサイドパネルに</title>
 <meta name="description" content="YouTubeのライブチャットとチャットのリプレイを、動画の横に並ぶ幅可変のサイドパネルにする無料のChrome拡張機能。通常表示・シアターモード・全画面のすべてで動作します。">
 <link rel="canonical" href="https://cc100053.github.io/YouTube-Chat-Dock/ja/">
@@ -104,6 +102,8 @@ li{margin:6px 0}
 .card p{margin:0; color:var(--muted); font-size:.95rem}
 
 table{width:100%; border-collapse:collapse; margin:14px 0; font-size:.95rem}
+caption{text-align:start; font-size:1.2rem; font-weight:600; color:var(--fg)}
+.facts th{width:24%}
 th,td{text-align:start; padding:9px 10px; border-bottom:1px solid var(--line); vertical-align:top}
 th{color:var(--muted); font-weight:600}
 .scroller{overflow-x:auto}
@@ -133,8 +133,15 @@ code{background:var(--card); border:1px solid var(--line); border-radius:5px; pa
     <a class="btn" href="https://chromewebstore.google.com/detail/youtube-chat-dock/bkmbhlkcjbkjapbamkidacajjfhoiiam">Chromeに追加（無料）</a>
     <a class="btn ghost" href="https://github.com/cc100053/YouTube-Chat-Dock">GitHubでソースを見る</a>
   </div>
-  <p class="meta">Chrome 105以降とChromium系ブラウザ · 権限はひとつ、インストール時の警告なし · データ収集なし · 12言語 · MITライセンス</p>
+  <p class="meta">デスクトップ版Chrome 105以降と互換性のあるChromium系ブラウザ · storage権限のみ · 自動データ収集なし · UIは12言語 · MITライセンス</p>
 </header>
+
+<main>
+<table class="facts">
+  <caption>YouTube Chat Dockの基本情報</caption>
+  <tbody><tr><th scope="row">拡張機能のバージョン</th><td>2.0.2</td></tr><tr><th scope="row">料金とライセンス</th><td>無料・オープンソース、MITライセンス</td></tr><tr><th scope="row">対象</th><td>既存のYouTubeライブチャットとチャットリプレイ。チャットがない動画に新しく作る機能はありません</td></tr><tr><th scope="row">表示モード</th><td>通常表示・シアターモード・全画面で、それぞれ別の幅を保存</td></tr><tr><th scope="row">必要な表示領域</th><td>仕切りには幅1000 CSSピクセル以上が必要。チャット幅は最小120 CSSピクセルで、上限は空き領域によります</td></tr></tbody>
+</table>
+<nav aria-label="目次"><ul><li><a href="#faq-2">YouTubeのライブチャットの幅は変えられる？</a></li><li><a href="#faq-4">全画面でもライブチャットは使える？</a></li><li><a href="#faq-9">YouTube Chat Dockはデータを収集する？</a></li><li><a href="#faq-12">できないことはある？</a></li><li><a href="#faq-13">インストール方法は？</a></li></ul></nav>
 
 <!--
   MP4, not a GIF, and that is measured rather than preferred. The clip is
@@ -142,31 +149,38 @@ code{background:var(--card); border:1px solid var(--line); border-radius:5px; pa
   pixel changes every frame and GIF's inter-frame compression has nothing to
   work with: the same 2.8 seconds measured 4.3MB as a 480px GIF that looked
   rough, against 2.0MB as a 1280px MP4 that does not.
-  autoplay+muted+loop+playsinline behaves like a GIF anyway, and is the
-  combination iOS Safari requires to play inline at all.
+  Playback controls let readers start and pause the clip without autoplay.
 -->
 <figure>
   <video class="shot" src="../assets/demo.mp4" poster="../assets/demo-poster.jpg"
          width="1280" height="732"
-         autoplay loop muted playsinline preload="metadata"
+         controls loop muted playsinline preload="none"
          aria-label="画面録画：YouTubeの全画面表示で、ライブチャットが動画の横にドッキングされている様子。パネルを反対側に移動したあと、仕切りをドラッグして幅を528pxから184pxまで変更しても、動画は切れずにリサイズされる。">
   </video>
   <figcaption>ライブ配信を本当の全画面で表示したところ。チャットを反対側に移し、そのあと仕切りを528pxから184pxまでドラッグ。プレイヤーが追従してリサイズされ、動画は一度も切れていません。</figcaption>
 </figure>
+<p>収録済みのデモです。利用条件と制限についてはFAQをご確認ください。</p>
 
 <figure>
-  <img class="shot" src="../assets/ja/screenshot-1-side-panel.png" width="1280" height="800"
+  <img class="shot" loading="lazy" decoding="async" src="../assets/ja/screenshot-1-side-panel.png" width="1280" height="800"
        alt="YouTubeのライブチャットが動画の右側に幅可変の列としてドッキングされ、あいだにドラッグ可能な仕切りがある図">
   <figcaption>チャットはプレイヤーの横の独立した列。あいだの仕切りをドラッグできます。</figcaption>
 </figure>
 
+<div id="faq">
+<section id="faq-1">
+
 <h2>YouTubeのライブチャットを動画の横に並べるには？</h2>
 
 <p class="answer">
-  ドッキングさせる拡張機能を入れてください。YouTube側には、チャットの幅も位置も変える手段がありません。3つの表示モードのどれにも、チャットパネルをリサイズしたり移動したりする設定は存在しません。
+  ChromeウェブストアからYouTube Chat Dockをインストールし、YouTubeを再読み込みします。ライブチャットまたはチャットリプレイがある動画を開き、幅1000 CSSピクセル以上のデスクトップ表示で仕切りをドラッグすると、既存のチャットを動画の横でリサイズできます。
 </p>
 
 <p>YouTube Chat Dockは、すでにページにあるチャットのレイアウトを組み替えるだけです。ですからチャットはYouTube純正のまま、スーパーチャットもスタンプもモデレーション機能もメンバーバッジもそのまま動きます。作り直しても、経由させてもいません。変わるのは、チャットがどこに置かれ、どれだけの幅を持つかだけです。</p>
+
+</section>
+
+<section id="faq-2">
 
 <h2>YouTubeのライブチャットの幅は変えられる？</h2>
 
@@ -174,60 +188,84 @@ code{background:var(--card); border:1px solid var(--line); border-radius:5px; pa
   はい、動画とチャットのあいだの仕切りをドラッグします。通常表示・シアターモード・全画面はそれぞれ別の幅を記憶するので、全画面にしてもレイアウトが崩れません。
 </p>
 
-<ul><li>仕切りをドラッグして、120px以上の好きな幅に。</li><li>仕切りをダブルクリックすると既定の幅に戻ります。</li><li>仕切りをフォーカスして矢印キーでも調整できます。Shiftで大きく、HomeとEndで最小・最大へ。</li><li>仕切りにマウスを重ねて &#8646; を押すと、チャットが反対側へ移動します。選択は保持されます。</li><li>ツールバーの設定パネルのスライダーでも変更でき、ドラッグ中もその場で反映されます。</li></ul>
+<ul><li>仕切りをドラッグして最小120 CSSピクセルから調整できます。上限は表示領域の空きによります。</li><li>仕切りをダブルクリックすると既定の幅に戻ります。</li><li>仕切りにフォーカスして矢印キーでも調整できます。Shiftで大きく、HomeとEndで最小・最大へ。</li><li>仕切りにマウスを重ねて左右切り替えを押すか、設定パネルで切り替えます。選択は保存されます。</li><li>設定パネルのスライダーでも変更でき、ドラッグ中に反映されます。</li></ul>
 
 <figure>
-  <img class="shot" src="../assets/ja/screenshot-2-drag-to-resize.png" width="1280" height="800"
+  <img class="shot" loading="lazy" decoding="async" src="../assets/ja/screenshot-2-drag-to-resize.png" width="1280" height="800"
        alt="仕切りをドラッグし、残ったスペースに合わせて動画がリサイズされる様子の図">
   <figcaption>残ったスペースに合わせてプレイヤーがリサイズされるので、動画が切れることはありません。</figcaption>
 </figure>
 
+</section>
+
+<section id="faq-3">
+
 <h2>シアターモードでチャットの幅を変えられないのはなぜ？</h2>
 
 <p class="answer">
-  YouTubeがチャットをプレイヤーの横に固定し、その幅を自動で決めてしまうからです。どこにも変更する設定はありません。この拡張機能はその幅をあなたのものにします。仕切りをドラッグすればプレイヤーも合わせてリサイズされ、両者が常に画面をぴったり分け合います。
+  YouTube標準のシアターモードでは、チャット幅をYouTube側が決めます。YouTube Chat Dockはドラッグ可能な仕切りを追加し、チャット幅とプレイヤーの大きさを一緒に調整します。表示領域の幅は1000 CSSピクセル以上必要です。
 </p>
 
 <p>YouTubeの以前の挙動はこれとは違いました。プレイヤーを狭めて横に領域を確保し、その領域を空のまま残してチャットを動画の下に置いていた——「シアターモードでチャットが動画の下に行く」という声はここから来ています。当時も拡張機能の有無で実測して同一だったので、拡張機能が壊していたわけではありません。その後YouTube側が変更しました。1920&times;769でライブ配信2本とチャットリプレイ1本を実測したところ、チャットはプレイヤーの横に固定され、スクロールしてもその位置に留まり、関連動画がその下を流れていきます。この拡張機能は現在のレイアウトに従い、幅以外は何も変えません。</p>
 
+</section>
+
+<section id="faq-4">
+
 <h2>全画面でもライブチャットは使える？</h2>
 
 <p class="answer">
-  使えますが、思いどおりにはなりません。リサイズも位置の指定もできないからです。この拡張機能を入れると、チャットは記憶された幅で動画の横にドッキングされ、何も覆わず、動画も切れません。
+  YouTube Chat Dockは、本当の全画面でも既存のライブチャットとチャットリプレイを動画の横に配置します。仕切りでチャット幅を変えるとプレイヤーも追従し、動画を切り取らずに表示します。全画面用の幅は個別に保存されます。
 </p>
 
+<p>詳しい手順：<a href="https://cc100053.github.io/YouTube-Chat-Dock/ja/guides/youtube-live-chat-fullscreen/">YouTubeライブを全画面にしてもチャットを動画の横に表示する方法</a></p>
+
 <figure>
-  <img class="shot" src="../assets/ja/screenshot-3-fullscreen.png" width="1280" height="800"
+  <img class="shot" loading="lazy" decoding="async" src="../assets/ja/screenshot-3-fullscreen.png" width="1280" height="800"
        alt="本当の全画面でチャットが動画の横にドッキングされ、動画が切れていない様子の図">
   <figcaption>本当の全画面。チャットは横に並んだまま。</figcaption>
 </figure>
 
+</section>
+
+<section id="faq-5">
+
 <h2>過去の配信のチャットリプレイでも使える？</h2>
 
 <p class="answer">
-  はい。アーカイブのチャットリプレイも、配信中のライブチャットとまったく同じようにドッキングされ、リサイズできます。個別の設定は不要です。
+  はい。YouTube Chat Dockは、チャットリプレイが提供されている過去の配信で、チャットを動画の横に配置してリサイズできます。無効または存在しないリプレイを復元する機能ではありません。
 </p>
+
+</section>
+
+<section id="faq-6">
 
 <h2>全画面にするとチャットリプレイが真っ白になるのはなぜ？</h2>
 
 <p class="answer">
-  チャットリプレイが止まってしまうからです。メッセージが届かなくなり、そのまま二度と再開しません。これはYouTube側の不具合で、拡張機能を何も入れていなくても起きます。YouTube Chat Dockは全画面の切り替えのあとで止まったリプレイを検知し、選んでいたモードを保ったまま自動で再開させます。
+  全画面への切り替え後にYouTubeのリプレイが停止し、チャットが空白になる場合があります。拡張機能なしでも発生するこの停止をYouTube Chat Dockが検知し、現在のチャットモードを再選択して再開を試みます。すべての空白表示や通信障害を修復するものではありません。
 </p>
 
 <p>止まったリプレイを実測すると、メッセージ一覧にはYouTube自身のお知らせが1件あるだけでした。パネルの大きさも表示も正常で、動画も普通に再生されているので、外から見て壊れているようには見えません。チャットのフレームを再読み込みしても<em>直りません</em>。フレームが無効になったトークンを握ったままだからです。チャットのヘッダーでモードを選び直すと直るのは、YouTubeが新しいトークンを取得して一覧を作り直すからです。この拡張機能は「すでに選ばれているモード」を選び直すので、上位のチャットのリプレイはそのままです。設定パネルでオフにもできます。</p>
 
+</section>
+
+<section id="faq-7">
+
 <h2>チャットを左側に移せる？</h2>
 
 <p class="answer">
-  はい。仕切りにマウスを重ねて &amp;#8646; ボタンを押すか、ツールバーの設定パネルで切り替えます。選択は動画をまたいでも保持されます。
+  はい。仕切りにマウスを重ねて左右切り替えを押すか、設定パネルで切り替えます。選択は保存されます。バージョン2.0.2で、右から左のレイアウトを含むYouTubeの新しい固定サイドレールの通常表示での切り替え不具合を修正しました。
 </p>
 
-<p>アラビア語のような右から左に読む言語では、切り替えはレイアウト全体と一緒に反転します。逆向きになったりしないので、「反対側」は常に見たとおりの意味になります。</p>
+</section>
+
+<section id="faq-8">
 
 <h2>設定にはどんな項目がある？</h2>
 
 <p class="answer">
-  有効化スイッチ、チャットリプレイの修復、言語選択、左右の切り替え、3つの幅スライダー、そしてリセット。すべてツールバーの設定パネルにあります。ただし開く必要はありません。仕切りだけでスライダーと同じことができ、矢印キーでも幅を変えられます。
+  設定パネルにはドッキング、リプレイ修復、ホバー一時停止、言語、左右切り替え、3つの幅スライダー、リセットがあります。ドッキングのスイッチはレイアウトと仕切りを制御し、ホバー一時停止とリプレイ修復は個別のスイッチで制御します。
 </p>
 
 <div class="scroller">
@@ -238,27 +276,39 @@ code{background:var(--card); border:1px solid var(--line); border-radius:5px; pa
 </div>
 
 <figure>
-  <img class="shot" src="../assets/ja/screenshot-5-settings.png" width="1280" height="800"
+  <img class="shot" loading="lazy" decoding="async" src="../assets/ja/screenshot-5-settings.png" width="1280" height="800"
        alt="設定パネル。有効化スイッチ、言語選択、左右切り替え、3つの幅スライダーが表示されている">
 </figure>
+
+</section>
+
+<section id="faq-9">
 
 <h2>YouTube Chat Dockはデータを収集する？</h2>
 
 <p class="answer">
-  いいえ。収集も送信も一切なく、ネットワーク通信そのものを行いません。分析も、テレメトリも、リモート設定もありません。設定はあなたのブラウザ内に保存され、端末から出ることはありません。
+  拡張機能による自動データ収集、分析、テレメトリ、リモート設定はありません。設定は端末内に保存されます。外部のフィードバックフォームを自分で開いた場合、URLに拡張機能のバージョンと選択中の表示言語が含まれます。送信は任意です。
 </p>
 
-<ul class="privacy"><li class="no">データの収集・送信・販売を一切しません（匿名化も集計もしません）</li><li class="no">ネットワーク通信なし、分析なし、テレメトリなし</li><li class="no">バックグラウンドで動くService Workerなし。YouTube以外では何も動きません</li><li class="no">アカウント不要、ログイン不要、クラウド同期なし</li><li class="no">ホスト権限なし。<code>youtube.com</code>以外では動作できません</li><li class="yes">権限は<code>storage</code>ひとつだけ。Chromeはインストール時に何の警告も出しません</li></ul>
+<ul class="privacy"><li class="no">自動データ収集・販売なし。任意のフィードバックは別途送信</li><li class="no">拡張機能による自動通信・分析・テレメトリなし</li><li class="no">バックグラウンドで動くService Workerなし。YouTube以外では何も動きません</li><li class="no">アカウント不要、ログイン不要、クラウド同期なし</li><li class="no">ホスト権限なし。<code>youtube.com</code>以外では動作できません</li><li class="yes">権限は<code>storage</code>ひとつだけ。Chromeはインストール時に何の警告も出しません</li></ul>
 
-<p><code>storage</code>権限がある理由はひとつだけです。設定パネルは独立した拡張機能ページなので、それ以外の方法では設定対象のタブに設定を届けられないからです。詳細：<a href="https://github.com/cc100053/YouTube-Chat-Dock/blob/main/store/PRIVACY.md">store/PRIVACY.md</a>。拡張機能全体はCSS 1枚と小さなスクリプト1本、MITライセンスで、10分ほどで最初から最後まで読み通せます。</p>
+<p><code>storage</code>権限がある理由はひとつだけです。設定パネルは独立した拡張機能ページなので、それ以外の方法では設定対象のタブに設定を届けられないからです。詳細：<a href="https://github.com/cc100053/YouTube-Chat-Dock/blob/main/store/PRIVACY.md">store/PRIVACY.md</a>。拡張機能はCSS 1枚、4本のコンテンツスクリプトと設定パネルで構成されます。MITライセンスで、実行時の依存ライブラリはありません。</p>
+
+</section>
+
+<section id="faq-10">
 
 <h2>Edge・Brave・Opera・Arcでも動く？</h2>
 
 <p class="answer">
-  はい。依存関係のないManifest V3拡張機能で、Chrome 105以降とChromium系ブラウザ（Edge、Brave、Opera、Vivaldi、Arc）で動作します。
+  YouTube Chat Dockは、デスクトップ版Chrome 105以降と互換性のあるChromium系ブラウザ（Edge、Brave、Opera、Vivaldi、Arc）を対象としています。各ブラウザの現行版を個別に検証したものではありません。Firefoxアドオンではありません。
 </p>
 
 <p>Chromeウェブストアで公開しており、Edgeをはじめ他のChromium系ブラウザからも直接インストールできます。Firefoxアドオンではありません。</p>
+
+</section>
+
+<section id="faq-11">
 
 <h2>対応している言語は？</h2>
 
@@ -266,23 +316,35 @@ code{background:var(--card); border:1px solid var(--line); border-radius:5px; pa
   12言語です。English、繁體中文、简体中文、日本語、한국어、Español、Português、Français、Deutsch、Русский、العربية、हिन्दी。
 </p>
 
-<p>言語の選択はブラウザの言語とは独立しています。Chromeを別の言語にしたまま、この拡張機能だけ日本語にできます。右から左に読む言語のレイアウトも、たまたま反転するのではなく、きちんと処理しています。</p>
+<p>表示言語はブラウザの言語とは独立して選べます。右から左のレイアウトにも対応しています。</p>
+
+</section>
+
+<section id="faq-12">
 
 <h2>できないことはある？</h2>
 
 <p class="answer">
-  2つあります。ブラウザ幅が1000px未満のときは意図的に何もしないこと、そしてyoutube.comのサイトデータを消すと保存した幅がリセットされることです。
+  仕切りを使うには表示領域の幅が1000 CSSピクセル以上必要です。YouTubeのサイトデータを消しても拡張機能側の保存値から復元される場合があるため、初期化には設定パネルのリセットを使ってください。
 </p>
 
-<ul><li><strong>ウィンドウ幅が1000px未満のとき。</strong>YouTubeは1カラムのレイアウトに切り替わり、チャットを動画の下に置きます。この拡張機能は、YouTube自身のレスポンシブなレイアウトと争わず、あえて何もしません。</li><li><strong>サイトデータを消すと幅がリセットされます。</strong>幅は<code>localStorage</code>に保存しています。ページが描画される<em>前</em>に適用するためで、これが読み込みのたびにレイアウトがちらつくのを防いでいます。</li></ul>
+<ul><li><strong>1000 CSSピクセル未満。</strong>仕切りは非表示になり、通常表示とシアターの幅調整ルールも適用されません。ホバー一時停止は独立しています。</li><li><strong>設定の保存。</strong>YouTubeのlocalStorageで初回描画に適用し、chrome.storage.localから復元できます。初期化には設定パネルのリセットを使ってください。</li></ul>
+
+</section>
+
+<section id="faq-13">
 
 <h2>インストール方法は？</h2>
 
 <p class="answer">
-  Chromeウェブストアからワンクリックで追加し、開いているYouTubeのタブを再読み込みするだけです。サイドパネルにするための設定は必要ありません。
+  ChromeウェブストアからYouTube Chat Dockをインストールし、開いているYouTubeタブを再読み込みします。ライブチャットまたはリプレイがある動画でチャットを展開し、仕切りをドラッグしてください。デスクトップの表示領域は幅1000 CSSピクセル以上必要です。
 </p>
 
 <div class="grid"><div class="card"><h3>ウェブストアから</h3><p><a href="https://chromewebstore.google.com/detail/youtube-chat-dock/bkmbhlkcjbkjapbamkidacajjfhoiiam">Chromeに追加</a>して、YouTubeのタブを再読み込みするだけ。Chromeは何の許可も求めません。</p></div><div class="card"><h3>ソースから</h3><p>リポジトリをクローンし、<code>chrome://extensions/</code>を開いてデベロッパーモードをオンにし、「パッケージ化されていない拡張機能を読み込む」でフォルダを選びます。ビルド不要、依存関係もありません。</p></div></div>
+
+</section>
+
+<section id="faq-14">
 
 <h2>メッセージを読むあいだ、チャットのスクロールを止められる？</h2>
 
@@ -290,9 +352,15 @@ code{background:var(--card); border:1px solid var(--line); border-radius:5px; pa
   はい。メッセージ一覧にマウスを重ねるとその場で固定されるので、速いチャットでも読んだりリンクを押したりするあいだ止まっています。新しいメッセージはその下に届き続け、マウスを離すとライブに戻ります。マウス専用です。タッチ画面にはホバーがないので、その場合はYouTube自身のスクロールアップによる一時停止が働きます。設定パネルにオン・オフのスイッチがあります。
 </p>
 
+</section>
+</div>
+</main>
+
 <footer>
   <p><a href="https://chromewebstore.google.com/detail/youtube-chat-dock/bkmbhlkcjbkjapbamkidacajjfhoiiam">Chromeウェブストア</a> <span aria-hidden="true">&middot;</span> <a href="https://github.com/cc100053/YouTube-Chat-Dock">GitHub</a> <span aria-hidden="true">&middot;</span> <a href="https://github.com/cc100053/YouTube-Chat-Dock/blob/main/store/PRIVACY.md">プライバシー</a> <span aria-hidden="true">&middot;</span> <a href="https://github.com/cc100053/YouTube-Chat-Dock/issues">問題を報告</a></p>
   <nav class="langs" aria-label="言語"><a href="https://cc100053.github.io/YouTube-Chat-Dock/" hreflang="en">English</a> <span aria-hidden="true">·</span> <strong aria-current="true">日本語</strong> <span aria-hidden="true">·</span> <a href="https://cc100053.github.io/YouTube-Chat-Dock/zh-TW/" hreflang="zh-TW">繁體中文</a></nav>
+  <p>内容確認日: <time datetime="2026-10-22">2026-10-22</time> · 拡張機能のバージョン: 2.0.2<br>
+  プロジェクト管理者: <a href="https://github.com/cc100053" rel="author">cc100053</a></p>
   <p>MITライセンス。YouTubeおよびGoogleとは提携しておらず、承認・後援を受けているものでもありません。</p>
 </footer>
 
@@ -304,20 +372,33 @@ code{background:var(--card); border:1px solid var(--line); border-radius:5px; pa
   "@graph": [
     {
       "@type": "SoftwareApplication",
-      "@id": "https://cc100053.github.io/YouTube-Chat-Dock/ja/#app",
+      "@id": "https://cc100053.github.io/YouTube-Chat-Dock/#app",
       "name": "YouTube Chat Dock",
       "description": "YouTubeのライブチャットとチャットのリプレイを、通常表示・シアターモード・本当の全画面で、動画の横に並ぶ幅可変のサイドパネルにするChrome拡張機能。",
       "applicationCategory": "BrowserApplication",
       "applicationSubCategory": "Chrome Extension",
-      "operatingSystem": "Chrome 105+, Microsoft Edge, Brave, Opera, Vivaldi, Arc",
-      "browserRequirements": "Requires Chrome 105 or any Chromium-based browser",
-      "softwareVersion": "2.0.0",
+      "softwareRequirements": "Requires desktop Chrome 105+ or a compatible Chromium browser",
+      "softwareVersion": "2.0.2",
       "url": "https://cc100053.github.io/YouTube-Chat-Dock/ja/",
       "inLanguage": [
         "en",
+        "zh-Hant",
+        "zh-Hans",
         "ja",
-        "zh-Hant"
+        "ko",
+        "es",
+        "pt-BR",
+        "fr",
+        "de",
+        "ru",
+        "ar",
+        "hi"
       ],
+      "author": {
+        "@type": "Person",
+        "name": "cc100053",
+        "url": "https://github.com/cc100053"
+      },
       "downloadUrl": "https://chromewebstore.google.com/detail/youtube-chat-dock/bkmbhlkcjbkjapbamkidacajjfhoiiam",
       "installUrl": "https://chromewebstore.google.com/detail/youtube-chat-dock/bkmbhlkcjbkjapbamkidacajjfhoiiam",
       "screenshot": "https://cc100053.github.io/YouTube-Chat-Dock/assets/ja/screenshot-1-side-panel.png",
@@ -335,7 +416,7 @@ code{background:var(--card); border:1px solid var(--line); border-radius:5px; pa
         "本当の全画面でも動作します。YouTube側ではチャットの幅も位置も変えられません",
         "シアターモードのチャット幅を変えられるようにし、プレイヤーもそれに合わせます",
         "アーカイブのチャットリプレイもライブチャットと同じように動きます",
-        "チャットは左右どちらにも移動できます",
+        "固定サイドレールの通常表示を含め、チャットを反対側に移動できます",
         "右から左に読む言語のレイアウトに対応",
         "ブラウザの言語とは独立した12言語のUI",
         "マウスが重なっているあいだチャットが止まるので、速いチャットも読めます"
@@ -344,18 +425,26 @@ code{background:var(--card); border:1px solid var(--line); border-radius:5px; pa
     {
       "@type": "FAQPage",
       "@id": "https://cc100053.github.io/YouTube-Chat-Dock/ja/#faq",
+      "url": "https://cc100053.github.io/YouTube-Chat-Dock/ja/",
+      "name": "YouTube Chat Dock — YouTubeのライブチャットをサイドパネルに",
       "inLanguage": "ja",
+      "lastReviewed": "2026-10-22",
+      "about": {
+        "@id": "https://cc100053.github.io/YouTube-Chat-Dock/#app"
+      },
       "mainEntity": [
         {
           "@type": "Question",
+          "@id": "https://cc100053.github.io/YouTube-Chat-Dock/ja/#faq-1",
           "name": "YouTubeのライブチャットを動画の横に並べるには？",
           "acceptedAnswer": {
             "@type": "Answer",
-            "text": "ドッキングさせる拡張機能を入れてください。YouTube側には、チャットの幅も位置も変える手段がありません。3つの表示モードのどれにも、チャットパネルをリサイズしたり移動したりする設定は存在しません。"
+            "text": "ChromeウェブストアからYouTube Chat Dockをインストールし、YouTubeを再読み込みします。ライブチャットまたはチャットリプレイがある動画を開き、幅1000 CSSピクセル以上のデスクトップ表示で仕切りをドラッグすると、既存のチャットを動画の横でリサイズできます。"
           }
         },
         {
           "@type": "Question",
+          "@id": "https://cc100053.github.io/YouTube-Chat-Dock/ja/#faq-2",
           "name": "YouTubeのライブチャットの幅は変えられる？",
           "acceptedAnswer": {
             "@type": "Answer",
@@ -364,70 +453,79 @@ code{background:var(--card); border:1px solid var(--line); border-radius:5px; pa
         },
         {
           "@type": "Question",
+          "@id": "https://cc100053.github.io/YouTube-Chat-Dock/ja/#faq-3",
           "name": "シアターモードでチャットの幅を変えられないのはなぜ？",
           "acceptedAnswer": {
             "@type": "Answer",
-            "text": "YouTubeがチャットをプレイヤーの横に固定し、その幅を自動で決めてしまうからです。どこにも変更する設定はありません。この拡張機能はその幅をあなたのものにします。仕切りをドラッグすればプレイヤーも合わせてリサイズされ、両者が常に画面をぴったり分け合います。"
+            "text": "YouTube標準のシアターモードでは、チャット幅をYouTube側が決めます。YouTube Chat Dockはドラッグ可能な仕切りを追加し、チャット幅とプレイヤーの大きさを一緒に調整します。表示領域の幅は1000 CSSピクセル以上必要です。"
           }
         },
         {
           "@type": "Question",
+          "@id": "https://cc100053.github.io/YouTube-Chat-Dock/ja/#faq-4",
           "name": "全画面でもライブチャットは使える？",
           "acceptedAnswer": {
             "@type": "Answer",
-            "text": "使えますが、思いどおりにはなりません。リサイズも位置の指定もできないからです。この拡張機能を入れると、チャットは記憶された幅で動画の横にドッキングされ、何も覆わず、動画も切れません。"
+            "text": "YouTube Chat Dockは、本当の全画面でも既存のライブチャットとチャットリプレイを動画の横に配置します。仕切りでチャット幅を変えるとプレイヤーも追従し、動画を切り取らずに表示します。全画面用の幅は個別に保存されます。"
           }
         },
         {
           "@type": "Question",
+          "@id": "https://cc100053.github.io/YouTube-Chat-Dock/ja/#faq-5",
           "name": "過去の配信のチャットリプレイでも使える？",
           "acceptedAnswer": {
             "@type": "Answer",
-            "text": "はい。アーカイブのチャットリプレイも、配信中のライブチャットとまったく同じようにドッキングされ、リサイズできます。個別の設定は不要です。"
+            "text": "はい。YouTube Chat Dockは、チャットリプレイが提供されている過去の配信で、チャットを動画の横に配置してリサイズできます。無効または存在しないリプレイを復元する機能ではありません。"
           }
         },
         {
           "@type": "Question",
+          "@id": "https://cc100053.github.io/YouTube-Chat-Dock/ja/#faq-6",
           "name": "全画面にするとチャットリプレイが真っ白になるのはなぜ？",
           "acceptedAnswer": {
             "@type": "Answer",
-            "text": "チャットリプレイが止まってしまうからです。メッセージが届かなくなり、そのまま二度と再開しません。これはYouTube側の不具合で、拡張機能を何も入れていなくても起きます。YouTube Chat Dockは全画面の切り替えのあとで止まったリプレイを検知し、選んでいたモードを保ったまま自動で再開させます。"
+            "text": "全画面への切り替え後にYouTubeのリプレイが停止し、チャットが空白になる場合があります。拡張機能なしでも発生するこの停止をYouTube Chat Dockが検知し、現在のチャットモードを再選択して再開を試みます。すべての空白表示や通信障害を修復するものではありません。"
           }
         },
         {
           "@type": "Question",
+          "@id": "https://cc100053.github.io/YouTube-Chat-Dock/ja/#faq-7",
           "name": "チャットを左側に移せる？",
           "acceptedAnswer": {
             "@type": "Answer",
-            "text": "はい。仕切りにマウスを重ねて &#8646; ボタンを押すか、ツールバーの設定パネルで切り替えます。選択は動画をまたいでも保持されます。"
+            "text": "はい。仕切りにマウスを重ねて左右切り替えを押すか、設定パネルで切り替えます。選択は保存されます。バージョン2.0.2で、右から左のレイアウトを含むYouTubeの新しい固定サイドレールの通常表示での切り替え不具合を修正しました。"
           }
         },
         {
           "@type": "Question",
+          "@id": "https://cc100053.github.io/YouTube-Chat-Dock/ja/#faq-8",
           "name": "設定にはどんな項目がある？",
           "acceptedAnswer": {
             "@type": "Answer",
-            "text": "有効化スイッチ、チャットリプレイの修復、言語選択、左右の切り替え、3つの幅スライダー、そしてリセット。すべてツールバーの設定パネルにあります。ただし開く必要はありません。仕切りだけでスライダーと同じことができ、矢印キーでも幅を変えられます。"
+            "text": "設定パネルにはドッキング、リプレイ修復、ホバー一時停止、言語、左右切り替え、3つの幅スライダー、リセットがあります。ドッキングのスイッチはレイアウトと仕切りを制御し、ホバー一時停止とリプレイ修復は個別のスイッチで制御します。"
           }
         },
         {
           "@type": "Question",
+          "@id": "https://cc100053.github.io/YouTube-Chat-Dock/ja/#faq-9",
           "name": "YouTube Chat Dockはデータを収集する？",
           "acceptedAnswer": {
             "@type": "Answer",
-            "text": "いいえ。収集も送信も一切なく、ネットワーク通信そのものを行いません。分析も、テレメトリも、リモート設定もありません。設定はあなたのブラウザ内に保存され、端末から出ることはありません。"
+            "text": "拡張機能による自動データ収集、分析、テレメトリ、リモート設定はありません。設定は端末内に保存されます。外部のフィードバックフォームを自分で開いた場合、URLに拡張機能のバージョンと選択中の表示言語が含まれます。送信は任意です。"
           }
         },
         {
           "@type": "Question",
+          "@id": "https://cc100053.github.io/YouTube-Chat-Dock/ja/#faq-10",
           "name": "Edge・Brave・Opera・Arcでも動く？",
           "acceptedAnswer": {
             "@type": "Answer",
-            "text": "はい。依存関係のないManifest V3拡張機能で、Chrome 105以降とChromium系ブラウザ（Edge、Brave、Opera、Vivaldi、Arc）で動作します。"
+            "text": "YouTube Chat Dockは、デスクトップ版Chrome 105以降と互換性のあるChromium系ブラウザ（Edge、Brave、Opera、Vivaldi、Arc）を対象としています。各ブラウザの現行版を個別に検証したものではありません。Firefoxアドオンではありません。"
           }
         },
         {
           "@type": "Question",
+          "@id": "https://cc100053.github.io/YouTube-Chat-Dock/ja/#faq-11",
           "name": "対応している言語は？",
           "acceptedAnswer": {
             "@type": "Answer",
@@ -436,22 +534,25 @@ code{background:var(--card); border:1px solid var(--line); border-radius:5px; pa
         },
         {
           "@type": "Question",
+          "@id": "https://cc100053.github.io/YouTube-Chat-Dock/ja/#faq-12",
           "name": "できないことはある？",
           "acceptedAnswer": {
             "@type": "Answer",
-            "text": "2つあります。ブラウザ幅が1000px未満のときは意図的に何もしないこと、そしてyoutube.comのサイトデータを消すと保存した幅がリセットされることです。"
+            "text": "仕切りを使うには表示領域の幅が1000 CSSピクセル以上必要です。YouTubeのサイトデータを消しても拡張機能側の保存値から復元される場合があるため、初期化には設定パネルのリセットを使ってください。"
           }
         },
         {
           "@type": "Question",
+          "@id": "https://cc100053.github.io/YouTube-Chat-Dock/ja/#faq-13",
           "name": "インストール方法は？",
           "acceptedAnswer": {
             "@type": "Answer",
-            "text": "Chromeウェブストアからワンクリックで追加し、開いているYouTubeのタブを再読み込みするだけです。サイドパネルにするための設定は必要ありません。"
+            "text": "ChromeウェブストアからYouTube Chat Dockをインストールし、開いているYouTubeタブを再読み込みします。ライブチャットまたはリプレイがある動画でチャットを展開し、仕切りをドラッグしてください。デスクトップの表示領域は幅1000 CSSピクセル以上必要です。"
           }
         },
         {
           "@type": "Question",
+          "@id": "https://cc100053.github.io/YouTube-Chat-Dock/ja/#faq-14",
           "name": "メッセージを読むあいだ、チャットのスクロールを止められる？",
           "acceptedAnswer": {
             "@type": "Answer",

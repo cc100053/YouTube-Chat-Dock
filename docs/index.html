@@ -4,12 +4,9 @@
   Edit the strings in that script and re-run it, or the next run silently
   reverts whatever you changed here.
 
-  The page exists for search and for answer engines, which is why it is shaped
-  this way: the store listing cannot rank for long-tail how-to queries, and a
-  README ranks for little beyond the brand name. Every H2 is a question someone
-  actually types, and each answer opens with a direct sentence rather than a
-  preamble — that first sentence is what gets lifted into a snippet or an LLM
-  answer.
+  Each FAQ opens with a direct answer, with product requirements and known
+  limitations in visible text. Structured data describes that same content;
+  it does not guarantee indexing, rich results or inclusion in AI answers.
 
   The FAQPage JSON-LD below is emitted from the same strings as the visible
   answers, so the two cannot disagree. store/package.sh still compares them.
@@ -105,6 +102,8 @@ li{margin:6px 0}
 .card p{margin:0; color:var(--muted); font-size:.95rem}
 
 table{width:100%; border-collapse:collapse; margin:14px 0; font-size:.95rem}
+caption{text-align:start; font-size:1.2rem; font-weight:600; color:var(--fg)}
+.facts th{width:24%}
 th,td{text-align:start; padding:9px 10px; border-bottom:1px solid var(--line); vertical-align:top}
 th{color:var(--muted); font-weight:600}
 .scroller{overflow-x:auto}
@@ -134,8 +133,15 @@ code{background:var(--card); border:1px solid var(--line); border-radius:5px; pa
     <a class="btn" href="https://chromewebstore.google.com/detail/youtube-chat-dock/bkmbhlkcjbkjapbamkidacajjfhoiiam">Add to Chrome — free</a>
     <a class="btn ghost" href="https://github.com/cc100053/YouTube-Chat-Dock">View the source on GitHub</a>
   </div>
-  <p class="meta">Chrome 105+ and any Chromium browser · one permission, no permission prompt · no data collected · 12 languages · MIT licensed</p>
+  <p class="meta">Desktop Chrome 105+ and compatible Chromium browsers · storage permission only · no automatic data collection · 12 interface languages · MIT licensed</p>
 </header>
+
+<main>
+<table class="facts">
+  <caption>YouTube Chat Dock at a glance</caption>
+  <tbody><tr><th scope="row">Extension version</th><td>2.0.2</td></tr><tr><th scope="row">Price and license</th><td>Free and open source under the MIT license</td></tr><tr><th scope="row">Works with</th><td>Existing YouTube live chat and chat replay; it does not create chat for videos without it</td></tr><tr><th scope="row">Display modes</th><td>Page view, theater mode and true fullscreen, with a saved width for each</td></tr><tr><th scope="row">Minimum viewport</th><td>1000 CSS pixels wide to use the divider; chat widths start at 120 CSS pixels and depend on available space</td></tr></tbody>
+</table>
+<nav aria-label="On this page"><ul><li><a href="#faq-2">Can I resize YouTube’s live chat?</a></li><li><a href="#faq-4">Does live chat work in fullscreen on YouTube?</a></li><li><a href="#faq-9">Does YouTube Chat Dock collect any data?</a></li><li><a href="#faq-12">Are there any limitations?</a></li><li><a href="#faq-13">How do I install it?</a></li></ul></nav>
 
 <!--
   MP4, not a GIF, and that is measured rather than preferred. The clip is
@@ -143,31 +149,38 @@ code{background:var(--card); border:1px solid var(--line); border-radius:5px; pa
   pixel changes every frame and GIF's inter-frame compression has nothing to
   work with: the same 2.8 seconds measured 4.3MB as a 480px GIF that looked
   rough, against 2.0MB as a 1280px MP4 that does not.
-  autoplay+muted+loop+playsinline behaves like a GIF anyway, and is the
-  combination iOS Safari requires to play inline at all.
+  Playback controls let readers start and pause the clip without autoplay.
 -->
 <figure>
   <video class="shot" src="assets/demo.mp4" poster="assets/demo-poster.jpg"
          width="1280" height="732"
-         autoplay loop muted playsinline preload="metadata"
+         controls loop muted playsinline preload="none"
          aria-label="Screen recording: YouTube in true fullscreen with live chat docked as a side panel beside the video. The panel is flipped to the other side, then resized by dragging the divider from 528px down to 184px, with the video resizing to fit and never cropping.">
   </video>
   <figcaption>True fullscreen, on a live stream. Chat flips to the other side, then the divider is dragged from 528px down to 184px — the player resizes to fit and the video is never cropped.</figcaption>
 </figure>
+<p>Recorded demonstration. See the FAQ for setup requirements and limitations.</p>
 
 <figure>
-  <img class="shot" src="assets/screenshot-1-side-panel.png" width="1280" height="800"
+  <img class="shot" loading="lazy" decoding="async" src="assets/screenshot-1-side-panel.png" width="1280" height="800"
        alt="YouTube live chat docked as a resizable column to the right of the video, with a draggable divider between them">
   <figcaption>Chat as a real column beside the player, with a draggable divider between them.</figcaption>
 </figure>
 
+<div id="faq">
+<section id="faq-1">
+
 <h2>How do I put YouTube live chat next to the video?</h2>
 
 <p class="answer">
-  Install a browser extension that docks it — YouTube gives you no control over how wide chat is or where it sits. There is no setting anywhere to resize the chat panel or to move it, in any of the three view modes.
+  Install YouTube Chat Dock from the Chrome Web Store, reload YouTube, and open a live stream with chat or a video with chat replay. On a desktop viewport at least 1000 CSS pixels wide, drag the divider to resize the existing chat beside the video.
 </p>
 
 <p>YouTube Chat Dock re-lays out the chat that is already on the page, so it stays YouTube’s own chat with YouTube’s own features — Super Chat, emotes, moderation tools, member badges. Nothing is re-implemented and nothing is proxied. What changes is where the chat sits and how wide it is.</p>
+
+</section>
+
+<section id="faq-2">
 
 <h2>Can I resize YouTube’s live chat?</h2>
 
@@ -175,60 +188,84 @@ code{background:var(--card); border:1px solid var(--line); border-radius:5px; pa
   Yes, by dragging the divider between the video and the chat. Page view, theater mode and fullscreen each remember their own width, so going fullscreen does not undo your layout.
 </p>
 
-<ul><li>Drag the divider to any width from 120px up.</li><li>Double-click the divider to snap back to the default.</li><li>Focus the divider and use the arrow keys — Shift for bigger steps, Home and End for the limits.</li><li>Hover the divider and click the &#8646; toggle to move chat to the other side. The choice sticks.</li><li>Or use the sliders in the toolbar popup, which preview live as you drag.</li></ul>
+<ul><li>Drag the divider to resize, starting at 120 CSS pixels; the maximum depends on available viewport space.</li><li>Double-click the divider to restore the default width.</li><li>Focus the divider and use the arrow keys — Shift for bigger steps, Home and End for the limits.</li><li>Hover the divider and click the side toggle, or use the toolbar popup, to switch sides. Your choice is saved.</li><li>Or use the sliders in the toolbar popup, which preview live as you drag.</li></ul>
 
 <figure>
-  <img class="shot" src="assets/screenshot-2-drag-to-resize.png" width="1280" height="800"
+  <img class="shot" loading="lazy" decoding="async" src="assets/screenshot-2-drag-to-resize.png" width="1280" height="800"
        alt="Illustration of the divider being dragged, with the video resizing to fit the space left over">
   <figcaption>The player is resized to fit the space left over, so the video is never cropped.</figcaption>
 </figure>
 
+</section>
+
+<section id="faq-3">
+
 <h2>Why can’t I resize the chat in YouTube’s theater mode?</h2>
 
 <p class="answer">
-  Because YouTube pins the chat beside the player at a width it picks for you, and there is no setting anywhere to change it. This extension makes that width yours: drag the divider and the player resizes to match, so the two always tile the window exactly.
+  YouTube controls the native theater-mode chat width. YouTube Chat Dock adds a draggable divider so you can adjust that width and resize the player alongside it. The divider requires a viewport at least 1000 CSS pixels wide.
 </p>
 
 <p>YouTube used to behave differently here. It narrowed the player to reserve a side column, then left that column empty and dropped chat below the video — which is where the complaint about chat going underneath the video in theater mode came from. That was measured identical with this extension enabled and disabled, so it was never damage an extension was doing. YouTube has since changed it: measured at 1920&times;769 on two live streams and a chat replay, the chat is pinned beside the player and stays there while you scroll, so the recommended videos scroll past underneath it. This extension follows the current layout and changes nothing about it except the width.</p>
 
+</section>
+
+<section id="faq-4">
+
 <h2>Does live chat work in fullscreen on YouTube?</h2>
 
 <p class="answer">
-  Yes, but not on your terms — you cannot resize it or decide where it sits. With this extension chat is docked beside the video at its own remembered width, so it covers nothing and the video is never cropped.
+  YouTube Chat Dock keeps existing YouTube live chat and chat replay beside the video in true fullscreen. Drag the divider to adjust the chat width; the player resizes to fit without cropping the video. Fullscreen remembers its own width.
 </p>
 
+<p>Step-by-step guide: <a href="https://cc100053.github.io/YouTube-Chat-Dock/guides/youtube-live-chat-fullscreen/">How to keep YouTube live chat beside the video in fullscreen</a></p>
+
 <figure>
-  <img class="shot" src="assets/screenshot-3-fullscreen.png" width="1280" height="800"
+  <img class="shot" loading="lazy" decoding="async" src="assets/screenshot-3-fullscreen.png" width="1280" height="800"
        alt="Illustration of chat docked beside the video in true fullscreen, with the video uncropped">
   <figcaption>True fullscreen, chat still docked.</figcaption>
 </figure>
 
+</section>
+
+<section id="faq-5">
+
 <h2>Does this work with chat replay on old streams?</h2>
 
 <p class="answer">
-  Yes. Chat replay on a VOD is docked and resized exactly like live chat on an active stream, with no separate setting.
+  Yes. YouTube Chat Dock docks and resizes chat replay on past live streams that already have replay available. It does not restore missing or disabled chat replay.
 </p>
+
+</section>
+
+<section id="faq-6">
 
 <h2>Why does YouTube’s chat replay go blank in fullscreen?</h2>
 
 <p class="answer">
-  Because the replay stalls: messages stop arriving and never resume, and the only cures used to be reloading the page or re-picking the chat mode by hand. It is YouTube’s own bug — it happens with no extension installed at all. YouTube Chat Dock spots a stalled replay after a fullscreen switch and restarts it for you, keeping whichever chat mode you had selected.
+  A stalled YouTube replay can leave chat blank after a fullscreen switch, even without extensions. YouTube Chat Dock detects this specific stall and reselects the current chat mode to restart replay. It is not a fix for every blank-chat or network problem.
 </p>
 
 <p>Measured on a stalled replay: the message list holds a single item — YouTube’s own “Live chat replay is on” notice — while the panel is the right size, fully visible, and the video plays normally, so nothing looks broken from the outside. Reloading the chat frame does <em>not</em> fix it, because that frame is holding a dead token. Picking a mode in the chat header does, because YouTube fetches a fresh one and rebuilds the list. The extension re-picks the mode that is <em>already</em> selected, so Top chat replay stays Top chat replay, and it can be switched off in the popup.</p>
 
+</section>
+
+<section id="faq-7">
+
 <h2>Can I move YouTube chat to the left side?</h2>
 
 <p class="answer">
-  Yes. Hover the divider and click the ⇆ toggle, or flip the switch in the toolbar popup. The choice persists across videos and sessions.
+  Yes. Hover the divider and click the side toggle, or use the toolbar popup. YouTube Chat Dock saves your side preference. Version 2.0.2 fixes switching sides in YouTube’s new fixed side-rail page layout, including right-to-left layouts.
 </p>
 
-<p>In right-to-left interface languages such as Arabic, the toggle mirrors with the rest of the layout rather than inverting, so “the other side” always means what it looks like it means.</p>
+</section>
+
+<section id="faq-8">
 
 <h2>What settings does it have?</h2>
 
 <p class="answer">
-  An on/off switch, a chat-replay fix, a language picker, a side toggle, three width sliders and a reset — all in the toolbar popup. You never have to open it, though: the divider does everything the sliders do, and it can be resized with the arrow keys too.
+  The toolbar popup has a docking switch, chat-replay fix, pause-on-hover switch, language picker, side toggle, three width sliders and reset. The docking switch controls the layout and divider; pause-on-hover and replay recovery have independent switches.
 </p>
 
 <div class="scroller">
@@ -239,27 +276,39 @@ code{background:var(--card); border:1px solid var(--line); border-radius:5px; pa
 </div>
 
 <figure>
-  <img class="shot" src="assets/screenshot-5-settings.png" width="1280" height="800"
+  <img class="shot" loading="lazy" decoding="async" src="assets/screenshot-5-settings.png" width="1280" height="800"
        alt="The settings popup, showing an enable switch, language picker, side toggle and three width sliders">
 </figure>
+
+</section>
+
+<section id="faq-9">
 
 <h2>Does YouTube Chat Dock collect any data?</h2>
 
 <p class="answer">
-  No. It collects nothing, transmits nothing, and makes no network requests of any kind — no analytics, no telemetry, no remote configuration. Your settings are stored in your own browser and never leave the device.
+  The extension has no automatic data collection, analytics, telemetry or remote configuration. Settings stay on your device. If you choose to open the external feedback form, its URL includes the extension version and selected interface language; submitting feedback is optional.
 </p>
 
-<ul class="privacy"><li class="no">No data collected, transmitted, or sold — not anonymised, not aggregated</li><li class="no">No network requests, no analytics, no telemetry</li><li class="no">No background service worker; nothing runs when you are not on YouTube</li><li class="no">No account, no sign-in, no cloud sync</li><li class="no">No host permissions — it acts on <code>youtube.com</code> and nowhere else</li><li class="yes">One permission, <code>storage</code>, for which Chrome shows no install prompt</li></ul>
+<ul class="privacy"><li class="no">No automatic data collection or sale; optional feedback is submitted separately</li><li class="no">No automatic extension network requests, analytics or telemetry</li><li class="no">No background service worker; nothing runs when you are not on YouTube</li><li class="no">No account, no sign-in, no cloud sync</li><li class="no">No host permissions — it acts on <code>youtube.com</code> and nowhere else</li><li class="yes">One permission, <code>storage</code>, for which Chrome shows no install prompt</li></ul>
 
-<p>The single <code>storage</code> permission exists for exactly one reason: the settings popup is a separate extension page and cannot otherwise reach the tab it is configuring. Full policy: <a href="https://github.com/cc100053/YouTube-Chat-Dock/blob/main/store/PRIVACY.md">store/PRIVACY.md</a>. The whole extension is one stylesheet and one small script, MIT licensed, and readable end to end in about ten minutes.</p>
+<p>The single <code>storage</code> permission exists for exactly one reason: the settings popup is a separate extension page and cannot otherwise reach the tab it is configuring. Full policy: <a href="https://github.com/cc100053/YouTube-Chat-Dock/blob/main/store/PRIVACY.md">store/PRIVACY.md</a>. The extension uses one stylesheet and four content scripts, plus its toolbar popup. It is MIT licensed and has no runtime dependencies.</p>
+
+</section>
+
+<section id="faq-10">
 
 <h2>Does it work in Edge, Brave, Opera or Arc?</h2>
 
 <p class="answer">
-  Yes. It is a Manifest V3 extension with no dependencies, and it runs on Chrome 105 and up and on any Chromium-based browser — Edge, Brave, Opera, Vivaldi, Arc.
+  YouTube Chat Dock targets desktop Chrome 105+ and compatible Chromium browsers, including Edge, Brave, Opera, Vivaldi and Arc. Each browser’s current version has not been independently verified. It is not a Firefox add-on.
 </p>
 
 <p>It is published on the Chrome Web Store, which Edge and the other Chromium browsers can install from directly. It is not a Firefox add-on.</p>
+
+</section>
+
+<section id="faq-11">
 
 <h2>What languages does it support?</h2>
 
@@ -267,23 +316,35 @@ code{background:var(--card); border:1px solid var(--line); border-radius:5px; pa
   Twelve: English, 繁體中文, 简体中文, 日本語, 한국어, Español, Português, Français, Deutsch, Русский, العربية and हिन्दी.
 </p>
 
-<p>The picker is independent of the browser’s language, so Chrome can be in one language and the extension in another. Right-to-left layouts are handled properly rather than mirrored by accident.</p>
+<p>The interface language can be chosen independently of the browser language. Right-to-left layouts are supported.</p>
+
+</section>
+
+<section id="faq-12">
 
 <h2>Are there any limitations?</h2>
 
 <p class="answer">
-  Two worth knowing. Below a 1000px browser window it deliberately does nothing, and clearing site data for youtube.com resets your saved widths.
+  The divider needs a viewport at least 1000 CSS pixels wide. Clearing YouTube site data removes the first-paint settings copy, but the extension’s local storage can restore it; use Reset to defaults for a deliberate reset.
 </p>
 
-<ul><li><strong>Windows narrower than 1000px.</strong> YouTube switches to a single-column layout there and puts chat under the video. The extension stays out of the way rather than fighting YouTube’s own responsive layout.</li><li><strong>Clearing site data resets widths.</strong> They are kept in <code>localStorage</code> so they can be applied <em>before</em> the page paints, which is what stops the layout flickering on every load.</li></ul>
+<ul><li><strong>Viewport below 1000 CSS pixels.</strong> The divider is hidden; page and theater sizing rules require at least this width. Pause-on-hover is independent.</li><li><strong>Local settings.</strong> YouTube localStorage supplies the first-paint values; chrome.storage.local can restore them after site data is cleared. Use Reset to defaults in the popup to reset settings.</li></ul>
+
+</section>
+
+<section id="faq-13">
 
 <h2>How do I install it?</h2>
 
 <p class="answer">
-  Install it from the Chrome Web Store in one click, then reload any open YouTube tab. There is nothing to configure to get the side panel.
+  Install YouTube Chat Dock from the Chrome Web Store, then reload any open YouTube tab. Open a live stream with chat or a past stream with chat replay, expand chat, and drag the divider. Use a desktop viewport at least 1000 CSS pixels wide.
 </p>
 
 <div class="grid"><div class="card"><h3>From the Web Store</h3><p><a href="https://chromewebstore.google.com/detail/youtube-chat-dock/bkmbhlkcjbkjapbamkidacajjfhoiiam">Add to Chrome</a>, then reload your YouTube tab. Chrome asks you to approve nothing.</p></div><div class="card"><h3>From source</h3><p>Clone the repo, open <code>chrome://extensions/</code>, turn on Developer mode, click Load unpacked and pick the folder. No build step, no dependencies.</p></div></div>
+
+</section>
+
+<section id="faq-14">
 
 <h2>Can I stop the chat scrolling while I read a message?</h2>
 
@@ -291,9 +352,15 @@ code{background:var(--card); border:1px solid var(--line); border-radius:5px; pa
   Yes. Hover the mouse over the message list and it freezes in place, so a fast chat holds still while you read or click a link. New messages keep arriving underneath; move the mouse away and it jumps back to live. It is mouse-only — on a touchscreen there is no hover, so YouTube’s own scroll-up pause still applies. There is a switch for it in the toolbar popup.
 </p>
 
+</section>
+</div>
+</main>
+
 <footer>
   <p><a href="https://chromewebstore.google.com/detail/youtube-chat-dock/bkmbhlkcjbkjapbamkidacajjfhoiiam">Chrome Web Store</a> <span aria-hidden="true">&middot;</span> <a href="https://github.com/cc100053/YouTube-Chat-Dock">GitHub</a> <span aria-hidden="true">&middot;</span> <a href="https://github.com/cc100053/YouTube-Chat-Dock/blob/main/store/PRIVACY.md">Privacy</a> <span aria-hidden="true">&middot;</span> <a href="https://github.com/cc100053/YouTube-Chat-Dock/issues">Report an issue</a></p>
   <nav class="langs" aria-label="Language"><strong aria-current="true">English</strong> <span aria-hidden="true">·</span> <a href="https://cc100053.github.io/YouTube-Chat-Dock/ja/" hreflang="ja">日本語</a> <span aria-hidden="true">·</span> <a href="https://cc100053.github.io/YouTube-Chat-Dock/zh-TW/" hreflang="zh-TW">繁體中文</a></nav>
+  <p>Content reviewed: <time datetime="2026-10-22">2026-10-22</time> · Extension version: 2.0.2<br>
+  Project maintainer: <a href="https://github.com/cc100053" rel="author">cc100053</a></p>
   <p>MIT licensed. Not affiliated with, endorsed by, or sponsored by YouTube or Google.</p>
 </footer>
 
@@ -310,15 +377,28 @@ code{background:var(--card); border:1px solid var(--line); border-radius:5px; pa
       "description": "A Chrome extension that turns YouTube's live chat and chat replay into a resizable side panel beside the video, in page view, theater mode and true fullscreen.",
       "applicationCategory": "BrowserApplication",
       "applicationSubCategory": "Chrome Extension",
-      "operatingSystem": "Chrome 105+, Microsoft Edge, Brave, Opera, Vivaldi, Arc",
-      "browserRequirements": "Requires Chrome 105 or any Chromium-based browser",
-      "softwareVersion": "2.0.0",
+      "softwareRequirements": "Requires desktop Chrome 105+ or a compatible Chromium browser",
+      "softwareVersion": "2.0.2",
       "url": "https://cc100053.github.io/YouTube-Chat-Dock/",
       "inLanguage": [
         "en",
+        "zh-Hant",
+        "zh-Hans",
         "ja",
-        "zh-Hant"
+        "ko",
+        "es",
+        "pt-BR",
+        "fr",
+        "de",
+        "ru",
+        "ar",
+        "hi"
       ],
+      "author": {
+        "@type": "Person",
+        "name": "cc100053",
+        "url": "https://github.com/cc100053"
+      },
       "downloadUrl": "https://chromewebstore.google.com/detail/youtube-chat-dock/bkmbhlkcjbkjapbamkidacajjfhoiiam",
       "installUrl": "https://chromewebstore.google.com/detail/youtube-chat-dock/bkmbhlkcjbkjapbamkidacajjfhoiiam",
       "screenshot": "https://cc100053.github.io/YouTube-Chat-Dock/assets/screenshot-1-side-panel.png",
@@ -336,7 +416,7 @@ code{background:var(--card); border:1px solid var(--line); border-radius:5px; pa
         "Works in true fullscreen, where YouTube gives you no control over the chat's width or position",
         "Makes the theater-mode chat width adjustable, with the player resizing to match",
         "Chat replay on VODs behaves exactly like live chat",
-        "Chat can be moved to either side",
+        "Move chat to either side, including in the fixed side-rail page layout",
         "Right-to-left layouts supported",
         "12 interface languages, independent of the browser language",
         "Chat freezes while the mouse is over it, so a fast chat can be read"
@@ -345,18 +425,26 @@ code{background:var(--card); border:1px solid var(--line); border-radius:5px; pa
     {
       "@type": "FAQPage",
       "@id": "https://cc100053.github.io/YouTube-Chat-Dock/#faq",
+      "url": "https://cc100053.github.io/YouTube-Chat-Dock/",
+      "name": "YouTube Chat Dock — Live Chat Side Panel for YouTube",
       "inLanguage": "en",
+      "lastReviewed": "2026-10-22",
+      "about": {
+        "@id": "https://cc100053.github.io/YouTube-Chat-Dock/#app"
+      },
       "mainEntity": [
         {
           "@type": "Question",
+          "@id": "https://cc100053.github.io/YouTube-Chat-Dock/#faq-1",
           "name": "How do I put YouTube live chat next to the video?",
           "acceptedAnswer": {
             "@type": "Answer",
-            "text": "Install a browser extension that docks it — YouTube gives you no control over how wide chat is or where it sits. There is no setting anywhere to resize the chat panel or to move it, in any of the three view modes."
+            "text": "Install YouTube Chat Dock from the Chrome Web Store, reload YouTube, and open a live stream with chat or a video with chat replay. On a desktop viewport at least 1000 CSS pixels wide, drag the divider to resize the existing chat beside the video."
           }
         },
         {
           "@type": "Question",
+          "@id": "https://cc100053.github.io/YouTube-Chat-Dock/#faq-2",
           "name": "Can I resize YouTube’s live chat?",
           "acceptedAnswer": {
             "@type": "Answer",
@@ -365,70 +453,79 @@ code{background:var(--card); border:1px solid var(--line); border-radius:5px; pa
         },
         {
           "@type": "Question",
+          "@id": "https://cc100053.github.io/YouTube-Chat-Dock/#faq-3",
           "name": "Why can’t I resize the chat in YouTube’s theater mode?",
           "acceptedAnswer": {
             "@type": "Answer",
-            "text": "Because YouTube pins the chat beside the player at a width it picks for you, and there is no setting anywhere to change it. This extension makes that width yours: drag the divider and the player resizes to match, so the two always tile the window exactly."
+            "text": "YouTube controls the native theater-mode chat width. YouTube Chat Dock adds a draggable divider so you can adjust that width and resize the player alongside it. The divider requires a viewport at least 1000 CSS pixels wide."
           }
         },
         {
           "@type": "Question",
+          "@id": "https://cc100053.github.io/YouTube-Chat-Dock/#faq-4",
           "name": "Does live chat work in fullscreen on YouTube?",
           "acceptedAnswer": {
             "@type": "Answer",
-            "text": "Yes, but not on your terms — you cannot resize it or decide where it sits. With this extension chat is docked beside the video at its own remembered width, so it covers nothing and the video is never cropped."
+            "text": "YouTube Chat Dock keeps existing YouTube live chat and chat replay beside the video in true fullscreen. Drag the divider to adjust the chat width; the player resizes to fit without cropping the video. Fullscreen remembers its own width."
           }
         },
         {
           "@type": "Question",
+          "@id": "https://cc100053.github.io/YouTube-Chat-Dock/#faq-5",
           "name": "Does this work with chat replay on old streams?",
           "acceptedAnswer": {
             "@type": "Answer",
-            "text": "Yes. Chat replay on a VOD is docked and resized exactly like live chat on an active stream, with no separate setting."
+            "text": "Yes. YouTube Chat Dock docks and resizes chat replay on past live streams that already have replay available. It does not restore missing or disabled chat replay."
           }
         },
         {
           "@type": "Question",
+          "@id": "https://cc100053.github.io/YouTube-Chat-Dock/#faq-6",
           "name": "Why does YouTube’s chat replay go blank in fullscreen?",
           "acceptedAnswer": {
             "@type": "Answer",
-            "text": "Because the replay stalls: messages stop arriving and never resume, and the only cures used to be reloading the page or re-picking the chat mode by hand. It is YouTube’s own bug — it happens with no extension installed at all. YouTube Chat Dock spots a stalled replay after a fullscreen switch and restarts it for you, keeping whichever chat mode you had selected."
+            "text": "A stalled YouTube replay can leave chat blank after a fullscreen switch, even without extensions. YouTube Chat Dock detects this specific stall and reselects the current chat mode to restart replay. It is not a fix for every blank-chat or network problem."
           }
         },
         {
           "@type": "Question",
+          "@id": "https://cc100053.github.io/YouTube-Chat-Dock/#faq-7",
           "name": "Can I move YouTube chat to the left side?",
           "acceptedAnswer": {
             "@type": "Answer",
-            "text": "Yes. Hover the divider and click the ⇆ toggle, or flip the switch in the toolbar popup. The choice persists across videos and sessions."
+            "text": "Yes. Hover the divider and click the side toggle, or use the toolbar popup. YouTube Chat Dock saves your side preference. Version 2.0.2 fixes switching sides in YouTube’s new fixed side-rail page layout, including right-to-left layouts."
           }
         },
         {
           "@type": "Question",
+          "@id": "https://cc100053.github.io/YouTube-Chat-Dock/#faq-8",
           "name": "What settings does it have?",
           "acceptedAnswer": {
             "@type": "Answer",
-            "text": "An on/off switch, a chat-replay fix, a language picker, a side toggle, three width sliders and a reset — all in the toolbar popup. You never have to open it, though: the divider does everything the sliders do, and it can be resized with the arrow keys too."
+            "text": "The toolbar popup has a docking switch, chat-replay fix, pause-on-hover switch, language picker, side toggle, three width sliders and reset. The docking switch controls the layout and divider; pause-on-hover and replay recovery have independent switches."
           }
         },
         {
           "@type": "Question",
+          "@id": "https://cc100053.github.io/YouTube-Chat-Dock/#faq-9",
           "name": "Does YouTube Chat Dock collect any data?",
           "acceptedAnswer": {
             "@type": "Answer",
-            "text": "No. It collects nothing, transmits nothing, and makes no network requests of any kind — no analytics, no telemetry, no remote configuration. Your settings are stored in your own browser and never leave the device."
+            "text": "The extension has no automatic data collection, analytics, telemetry or remote configuration. Settings stay on your device. If you choose to open the external feedback form, its URL includes the extension version and selected interface language; submitting feedback is optional."
           }
         },
         {
           "@type": "Question",
+          "@id": "https://cc100053.github.io/YouTube-Chat-Dock/#faq-10",
           "name": "Does it work in Edge, Brave, Opera or Arc?",
           "acceptedAnswer": {
             "@type": "Answer",
-            "text": "Yes. It is a Manifest V3 extension with no dependencies, and it runs on Chrome 105 and up and on any Chromium-based browser — Edge, Brave, Opera, Vivaldi, Arc."
+            "text": "YouTube Chat Dock targets desktop Chrome 105+ and compatible Chromium browsers, including Edge, Brave, Opera, Vivaldi and Arc. Each browser’s current version has not been independently verified. It is not a Firefox add-on."
           }
         },
         {
           "@type": "Question",
+          "@id": "https://cc100053.github.io/YouTube-Chat-Dock/#faq-11",
           "name": "What languages does it support?",
           "acceptedAnswer": {
             "@type": "Answer",
@@ -437,22 +534,25 @@ code{background:var(--card); border:1px solid var(--line); border-radius:5px; pa
         },
         {
           "@type": "Question",
+          "@id": "https://cc100053.github.io/YouTube-Chat-Dock/#faq-12",
           "name": "Are there any limitations?",
           "acceptedAnswer": {
             "@type": "Answer",
-            "text": "Two worth knowing. Below a 1000px browser window it deliberately does nothing, and clearing site data for youtube.com resets your saved widths."
+            "text": "The divider needs a viewport at least 1000 CSS pixels wide. Clearing YouTube site data removes the first-paint settings copy, but the extension’s local storage can restore it; use Reset to defaults for a deliberate reset."
           }
         },
         {
           "@type": "Question",
+          "@id": "https://cc100053.github.io/YouTube-Chat-Dock/#faq-13",
           "name": "How do I install it?",
           "acceptedAnswer": {
             "@type": "Answer",
-            "text": "Install it from the Chrome Web Store in one click, then reload any open YouTube tab. There is nothing to configure to get the side panel."
+            "text": "Install YouTube Chat Dock from the Chrome Web Store, then reload any open YouTube tab. Open a live stream with chat or a past stream with chat replay, expand chat, and drag the divider. Use a desktop viewport at least 1000 CSS pixels wide."
           }
         },
         {
           "@type": "Question",
+          "@id": "https://cc100053.github.io/YouTube-Chat-Dock/#faq-14",
           "name": "Can I stop the chat scrolling while I read a message?",
           "acceptedAnswer": {
             "@type": "Answer",
