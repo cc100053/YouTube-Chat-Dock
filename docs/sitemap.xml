@@ -22,4 +22,25 @@
     <xhtml:link rel="alternate" hreflang="zh-Hant" href="https://cc100053.github.io/YouTube-Chat-Dock/zh-TW/"/>
     <xhtml:link rel="alternate" hreflang="x-default" href="https://cc100053.github.io/YouTube-Chat-Dock/"/>
   </url>
+  <url>
+    <loc>https://cc100053.github.io/YouTube-Chat-Dock/guides/youtube-live-chat-fullscreen/</loc>
+    <xhtml:link rel="alternate" hreflang="en" href="https://cc100053.github.io/YouTube-Chat-Dock/guides/youtube-live-chat-fullscreen/"/>
+    <xhtml:link rel="alternate" hreflang="ja" href="https://cc100053.github.io/YouTube-Chat-Dock/ja/guides/youtube-live-chat-fullscreen/"/>
+    <xhtml:link rel="alternate" hreflang="zh-Hant" href="https://cc100053.github.io/YouTube-Chat-Dock/zh-TW/guides/youtube-live-chat-fullscreen/"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://cc100053.github.io/YouTube-Chat-Dock/guides/youtube-live-chat-fullscreen/"/>
+  </url>
+  <url>
+    <loc>https://cc100053.github.io/YouTube-Chat-Dock/ja/guides/youtube-live-chat-fullscreen/</loc>
+    <xhtml:link rel="alternate" hreflang="en" href="https://cc100053.github.io/YouTube-Chat-Dock/guides/youtube-live-chat-fullscreen/"/>
+    <xhtml:link rel="alternate" hreflang="ja" href="https://cc100053.github.io/YouTube-Chat-Dock/ja/guides/youtube-live-chat-fullscreen/"/>
+    <xhtml:link rel="alternate" hreflang="zh-Hant" href="https://cc100053.github.io/YouTube-Chat-Dock/zh-TW/guides/youtube-live-chat-fullscreen/"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://cc100053.github.io/YouTube-Chat-Dock/guides/youtube-live-chat-fullscreen/"/>
+  </url>
+  <url>
+    <loc>https://cc100053.github.io/YouTube-Chat-Dock/zh-TW/guides/youtube-live-chat-fullscreen/</loc>
+    <xhtml:link rel="alternate" hreflang="en" href="https://cc100053.github.io/YouTube-Chat-Dock/guides/youtube-live-chat-fullscreen/"/>
+    <xhtml:link rel="alternate" hreflang="ja" href="https://cc100053.github.io/YouTube-Chat-Dock/ja/guides/youtube-live-chat-fullscreen/"/>
+    <xhtml:link rel="alternate" hreflang="zh-Hant" href="https://cc100053.github.io/YouTube-Chat-Dock/zh-TW/guides/youtube-live-chat-fullscreen/"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://cc100053.github.io/YouTube-Chat-Dock/guides/youtube-live-chat-fullscreen/"/>
+  </url>
 </urlset>
